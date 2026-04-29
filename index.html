@@ -118,7 +118,161 @@
                 { year: "2021 A/L Paper", link: "https://එකතු_කරන්න" },
                 { year: "2020 A/L Paper", link: "https://එකතු_කරන්න" }
             ]
-        };
+        };// ======= ⚙️ APP LOGIC (මේ ටික අනිවාර්යයෙන්ම දාන්න) =======
+        let isLoginMode = true;
+        let currentSubject = "";
+
+        // Login සහ Register අතර මාරු වීමට
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('auth-title').innerText = isLoginMode ? "Login" : "Register";
+            const toggleBtn = document.getElementById('toggle-btn');
+            const toggleText = document.getElementById('toggle-text');
+            const regFields = document.getElementById('register-fields');
+            const authBtn = document.getElementById('auth-btn');
+
+            if (isLoginMode) {
+                toggleText.innerText = "ගිණුමක් නොමැතිද?";
+                toggleBtn.innerText = "Register";
+                regFields.classList.add('hidden');
+                authBtn.innerText = "Login";
+            } else {
+                toggleText.innerText = "දැනටමත් ගිණුමක් තිබේද?";
+                toggleBtn.innerText = "Login";
+                regFields.classList.remove('hidden');
+                authBtn.innerText = "Register";
+            }
+        }
+
+        // Firebase හරහා Register/Login වීම
+        async function handleAuth() {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const nameField = document.getElementById('reg-name');
+            const name = nameField ? nameField.value : "";
+
+            if (!email || !password) return alert("කරුණාකර සියල්ල පුරවන්න.");
+
+            try {
+                if (isLoginMode) {
+                    await auth.signInWithEmailAndPassword(email, password);
+                } else {
+                    if (!name) return alert("නම ඇතුළත් කරන්න.");
+                    const res = await auth.createUserWithEmailAndPassword(email, password);
+                    await db.collection("users").doc(res.user.uid).set({ name, email });
+                }
+            } catch (e) {
+                alert("ගැටලුවක් පවතී: " + e.message);
+            }
+        }
+
+        // Dashboard එක පෙන්වීම
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                document.getElementById('bottom-nav').classList.remove('hidden');
+            }
+        });
+
+        function handleLogout() { auth.signOut().then(() => location.reload()); }
+
+        // Countdown Timer
+        function updateCountdown() {
+            const examDate = new Date("Nov 25, 2026 00:00:00").getTime();
+            const now = new Date().getTime();
+            const gap = examDate - now;
+            const d = Math.floor(gap / (1000 * 60 * 60 * 24));
+            const h = Math.floor((gap % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((gap % (1000 * 60 * 60)) / (1000 * 60));
+            document.getElementById("cd-days").innerText = d;
+            document.getElementById("cd-hours").innerText = h;
+            document.getElementById("cd-mins").innerText = m;
+        }
+        setInterval(updateCountdown, 60000); updateCountdown();
+
+        // Navigation
+        function navClick(tab) {
+            if (tab === 'home') {
+                document.getElementById('dashboard-content').classList.remove('hidden');
+                document.getElementById('calendar-view').classList.add('hidden');
+            } else {
+                document.getElementById('dashboard-content').classList.add('hidden');
+                document.getElementById('calendar-view').classList.remove('hidden');
+            }
+        }
+
+        function openSubject(name) {
+            currentSubject = name;
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('subject-screen').classList.remove('hidden');
+            document.getElementById('selected-subject-name').innerText = name;
+            
+            const pDiv = document.getElementById('papers');
+            pDiv.innerHTML = pastPapersData[name].map(p => `
+                <a href="${p.link}" target="_blank" class="glass-card p-4 rounded-xl flex justify-between items-center mb-3">
+                    <span>${p.year}</span><i class="fas fa-file-pdf text-red-500"></i>
+                </a>`).join('');
+            showLessonList();
+        }
+
+        function showLessonList() {
+            const listDiv = document.getElementById('lesson-list');
+            const lessons = allQuizData[currentSubject];
+            listDiv.innerHTML = `<h2 class="text-xl font-bold mb-4 opacity-50 sinhala-font">පාඩම් මාලාව</h2>`;
+            Object.keys(lessons).forEach(unit => {
+                listDiv.innerHTML += `<div onclick="startQuiz('${unit}')" class="glass-card p-5 rounded-2xl cursor-pointer border-l-4 border-yellow-500 mb-3 shadow-lg">${unit}</div>`;
+            });
+            document.getElementById('quiz-area').classList.add('hidden');
+            listDiv.classList.remove('hidden');
+        }
+
+        function startQuiz(unit) {
+            const quizArea = document.getElementById('quiz-area');
+            const questions = allQuizData[currentSubject][unit];
+            document.getElementById('lesson-list').classList.add('hidden');
+            quizArea.classList.remove('hidden');
+            quizArea.innerHTML = `<button onclick="showLessonList()" class="text-xs text-gray-400 mb-4"><i class="fas fa-arrow-left"></i> ආපසු</button>`;
+            
+            questions.forEach((qObj, i) => {
+                const card = document.createElement('div');
+                card.className = "glass-card p-5 rounded-2xl mb-6 shadow-xl";
+                card.innerHTML = `<p class="mb-4 font-bold text-white">${i+1}. ${qObj.q}</p>`;
+                qObj.options.forEach((opt, optIdx) => {
+                    const btn = document.createElement('button');
+                    btn.className = "w-full text-left p-4 mb-2 rounded-xl bg-slate-800/50 border border-white/5";
+                    btn.innerText = opt;
+                    btn.onclick = () => {
+                        if(optIdx === qObj.correct) btn.classList.add('bg-green-600');
+                        else btn.classList.add('bg-red-600');
+                    };
+                    card.appendChild(btn);
+                });
+                quizArea.appendChild(card);
+            });
+        }
+
+        function backToDashboard() {
+            document.getElementById('subject-screen').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            document.getElementById('bottom-nav').classList.remove('hidden');
+        }
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
+            document.getElementById(tabId).classList.add('active-tab');
+            const btnPapers = document.getElementById('btn-papers');
+            const btnQuiz = document.getElementById('btn-quiz');
+            if (tabId === 'papers') {
+                btnPapers.classList.add('bg-yellow-500', 'text-slate-900');
+                btnQuiz.classList.remove('bg-yellow-500', 'text-slate-900');
+                btnQuiz.classList.add('text-gray-400');
+            } else {
+                btnQuiz.classList.add('bg-yellow-500', 'text-slate-900');
+                btnPapers.classList.remove('bg-yellow-500', 'text-slate-900');
+                btnPapers.classList.add('text-gray-400');
+            }
+        }
 
         // ======= 📝 MCQ QUIZ DATA =======
         const allQuizData = {
