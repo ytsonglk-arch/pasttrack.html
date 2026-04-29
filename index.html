@@ -537,7 +537,56 @@
             document.getElementById('auth-btn').innerText = isLoginMode ? "Login" : "Register";
             document.getElementById('register-fields').classList.toggle('hidden');
         }
+// Firebase හරහා Register සහ Login කිරීමේ ප්‍රධාන Function එක
+        async function handleAuth() {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const nameField = document.getElementById('reg-name');
+            const name = nameField ? nameField.value : "";
 
+            if (!email || !password) {
+                alert("කරුණාකර Email සහ Password ඇතුළත් කරන්න.");
+                return;
+            }
+
+            try {
+                if (isLoginMode) {
+                    // Login වන අවස්ථාව
+                    await auth.signInWithEmailAndPassword(email, password);
+                } else {
+                    // Register වන අවස්ථාව
+                    if (!name) {
+                        alert("කරුණාකර ඔබේ නම ඇතුළත් කරන්න.");
+                        return;
+                    }
+                    const res = await auth.createUserWithEmailAndPassword(email, password);
+                    // Firestore එකේ user ගේ නම save කිරීම
+                    await db.collection("users").doc(res.user.uid).set({
+                        name: name,
+                        email: email
+                    });
+                }
+            } catch (error) {
+                // මොකක් හරි වැරැද්දක් වුණොත් ඒක alert එකකින් පෙන්වනවා
+                alert("ගැටලුවක් පවතී: " + error.message);
+            }
+        }
+
+        // පරිශීලකයා ලොග් වී ඇත්දැයි නිරන්තරයෙන් පරීක්ෂා කිරීම
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                document.getElementById('bottom-nav').classList.remove('hidden');
+            }
+        });
+
+        // Logout වීමේ function එක
+        function handleLogout() {
+            auth.signOut().then(() => {
+                location.reload();
+            });
+        }
         async function handleAuth() {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
