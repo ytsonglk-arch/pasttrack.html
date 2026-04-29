@@ -6,6 +6,12 @@
     <title>A/L Fast Track - 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Firebase SDKs (Compat Version for Web Apps) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Abhaya+Libre:wght@700&display=swap');
         body { font-family: 'Poppins', sans-serif; background-color: #0f172a; color: white; }
@@ -13,6 +19,7 @@
         .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .tab-content { display: none; }
         .active-tab { display: block; }
+        input::placeholder { color: #94a3b8; }
     </style>
 </head>
 <body>
@@ -23,108 +30,161 @@
             <h1 class="text-4xl font-extrabold text-yellow-500 mb-2">A/L Fast Track</h1>
             <p class="text-gray-400">ඔබේ ජයග්‍රහණයේ වේගවත්ම මාවත</p>
         </div>
-        <div class="w-full max-w-sm glass-card p-8 rounded-3xl">
-            <input type="text" placeholder="ඔබේ නම ඇතුළත් කරන්න" class="w-full p-4 mb-4 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-yellow-500">
-            <button onclick="showDashboard()" class="w-full p-4 bg-yellow-500 text-slate-900 font-bold rounded-xl shadow-lg hover:bg-yellow-400 transition">Log In</button>
+        <div class="w-full max-w-sm glass-card p-8 rounded-3xl shadow-2xl">
+            <input type="text" id="user-name" placeholder="ඔබේ නම ඇතුළත් කරන්න" 
+                class="w-full p-4 mb-4 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-yellow-500 text-white">
+            <button onclick="handleLogin()" id="login-btn" 
+                class="w-full p-4 bg-yellow-500 text-slate-900 font-bold rounded-xl shadow-lg hover:bg-yellow-400 transition">
+                ඇතුළු වන්න
+            </button>
         </div>
     </div>
 
     <!-- 2. Dashboard -->
     <div id="dashboard" class="hidden min-h-screen p-6">
-        <header class="mb-8">
-            <h1 class="text-3xl font-bold text-yellow-500 sinhala-font">මාස කිහිපයෙන් ගොඩ දාගමු! 🎯</h1>
-            <p class="text-gray-400">Art Stream - 2026</p>
+        <header class="flex justify-between items-start mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-yellow-500 sinhala-font">මාස කිහිපයෙන් ගොඩ දාගමු! 🎯</h1>
+                <p id="welcome-msg" class="text-gray-400 italic">සාදරයෙන් පිළිගනිමු!</p>
+            </div>
+            <button onclick="handleLogout()" class="text-red-400 text-xs bg-red-400/10 px-3 py-1 rounded-lg">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
         </header>
 
-        <h2 class="text-xl font-semibold mb-4">විෂයයන් තෝරන්න</h2>
+        <h2 class="text-xl font-semibold mb-4">විෂයයන් (Art Stream)</h2>
         <div class="grid grid-cols-1 gap-4 mb-10">
-            <!-- Subjects -->
-            <div onclick="openSubject('Media Studies')" class="glass-card p-5 rounded-2xl flex items-center cursor-pointer hover:bg-slate-800 transition">
+            <div onclick="openSubject('Media Studies')" class="glass-card p-5 rounded-2xl flex items-center cursor-pointer">
                 <div class="bg-purple-600 p-4 rounded-xl mr-4"><i class="fas fa-video"></i></div>
                 <span class="text-lg font-bold">Media Studies</span>
             </div>
-            <div onclick="openSubject('Political Science')" class="glass-card p-5 rounded-2xl flex items-center cursor-pointer hover:bg-slate-800 transition">
+            <div onclick="openSubject('Political Science')" class="glass-card p-5 rounded-2xl flex items-center cursor-pointer">
                 <div class="bg-blue-600 p-4 rounded-xl mr-4"><i class="fas fa-gavel"></i></div>
                 <span class="text-lg font-bold">Political Science</span>
             </div>
-            <div onclick="openSubject('Buddhist Culture')" class="glass-card p-5 rounded-2xl flex items-center cursor-pointer hover:bg-slate-800 transition">
+            <div onclick="openSubject('Buddhist Culture')" class="glass-card p-5 rounded-2xl flex items-center cursor-pointer">
                 <div class="bg-orange-600 p-4 rounded-xl mr-4"><i class="fas fa-dharmachakra"></i></div>
-                <span class="text-lg font-bold">Buddhist Culture (BC)</span>
+                <span class="text-lg font-bold">Buddhist Culture</span>
             </div>
-            <div onclick="openSubject('Agri Science')" class="glass-card p-5 rounded-2xl flex items-center cursor-pointer hover:bg-slate-800 transition">
+            <div onclick="openSubject('Agri Science')" class="glass-card p-5 rounded-2xl flex items-center cursor-pointer">
                 <div class="bg-green-600 p-4 rounded-xl mr-4"><i class="fas fa-leaf"></i></div>
                 <span class="text-lg font-bold">Agri Science</span>
             </div>
-            <div onclick="openSubject('History')" class="glass-card p-5 rounded-2xl flex items-center cursor-pointer hover:bg-slate-800 transition">
-                <div class="bg-amber-800 p-4 rounded-xl mr-4"><i class="fas fa-fort-awesome"></i></div>
+            <div onclick="openSubject('History')" class="glass-card p-5 rounded-2xl flex items-center cursor-pointer">
+                <div class="bg-amber-800 p-4 rounded-xl mr-4"><i class="fas fa-landmark"></i></div>
                 <span class="text-lg font-bold">History</span>
             </div>
         </div>
     </div>
 
-    <!-- 3. Subject Details Screen -->
+    <!-- 3. Content View -->
     <div id="subject-screen" class="hidden min-h-screen p-6">
-        <button onclick="backToDashboard()" class="mb-6 text-gray-400 flex items-center"><i class="fas fa-arrow-left mr-2"></i> ආපසු</button>
-        <h1 id="selected-subject-name" class="text-2xl font-bold text-yellow-500 mb-6 underline">Media Studies</h1>
+        <button onclick="backToDashboard()" class="mb-6 text-gray-400 flex items-center bg-slate-800 px-4 py-2 rounded-xl">
+            <i class="fas fa-arrow-left mr-2"></i> ආපසු
+        </button>
+        <h1 id="selected-subject-name" class="text-2xl font-bold text-yellow-500 mb-6">Subject Name</h1>
 
-        <!-- Tabs -->
         <div class="flex space-x-2 mb-6 bg-slate-800 p-1 rounded-xl">
             <button onclick="showTab('papers')" id="btn-papers" class="flex-1 py-2 rounded-lg font-bold bg-yellow-500 text-slate-900">Papers</button>
             <button onclick="showTab('guess')" id="btn-guess" class="flex-1 py-2 rounded-lg font-bold">අනුමාන</button>
-            <button onclick="showTab('notes')" id="btn-notes" class="flex-1 py-2 rounded-lg font-bold">Short Notes</button>
+            <button onclick="showTab('notes')" id="btn-notes" class="flex-1 py-2 rounded-lg font-bold">Notes</button>
         </div>
 
-        <!-- Tab Contents -->
         <div id="papers" class="tab-content active-tab space-y-4">
-            <div class="glass-card p-4 rounded-xl flex justify-between items-center"><span>2023 Past Paper</span> <i class="fas fa-download"></i></div>
-            <div class="glass-card p-4 rounded-xl flex justify-between items-center"><span>2022 Past Paper</span> <i class="fas fa-download"></i></div>
+            <div class="glass-card p-4 rounded-xl flex justify-between items-center italic">ප්‍රශ්න පත්‍ර ඉතා ඉක්මනින් මෙතනින්...</div>
         </div>
-
         <div id="guess" class="tab-content space-y-4">
-            <div class="glass-card p-4 rounded-xl border-l-4 border-yellow-500"><span>2026 අනුමාන ප්‍රශ්න පත්‍රය 01</span></div>
-            <div onclick="startQuiz()" class="bg-yellow-500/10 p-4 rounded-xl border border-yellow-500 text-yellow-500 font-bold text-center cursor-pointer">MCQ Quiz එක පටන් ගන්න</div>
+            <div class="glass-card p-4 rounded-xl border-l-4 border-yellow-500 italic text-yellow-500">2026 අනුමාන පත්‍රය 01</div>
         </div>
-
-        <div id="notes" class="tab-content space-y-4 text-gray-300">
-            <div class="glass-card p-4 rounded-xl font-bold">සන්නිවේදනය හැඳින්වීම - කෙටි සටහන්</div>
-            <div class="glass-card p-4 rounded-xl font-bold text-blue-400 italic">මතක තබා ගැනීමේ ලේසි ක්‍රම (Mind Maps)</div>
+        <div id="notes" class="tab-content space-y-4 text-gray-300 italic">
+            <div class="glass-card p-4 rounded-xl">කෙටි සටහන් සූදානම් වෙමින් පවතී.</div>
         </div>
     </div>
 
     <script>
-        function showDashboard() {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
+        // ======= 🚀 FIREBASE CONFIGURATION =======
+        const firebaseConfig = {
+            apiKey: "AIzaSyB_10UzdkgZPlu-P361PYbEQjTwbKjjWx0",
+            authDomain: "al-fast-track.firebaseapp.com",
+            projectId: "al-fast-track",
+            storageBucket: "al-fast-track.firebasestorage.app",
+            messagingSenderId: "272353911468",
+            appId: "1:272353911468:web:07c22eb0c9f167fce37509",
+            measurementId: "G-ZJBCLCQCX2"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ======= LOGIN LOGIC =======
+        async function handleLogin() {
+            const name = document.getElementById('user-name').value.trim();
+            const btn = document.getElementById('login-btn');
+
+            if (!name) return alert("කරුණාකර ඔබේ නම ඇතුළත් කරන්න.");
+            
+            btn.innerText = "සම්බන්ධ වෙමින්...";
+            btn.disabled = true;
+
+            try {
+                const userCredential = await auth.signInAnonymously();
+                const user = userCredential.user;
+
+                // Firestore එකේ ළමයාගේ නම සේව් කිරීම
+                await db.collection("students").doc(user.uid).set({
+                    name: name,
+                    joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                localStorage.setItem('fasttrack_user', name);
+                showDashboard(name);
+            } catch (error) {
+                alert("ගැටලුවක් පවතී: " + error.message);
+                btn.innerText = "ඇතුළු වන්න";
+                btn.disabled = false;
+            }
         }
 
+        function showDashboard(name) {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            document.getElementById('welcome-msg').innerText = `ආයුබෝවන්, ${name}!`;
+        }
+
+        function handleLogout() {
+            auth.signOut().then(() => {
+                localStorage.removeItem('fasttrack_user');
+                location.reload();
+            });
+        }
+
+        // ======= NAVIGATION =======
         function openSubject(name) {
-            document.getElementById('dashboard').style.display = 'none';
-            document.getElementById('subject-screen').style.display = 'block';
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('subject-screen').classList.remove('hidden');
             document.getElementById('selected-subject-name').innerText = name;
         }
 
         function backToDashboard() {
-            document.getElementById('subject-screen').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('subject-screen').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
         }
 
         function showTab(tabId) {
-            // Hide all
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active-tab'));
-            document.querySelectorAll('#subject-screen button').forEach(btn => {
-                if(btn.id.startsWith('btn-')) {
-                    btn.classList.remove('bg-yellow-500', 'text-slate-900');
-                }
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
+            document.querySelectorAll('#subject-screen button[id^="btn-"]').forEach(b => {
+                b.classList.remove('bg-yellow-500', 'text-slate-900');
             });
-
-            // Show selected
             document.getElementById(tabId).classList.add('active-tab');
             document.getElementById('btn-' + tabId).classList.add('bg-yellow-500', 'text-slate-900');
         }
 
-        function startQuiz() {
-            alert("MCQ Quiz පද්ධතිය සූදානම් වෙමින් පවතී...");
-        }
+        window.onload = () => {
+            const savedName = localStorage.getItem('fasttrack_user');
+            if (savedName) showDashboard(savedName);
+        };
     </script>
 </body>
 </html>
