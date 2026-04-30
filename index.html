@@ -11,12 +11,14 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Abhaya+Libre:wght@700&display=swap');
-        body { font-family: 'Poppins', sans-serif; background-color: #0f172a; color: white; }
+        body { font-family: 'Poppins', sans-serif; background-color: #0f172a; color: white; overflow-x: hidden; }
         .sinhala-font { font-family: 'Abhaya Libre', serif; }
         .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .tab-content { display: none; }
         .active-tab { display: block; }
         .countdown-box { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
+        .correct-pulse { animation: pulse-green 2s infinite; border: 2px solid #22c55e !important; }
     </style>
 </head>
 <body>
@@ -25,17 +27,21 @@
         <h1 class="text-4xl font-extrabold text-yellow-500 mb-2">A/L Fast Track</h1>
         <div class="w-full max-w-sm glass-card p-8 rounded-3xl shadow-2xl">
             <h2 id="auth-title" class="text-xl font-bold mb-6">Login</h2>
+            
+            <div id="sub-check-area" class="mb-5 p-4 rounded-2xl bg-red-600/10 border border-red-500/30 text-center">
+                <p class="text-[10px] text-red-400 mb-3 sinhala-font">ඇප් එක පාවිච්චි කිරීමට ප්‍රථම අපේ YouTube චැනලය Subscribe කර පසුව Login වන්න.</p>
+                <a href="https://youtube.com/@ඔයාගේ_චැනල්_ලින්ක්_එක" target="_blank" onclick="markSubscribed()" class="inline-flex items-center justify-center bg-red-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs">
+                    <i class="fab fa-youtube mr-2"></i> Subscribe Now
+                </a>
+            </div>
+
             <div id="register-fields" class="hidden">
                 <input type="text" id="reg-name" placeholder="ඔබේ නම" class="w-full p-4 mb-4 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-yellow-500 text-white">
-            </div><!-- YouTube Subscribe Section -->
-<div id="sub-check-area" class="mb-5 p-4 rounded-2xl bg-red-600/10 border border-red-500/30 text-center">
-    <p class="text-[10px] text-red-400 mb-3 sinhala-font">ඇප් එක පාවිච්චි කිරීමට ප්‍රථම අපේ YouTube චැනලය Subscribe කර පසුව Login වන්න.</p>
-    <a href="https://youtube.com/@ඔයාගේ_චැනල්_නම" target="_blank" onclick="markSubscribed()" class="inline-flex items-center justify-center bg-red-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-lg shadow-red-600/20">
-        <i class="fab fa-youtube mr-2 text-sm"></i> Subscribe Now
-    </a>
-</div>
+            </div>
+            
             <input type="email" id="auth-email" placeholder="Email ලිපිනය" class="w-full p-4 mb-4 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-yellow-500 text-white">
             <input type="password" id="auth-password" placeholder="Password" class="w-full p-4 mb-6 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-yellow-500 text-white">
+            
             <button onclick="handleAuth()" id="auth-btn" class="w-full p-4 bg-yellow-500 text-slate-900 font-bold rounded-xl shadow-lg hover:bg-yellow-400 transition">Login</button>
             <p class="text-sm text-gray-400 mt-4"><span id="toggle-text">ගිණුමක් නොමැතිද?</span> <button onclick="toggleAuthMode()" id="toggle-btn" class="text-yellow-500 font-bold">Register</button></p>
         </div>
@@ -47,17 +53,29 @@
             <h1 class="text-2xl font-bold text-yellow-500 sinhala-font">A/L Fast Track</h1>
             <button onclick="handleLogout()" class="text-red-400 text-xs bg-red-400/10 px-3 py-1 rounded-lg">Logout</button>
         </header>
-        <div class="countdown-box p-6 rounded-3xl mb-8 shadow-2xl text-slate-900">
-            <h2 class="text-center font-bold text-sm uppercase mb-3 italic">2026 A/L විභාගයට තව...</h2>
-            <div class="flex justify-around items-center">
-                <div class="text-center"><span id="cd-days" class="text-4xl font-black block">00</span><span class="text-[10px] font-bold">Days</span></div>
-                <div class="text-3xl font-bold">:</div>
-                <div class="text-center"><span id="cd-hours" class="text-4xl font-black block">00</span><span class="text-[10px] font-bold">Hours</span></div>
-                <div class="text-3xl font-bold">:</div>
-                <div class="text-center"><span id="cd-mins" class="text-4xl font-black block">00</span><span class="text-[10px] font-bold">Mins</span></div>
+
+        <!-- Home View -->
+        <div id="home-view">
+            <div class="countdown-box p-6 rounded-3xl mb-6 shadow-2xl text-slate-900">
+                <h2 class="text-center font-bold text-sm uppercase mb-3 italic">2026 A/L විභාගයට තව...</h2>
+                <div class="flex justify-around items-center">
+                    <div class="text-center"><span id="cd-days" class="text-4xl font-black block">00</span><span class="text-[10px] font-bold uppercase">Days</span></div>
+                    <div class="text-3xl font-bold">:</div>
+                    <div class="text-center"><span id="cd-hours" class="text-4xl font-black block">00</span><span class="text-[10px] font-bold uppercase">Hours</span></div>
+                    <div class="text-3xl font-bold">:</div>
+                    <div class="text-center"><span id="cd-mins" class="text-4xl font-black block">00</span><span class="text-[10px] font-bold uppercase">Mins</span></div>
+                </div>
             </div>
-        </div>
-        <div id="dashboard-content">
+
+            <!-- Daily Tip -->
+            <div class="glass-card p-4 rounded-2xl mb-8 border-l-4 border-yellow-500">
+                <div class="flex items-center mb-2">
+                    <i class="fas fa-lightbulb text-yellow-400 mr-2"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">අද දවසේ උපදෙස</span>
+                </div>
+                <p id="daily-tip" class="text-sm sinhala-font leading-relaxed">"සාර්ථකත්වයේ රහස වන්නේ අද පටන් ගැනීමයි!"</p>
+            </div>
+
             <div class="space-y-4">
                 <div onclick="openSubject('Media Studies')" class="glass-card p-5 rounded-2xl flex items-center cursor-pointer">
                     <div class="bg-purple-600 p-4 rounded-xl mr-4"><i class="fas fa-video"></i></div>
@@ -73,20 +91,46 @@
                 </div>
             </div>
         </div>
+
         <!-- Calendar View -->
         <div id="calendar-view" class="hidden">
             <h2 class="text-xl font-bold mb-6 text-yellow-500 sinhala-font">Exam Calendar - 2026</h2>
-            <div class="glass-card p-4 rounded-2xl border-l-4 border-yellow-500 mb-4"><h3>විභාගය ආරම්භය</h3><p class="text-sm text-gray-400">2026 අගෝස්තු 10 (අනුමාන)</p></div>
+            <div class="glass-card p-4 rounded-2xl border-l-4 border-yellow-500 mb-4">
+                <h3>විභාගය ආරම්භය</h3>
+                <p class="text-sm text-gray-400">2026 අගෝස්තු 10 (අනුමාන)</p>
+            </div>
+        </div>
+
+        <!-- Profile View -->
+        <div id="profile-view" class="hidden">
+            <h2 class="text-xl font-bold mb-6 text-yellow-500 sinhala-font text-center">My Profile</h2>
+            <div class="glass-card p-8 rounded-3xl text-center border-b-4 border-yellow-500 mb-6">
+                <div class="w-20 h-20 bg-yellow-500 rounded-full mx-auto mb-4 flex items-center justify-center text-slate-900 text-3xl font-bold">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h3 id="profile-name" class="text-xl font-bold text-white mb-1">Loading...</h3>
+                <p id="profile-email" class="text-xs text-gray-400">email@example.com</p>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass-card p-4 rounded-2xl text-center">
+                    <span class="text-[10px] uppercase text-gray-500">විභාගයට තව</span>
+                    <p class="text-lg font-bold text-yellow-500"><span id="profile-countdown">0</span> Days</p>
+                </div>
+                <div class="glass-card p-4 rounded-2xl text-center">
+                    <span class="text-[10px] uppercase text-gray-500">තත්ත්වය</span>
+                    <p class="text-lg font-bold text-green-500">Active</p>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Subject Screen -->
     <div id="subject-screen" class="hidden min-h-screen p-6 pb-24">
         <button onclick="backToDashboard()" class="mb-6 text-gray-400"><i class="fas fa-arrow-left"></i> ආපසු</button>
-        <h1 id="selected-subject-name" class="text-3xl font-bold text-yellow-500 mb-6">Subject</h1>
+        <h1 id="selected-subject-name" class="text-3xl font-bold text-yellow-500 mb-6 uppercase tracking-wider">Subject</h1>
         <div class="flex space-x-2 mb-6 bg-slate-800 p-1 rounded-xl">
             <button onclick="showTab('papers')" id="btn-papers" class="flex-1 py-3 rounded-lg font-bold bg-yellow-500 text-slate-900">Papers</button>
-            <button onclick="showTab('quiz')" id="btn-quiz" class="flex-1 py-3 rounded-lg font-bold text-gray-400">Quiz</button>
+            <button onclick="showTab('quiz')" id="btn-quiz" class="flex-1 py-3 rounded-lg font-bold text-gray-400 transition">Quiz</button>
         </div>
         <div id="papers" class="tab-content active-tab space-y-3"></div>
         <div id="quiz" class="tab-content">
@@ -96,22 +140,26 @@
     </div>
 
     <!-- Bottom Nav -->
-    <div id="bottom-nav" class="hidden fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-white/10 flex justify-around p-4">
-        <button onclick="navClick('home')" class="text-yellow-500 flex flex-col items-center"><i class="fas fa-home"></i><span class="text-[10px]">Home</span></button>
-        <button onclick="navClick('calendar')" class="text-gray-400 flex flex-col items-center"><i class="fas fa-calendar-alt"></i><span class="text-[10px]">Calendar</span></button>
+    <div id="bottom-nav" class="hidden fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-white/10 flex justify-around p-4 z-50">
+        <button onclick="navClick('home')" class="text-yellow-500 flex flex-col items-center"><i class="fas fa-home"></i><span class="text-[10px] mt-1 font-bold">Home</span></button>
+        <button onclick="navClick('calendar')" class="text-gray-400 flex flex-col items-center"><i class="fas fa-calendar-alt"></i><span class="text-[10px] mt-1">Calendar</span></button>
+        <button onclick="navClick('profile')" class="text-gray-400 flex flex-col items-center"><i class="fas fa-user-circle"></i><span class="text-[10px] mt-1 font-bold">Profile</span></button>
     </div>
 
     <script>
         let hasSubscribed = false;
+        let currentScore = 0;
+        let currentSubject = "";
 
-function markSubscribed() {
-    hasSubscribed = true;
-    const area = document.getElementById('sub-check-area');
-    if(area) {
-        area.innerHTML = `<p class="text-green-500 text-xs font-bold sinhala-font animate-pulse"><i class="fas fa-check-circle mr-2"></i> දැන් ඔබට ඇතුළු විය හැක!</p>`;
-        area.classList.replace('border-red-500/30', 'border-green-500/30');
-    }
-}
+        function markSubscribed() {
+            hasSubscribed = true;
+            const area = document.getElementById('sub-check-area');
+            if(area) {
+                area.innerHTML = `<p class="text-green-500 text-xs font-bold sinhala-font animate-pulse"><i class="fas fa-check-circle mr-2"></i> දැන් ඔබට ඇතුළු විය හැක!</p>`;
+                area.classList.replace('border-red-500/30', 'border-green-500/30');
+            }
+        }
+
         const firebaseConfig = {
             apiKey: "AIzaSyB_10UzdkgZPlu-P361PYbEQjTwbKjjWx0",
             authDomain: "al-fast-track.firebaseapp.com",
@@ -124,266 +172,29 @@ function markSubscribed() {
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        const pastPapersData = {
-            "Media Studies": [{year:"2024/25 Paper", link:"#"}, {year:"2023 Paper", link:"#"}, {year:"2022 Paper", link:"#"}, {year:"2021 Paper", link:"#"}, {year:"2020 Paper", link:"#"}],
-            "Buddhist Civilization": [{year:"2024/25 Paper", link:"#"}, {year:"2023 Paper", link:"#"}, {year:"2022 Paper", link:"#"}, {year:"2021 Paper", link:"#"}, {year:"2020 Paper", link:"#"}],
-            "Political Science": [{year:"2024/25 Paper", link:"#"}, {year:"2023 Paper", link:"#"}, {year:"2022 Paper", link:"#"}, {year:"2021 Paper", link:"#"}, {year:"2020 Paper", link:"#"}]
-        };
+        const studyTips = [
+            "පාඩම් කරන අතරතුර විනාඩි 5ක විවේකයක් ගන්න. එය මතකය තබා ගැනීමට උදව් වේ.",
+            "අමාරු විෂයන් උදෑසන කාලයේදී පාඩම් කරන්න.",
+            "පසුගිය විභාග ප්‍රශ්න පත්‍ර (Past Papers) වැඩිපුර පුහුණු වන්න.",
+            "හොඳින් ජලය පානය කරන්න. එය මොළයේ ක්‍රියාකාරිත්වය වැඩි කරයි.",
+            "ඔබ ඉගෙන ගත් දේ තවත් කෙනෙකුට කියා දෙන්න."
+        ];
 
+        // [All Quiz Data and Past Papers Data මෙතැනට ඇතුළත් වේ]
         const allQuizData = {
             "Media Studies": {
                 "Unit 01: සන්නිවේදනය හඳුන්වාදීම": [
                     { q: "මානව සන්නිවේදනයේ මූලිකම ඒකකය කුමක්ද?", options: ["සංකේතය", "භාෂාව", "මාධ්‍යය", "පණිවිඩය"], correct: 0 },
-                    { q: "සන්නිවේදනයේ 'රේඛීය ආකෘතිය' මුලින්ම ඉදිරිපත් කළේ කවුද?", options: ["ලැස්වෙල්", "ඇරිස්ටෝටල්", "ෂැනන් සහ වීවර්", "විල්බර් ශ්‍රාම්"], correct: 1 },
-                    { q: "අන්තර් පුද්ගල සන්නිවේදනය යනු කුමක්ද?", options: ["තමා සමඟම කරන සන්නිවේදනය", "දෙදෙනෙකු අතර සිදුවන සන්නිවේදනය", "කණ්ඩායමක් සමඟ කරන සන්නිවේදනය", "ගුවන් විදුලි සන්නිවේදනය"], correct: 1 },
-                    { q: "සන්නිවේදන ක්‍රියාවලියේ ඇතිවන බාධක හැඳින්වීමට භාවිත කරන පදය?", options: ["ප්‍රතිපෝෂණය", "ඝෝෂාව (Noise)", "සංකේතනය", "විසංකේතනය"], correct: 1 },
-                    { q: "සන්නිවේදකයා පණිවිඩය සකස් කිරීමේ ක්‍රියාවලිය කුමක්ද?", options: ["සංකේතනය", "විසංකේතනය", "ප්‍රතිපෝෂණය", "මාධ්‍යය තේරීම"], correct: 0 },
-                    { q: "අභිනයන් හා මුහුණේ ඉරියව් අයත් වන්නේ කුමන සන්නිවේදනයටද?", options: ["වාචික", "අවාචික", "ජන සන්නිවේදනය", "සමූහ සන්නිවේදනය"], correct: 1 },
-                    { q: "සන්නිවේදනය පිළිබඳ 'S-M-C-R' ආකෘතිය ඉදිරිපත් කළේ කවුද?", options: ["ඩේවිඩ් බර්ලෝ", "ලැස්වෙල්", "ෂැනන්", "ශ්‍රාම්"], correct: 0 },
-                    { q: "පුද්ගලයෙකු තම සිතුවිලි සමඟ කරන සන්නිවේදනය?", options: ["අන්තර් පුද්ගල", "ආත්මීය (Intrapersonal)", "ජන සන්නිවේදනය", "සමූහ"], correct: 1 },
-                    { q: "සන්නිවේදනය යන වචනය බිහිවූ 'Communis' යන ලතින් වචනයේ තේරුම?", options: ["වෙනස් කිරීම", "පොදු බවට පත් කිරීම", "කතා කිරීම", "ඇසීම"], correct: 1 },
-                    { q: "සන්නිවේදන ක්‍රියාවලියේ අවසාන පියවර ලෙස සැලකෙන්නේ?", options: ["මාධ්‍යය", "ප්‍රතිපෝෂණය", "සංකේතනය", "විසංකේතනය"], correct: 1 },
-                    { q: "භාෂාමය බාධක අයත් වන්නේ කුමන ගණයටද?", options: ["භෞතික", "මනෝවිද්‍යාත්මක", "අර්ථකථන (Semantic)", "යාන්ත්‍රික"], correct: 2 },
-                    { q: "ජනමාධ්‍ය භාවිතයේදී 'Gatekeeping' ලෙස ක්‍රියා කරන්නේ?", options: ["ශ්‍රාවකයා", "කර්තෘ/සංස්කාරක", "වෙළඳ දැන්වීම්කරු", "රජය"], correct: 1 },
-                    { q: "ශ්‍රව්‍ය මාධ්‍යයකට උදාහරණයක් වන්නේ?", options: ["පුවත්පත", "ගුවන් විදුලිය", "රූපවාහිනිය", "සිනමාව"], correct: 1 },
-                    { q: "සන්නිවේදනය 'ක්‍රියාවලියක්' ලෙස හඳුන්වන්නේ ඇයි?", options: ["එය නිරන්තරයෙන් සිදුවන බැවින්", "පොතක ඇති බැවින්", "රජය පාලනය කරන බැවින්", "මුදල් උපයන බැවින්"], correct: 0 },
-                    { q: "බහු මාධ්‍ය සන්නිවේදනයට උදාහරණයක් නොවන්නේ?", options: ["අන්තර්ජාලය", "ස්මාර්ට් දුරකථනය", "මුද්‍රිත පෝස්ටරය", "පරිගණකය"], correct: 2 },
-                    { q: "සංඥා භාෂාව (Sign Language) භාවිතා කරන්නේ කවුද?", options: ["නිවේදකයන්", "ශ්‍රවණාබාධිතයන්", "කර්තෘවරුන්", "ගුරුවරුන්"], correct: 1 },
-                    { q: "සන්නිවේදකයා සහ ග්‍රාහකයා අතර පණිවිඩය ගෙනයන උපකරණය?", options: ["පණිවිඩය", "මාධ්‍යය", "ප්‍රතිපෝෂණය", "බාධකය"], correct: 1 },
-                    { q: "අන්තර් පුද්ගල සන්නිවේදනයේදී ප්‍රතිපෝෂණය ලැබෙන්නේ?", options: ["ප්‍රමාද වී", "ඉතා ඉක්මනින්", "පැය කිහිපයකට පසු", "ලැබෙන්නේ නැත"], correct: 1 },
-                    { q: "සන්නිවේදන ආකෘතියක් යනු?", options: ["සැබෑ සන්නිවේදනයක සරල චිත්‍රමය ඉදිරිපත් කිරීමකි", "කැමරාවකි", "පුවත්පතක නමකි", "නීතියකි"], correct: 0 },
-                    { q: "කණ්ඩායම් සන්නිවේදනයට උදාහරණයක් වන්නේ?", options: ["පන්තියක උගන්වන අවස්ථාව", "දුරකථන සංවාදය", "පුවත්පත් කියවීම", "යාච්ඤා කිරීම"], correct: 0 },
-                    { q: "සන්නිවේදනය පිළිබඳ මුල්ම ආකෘතිය ඉදිරිපත් කළේ?", options: ["ඇරිස්ටෝටල්", "ලැස්වෙල්", "බර්ලෝ", "ෂැනන්"], correct: 0 },
-                    { q: "සන්නිවේදන ක්‍රියාවලියේදී 'විසංකේතනය' (Decoding) සිදු කරන්නේ?", options: ["සන්නිවේදකයා", "ග්‍රාහකයා", "මාධ්‍යය", "දැන්වීම්කරු"], correct: 1 },
-                    { q: "පණිවිඩයක අර්ථය නිවැරදිව තේරුම් ගැනීමට බාධාවක් වන්නේ?", options: ["පැහැදිලි උච්චාරණය", "ඝෝෂාව", "නිවැරදි භාෂාව", "හොඳ පෙනීම"], correct: 1 },
-                    { q: "සංස්කෘතික සන්නිවේදනයට උදාහරණයක් වන්නේ?", options: ["චිත්‍ර ශිල්පය", "නර්තනය", "ජන කවි", "ඉහත සියල්ල"], correct: 3 },
-                    { q: "සමාජ මාධ්‍ය භාවිතයේදී සන්නිවේදකයා සහ ග්‍රාහකයා අතර වෙනස?", options: ["ඉතා වැඩිය", "දෙදෙනාම එක් අයෙකු විය හැකිය", "පැහැදිලි පරතරයක් ඇත", "වෙනසක් නැත"], correct: 1 }
-                ],
-                "Unit 02: ජන සන්නිවේදනය හා ඉතිහාසය": [
-                    { q: "ශ්‍රී ලංකාවේ ප්‍රථම ගුවන් විදුලි විකාශනය ආරම්භ වූයේ?", options: ["1923", "1948", "1956", "1972"], correct: 0 },
-                    { q: "ලෝකයේ ප්‍රථම චලන චිත්‍රය ප්‍රදර්ශනය කළේ කවුද?", options: ["ලුමියර් සහෝදරයෝ", "එඩිසන්", "චැප්ලින්", "හිච්කොක්"], correct: 0 },
-                    { q: "ශ්‍රී ලංකාවේ රූපවාහිනී විකාශනය මුලින්ම ආරම්භ කළේ?", options: ["ජාතික රූපවාහිනිය", "ITN (ස්වාධීන රූපවාහිනිය)", "සිරස", "ස්වර්ණවාහිනිය"], correct: 1 },
-                    { q: "මුද්‍රණ කලාවේ පියා ලෙස සැලකෙන්නේ කවුද?", options: ["ජොහැන්නස් ගූටන්බර්ග්", "කැක්ස්ටන්", "ගැලීලියෝ", "එඩිසන්"], correct: 0 },
-                    { q: "ශ්‍රී ලංකාවේ ප්‍රථම සිංහල පුවත්පත කුමක්ද?", options: ["ලංකාලෝකය", "කලම්බු ජර්නල්", "ලක්මිණි පහන", "සරසවි සඳරැස"], correct: 0 },
-                    { q: "ජනමාධ්‍යයේ 'සිව්වන වතුයාය' ලෙස හඳුන්වන්නේ?", options: ["හමුදාව", "කෘෂිකර්මය", "ජනමාධ්‍ය", "අධ්‍යාපනය"], correct: 2 },
-                    { q: "ප්‍රවෘත්ති වාර්තාකරණයේදී '5W-1H' සංකල්පයට ඇතුළත් නොවන්නේ?", options: ["කවුද", "කොහේද", "පොත", "කවදාද"], correct: 2 },
-                    { q: "ගුවන් විදුලියේ 'ශ්‍රව්‍ය දෘශ්‍ය' හැකියාව ඇති කරන සාධකය?", options: ["හඬ", "රූප", "පරිකල්පනය", "කැමරාව"], correct: 2 },
-                    { q: "චිත්‍රපටයක වැදගත්ම ඒකකය ලෙස සැලකෙන්නේ?", options: ["දර්ශනය", "සීන් එක (Shot)", "නළුවා", "කැමරාව"], correct: 1 },
-                    { q: "ප්‍රථම සිංහල චිත්‍රපටය වන 'කඩවුණු පොරොන්දුව' තිරගත වූයේ?", options: ["1947 ජනවාරි 21", "1948 පෙබරවාරි 4", "1956 අප්‍රේල් 12", "1972 මැයි 22"], correct: 0 },
-                    { q: "මාධ්‍යයකින් ඉදිරිපත් කරන ප්‍රවෘත්තියක් මගින් ජනතාවගේ 'න්‍යාය පත්‍රය' සැකසීම?", options: ["Agenda Setting", "Gatekeeping", "Propaganda", "Magic Bullet"], correct: 0 },
-                    { q: "ජනසන්නිවේදකයා සහ ග්‍රාහකයා අතර දුරස්ථ භාවය?", options: ["ඉතා අඩුය", "ඉතා වැඩිය", "නැත", "පැහැදිලි කළ නොහැක"], correct: 1 },
-                    { q: "සිනමාව 'හත්වන කලාව' ලෙස හැඳින්වීමට හේතුව?", options: ["ඉරිදා ප්‍රදර්ශනය කරන නිසා", "කලාවන් රැසක එකතුවක් නිසා", "රුපියල් 7ක් ගන්නා නිසා", "වර්ණ 7ක් ඇති නිසා"], correct: 1 },
-                    { q: "පුවත්පතක 'කතුවැකිය' මගින් ඉදිරිපත් කරන්නේ?", options: ["වාර්තාකරුගේ මතය", "කර්තෘ මණ්ඩලයේ පොදු මතය", "ජනතාවගේ මතය", "රජයේ මතය"], correct: 1 },
-                    { q: "ශ්‍රී ලංකාවේ ප්‍රථම පුවත්පත වන 'The Colombo Journal' ආරම්භ වූ වර්ෂය?", options: ["1832", "1848", "1856", "1860"], correct: 0 },
-                    { q: "විග්‍රහ පුවත්පත් කලාව (Interpretative Journalism) යනු?", options: ["සිදුවීමක් පමණක් වාර්තා කිරීම", "සිදුවීම පිටුපස ඇති හේතු විග්‍රහ කිරීම", "ප්‍රචාරක දැන්වීම් දැමීම", "කතන්දර ලිවීම"], correct: 1 },
-                    { q: "ගුවන් විදුලියේ 'ජීවගුණය' රැකෙන්නේ කුමක් නිසාද?", options: ["කැමරාව", "හඬ හා සංගීතය", "පින්තූර", "රංගනය"], correct: 1 },
-                    { q: "පණිවිඩය ග්‍රාහකයාට 'වෙඩි උණ්ඩයක්' වගේ බලපාන බව කියන න්‍යාය?", options: ["Magic Bullet Theory", "Gatekeeping", "Agenda Setting", "Two Step Flow"], correct: 0 },
-                    { q: "ජනමාධ්‍ය පාලනය කිරීමට රජයකට ඇති බලය?", options: ["Censorship (වාරණය)", "Freedom", "Democracy", "Market"], correct: 0 },
-                    { q: "ප්‍රවෘත්තියක 'ලිඩ්' (Lead) එක යනු කුමක්ද?", options: ["අවසාන කොටස", "මුල්ම සහ වැදගත්ම ඡේදය", "ඡායාරූපය", "සිරස්තලය"], correct: 1 },
-                    { q: "විමර්ශනාත්මක පුවත්පත් කලාව (Investigative Journalism) අරමුණ?", options: ["සැඟවුණු දූෂණ හෝ තොරතුරු හෙළි කිරීම", "දැන්වීම් පෙන්වීම", "විනෝදය", "ක්‍රීඩා පුවත්"], correct: 0 },
-                    { q: "අන්තර්ජාලය ජනසන්නිවේදන මාධ්‍යයක් ලෙස හැඳින්වෙන්නේ ඇයි?", options: ["ලෝක ව්‍යාප්ත නිසා", "වේගවත් නිසා", "ද්විපාර්ශ්වික නිසා", "ඉහත සියල්ල"], correct: 3 },
-                    { q: "පුවත්පත් කලාවේ 'යෙලෝ ජර්නලිසම්' යනු?", options: ["කහ පාට පුවත්පත්", "සත්‍යය විකෘති කරමින් ආන්දෝලනාත්මක පුවත් පල කිරීම", "ගොවිතැන් පුවත්", "හොඳ පුවත්පත්"], correct: 1 },
-                    { q: "දෘශ්‍ය මාධ්‍යයකට පමණක් ආවේණික ලක්ෂණය කුමක්ද?", options: ["හඬ", "රූප හා චලනය", "අකුරු", "සංගීතය"], correct: 1 },
-                    { q: "ජන සන්නිවේදනයේ ප්‍රධාන ලක්ෂණයක් නොවන්නේ?", options: ["විෂමජාතීය ශ්‍රාවකයින්", "ප්‍රතිපෝෂණය ප්‍රමාද වීම", "සන්නිවේදකයා හඳුනාගත නොහැකි වීම", "පෞද්ගලික සම්බන්ධතාවය"], correct: 3 }
-                ],
-                "Unit 03: මාධ්‍ය නීතිය, ආචාරධර්ම සහ නව මාධ්‍ය": [
-                    { q: "මාධ්‍ය ආචාරධර්ම පද්ධතියක ප්‍රධාන අරමුණ?", options: ["විනය හා වගකීම පවත්වා ගැනීම", "මුදල් දීම", "සිනමාව දියුණු කිරීම", "පුවත්පත් විකිණීම"], correct: 0 },
-                    { q: "අන්තර්ජාලය හරහා සිදුවන අපහාස කිරීම් හෝ හිරිහැර කිරීම්?", options: ["Cyber Bullying", "Hacking", "Phishing", "Spam"], correct: 0 },
-                    { q: "මාධ්‍යවේදියෙකු සත්‍ය තොරතුරු පමණක් වාර්තා කිරීම අයත් වන්නේ?", options: ["නීතියට", "ආචාරධර්ම වලට", "ලාභයට", "ප්‍රචාරණයට"], correct: 1 },
-                    { q: "තොරතුරු දැනගැනීමේ අයිතිය (RTI) ලංකාවේ ස්ථාපිත කළේ?", options: ["2016", "2000", "2005", "2020"], correct: 0 },
-                    { q: "යුගයේ මාධ්‍ය පාලකයා ලෙස 'ග්‍රාහකයා' පත්වීමට හේතු වූ මාධ්‍ය?", options: ["පුවත්පත", "නව මාධ්‍ය (New Media)", "රූපවාහිනිය", "ගුවන් විදුලිය"], correct: 1 },
-                    { q: "ෆේස්බුක් (Facebook) යනු කුමන වර්ගයේ මාධ්‍යයක්ද?", options: ["සමාජ මාධ්‍ය", "මුද්‍රිත මාධ්‍ය", "පෞද්ගලික මාධ්‍ය", "රාජ්‍ය මාධ්‍ය"], correct: 0 },
-                    { q: "මාධ්‍ය වාරණය (Censorship) සිදු කරන්නේ ඇයි?", options: ["ජාතික ආරක්ෂාව හෝ පොදු යහපත උදෙසා", "මාධ්‍යවේදියාට උදව් කිරීමට", "මුදල් ඉතිරි කිරීමට", "විනෝදයට"], correct: 0 },
-                    { q: "ප්‍රසිද්ධ පුද්ගලයෙකුට අසත්‍ය තොරතුරු මගින් හානි කිරීම?", options: ["අපහාසය (Defamation)", "සොරකම", "වංචාව", "සත්‍යය"], correct: 0 },
-                    { q: "තොරතුරු අධිපරිභෝජනය (Information Overload) යනු?", options: ["තොරතුරු නැති වීම", "අවශ්‍ය ප්‍රමාණයට වඩා තොරතුරු ලැබීමෙන් ඇතිවන පීඩනය", "තොරතුරු සෙවීම", "තොරතුරු විකිණීම"], correct: 1 },
-                    { q: "මාධ්‍ය මගින් කරන 'ප්‍රචාරණය' (Propaganda) යනු?", options: ["තොරතුරු පමණක් දීම", "කිසියම් මතයක් ජනතාව තුළ වැපිරීමට කරන බලපෑම", "දැන්වීම් දැමීම", "චිත්‍රපට පෙන්වීම"], correct: 1 },
-                    { q: "නව මාධ්‍යයේ 'අන්තර්ක්‍රියාකාරීත්වය' (Interactivity) යනු?", options: ["මාධ්‍ය සහ ග්‍රාහකයා අතර සෘජු සම්බන්ධතාවය", "පින්තූර පෙන්වීම", "බොහෝ අය සිටීම", "හඬ ඇසීම"], correct: 0 },
-                    { q: "මාධ්‍යවේදියෙකු සිය ප්‍රභවයන් (Sources) රහසිගතව තබා ගැනීම?", options: ["වරදකි", "ආචාරධාර්මික වගකීමකි", "නීතියට පටහැනිය", "ලාභයකි"], correct: 1 },
-                    { q: "ඩිජිටල් බෙදීම (Digital Divide) යනු කුමක්ද?", options: ["පරිගණක කැඩීම", "තාක්ෂණය ඇති සහ නැති අය අතර පවතින පරතරය", "ඉන්ටර්නෙට් වේගය", "පරිගණක වර්ග"], correct: 1 },
-                    { q: "අසත්‍ය ප්‍රවෘත්ති හැඳින්වීමට භාවිත කරන ඉංග්‍රීසි පදය?", options: ["Fake News", "Hard News", "Feature", "Opinion"], correct: 0 },
-                    { q: "මාධ්‍ය ආචාරධර්ම උල්ලංඝනය කළහොත් ලැබෙන දඬුවම?", options: ["හිරේ යාම", "සමාජ අප්‍රසාදය හෝ ආයතනික විනය ක්‍රියාමාර්ග", "ප්‍රශංසාව", "මුදල් දීම"], correct: 1 },
-                    { q: "ප්‍රකාශන නිදහස (Freedom of Expression) යනු කුමක්ද?", options: ["ඕනෑම දෙයක් කීමේ අයිතිය", "වගකීමක් සහිතව අදහස් ප්‍රකාශ කිරීමේ අයිතිය", "නීතියට බිය වීම", "කට පියාගෙන සිටීම"], correct: 1 },
-                    { q: "බ්ලොග් අඩවියක් (Blog) යනු?", options: ["පෞද්ගලික වෙබ් සඟරාවක්", "රූපවාහිනී නාලිකාවක්", "පුවත්පත් යන්ත්‍රයක්", "ගුවන් විදුලියක්"], correct: 0 },
-                    { q: "මාධ්‍ය මගින් කුඩා දරුවන්ගේ පෞද්ගලිකත්වය ආරක්ෂා කිරීම?", options: ["කළ නොහැක", "අනිවාර්ය ආචාරධර්මයකි", "විනෝදාංශයකි", "අවශ්‍ය නැත"], correct: 1 },
-                    { q: "සිරස්තලයක් මගින් ග්‍රාහකයා රවටා වෙබ් අඩවියට ගෙන්වා ගැනීම?", options: ["Clickbait", "News", "Article", "Header"], correct: 0 },
-                    { q: "මාධ්‍ය නිදහස වැඩිපුරම පවතින්නේ කුමන පාලන ක්‍රමය යටතේද?", options: ["ප්‍රජාතන්ත්‍රවාදී", "ඒකාධිපති", "වැඩවසම්", "හමුදා"], correct: 0 },
-                    { q: "ලෝකය 'ගෝලීය ගම්මානයක්' ලෙස හැඳින්වූයේ?", options: ["මාර්ෂල් මැක්ලුහන්", "ලැස්වෙල්", "ෂැනන්", "ශ්‍රාම්"], correct: 0 },
-                    { q: "මාධ්‍ය සාක්ෂරතාවය (Media Literacy) යනු?", options: ["මාධ්‍ය කියවීමට ඇති හැකියාව", "මාධ්‍ය පණිවිඩ විචාරාත්මකව තේරුම් ගැනීමේ හැකියාව", "මාධ්‍යවේදියෙකු වීම", "කැමරා හැසිරවීම"], correct: 1 },
-                    { q: "ප්‍රවෘත්ති ආයතනයක මූලික පරමාර්ථය?", options: ["ලාභය සහ මහජන සේවය", "රජයට උදව් කිරීම", "අසත්‍ය පැවසීම", "යුද්ධ කිරීම"], correct: 0 },
-                    { q: "ජනමාධ්‍ය පාලනය කරන 'ද්වාර පාලක' න්‍යාය ඉදිරිපත් කළේ?", options: ["කර්ට් ලෙවින්", "ලැස්වෙල්", "බර්ලෝ", "ඊස්ටන්"], correct: 0 },
-                    { q: "මාධ්‍ය ආයතනයක 'කේතය' පිළිපැදීම කාගේ වගකීමක්ද?", options: ["රජයේ", "එම ආයතනයේ සියලු මාධ්‍යවේදීන්ගේ", "පොලිසියේ", "ජනතාවගේ"], correct: 1 }
-                ]
-            },
-            "Buddhist Civilization": {
-                "Unit 01: භාරතීය පසුබිම හා බුද්ධෝත්පාදය": [
-                    { q: "බුද්ධ කාලීන භාරතයේ ප්‍රබලතම රාජාණ්ඩුව කුමක්ද?", options: ["කෝසලය", "මගධය", "වත්සය", "අවන්තිය"], correct: 1 },
-                    { q: "ෂට් ශාස්තෘවරුන් අතරින් අකිරියවාදය ඉදිරිපත් කළේ කවුද?", options: ["පූරණ කස්සප", "මක්ඛලී ගෝසාල", "අජිත කේසකම්බල", "නිගණ්ඨ නාථපුත්ත"], correct: 0 },
-                    { q: "ලිච්ඡවී රජවරුන් අනුගමනය කළ පාලන ප්‍රතිපත්තිය?", options: ["සප්ත අපරිහාණිය ධර්ම", "දස රාජ ධර්ම", "සතර සංග්‍රහ වස්තු", "දස පාරමිතා"], correct: 0 },
-                    { q: "සිදුහත් කුමරුගේ උපත සිදු වූයේ කොහේද?", options: ["ලුම්බිණි සල් උයන", "කපිලවස්තු පුරය", "බුද්ධගයාව", "කුසිනාරාව"], correct: 0 },
-                    { q: "ප්‍රථම ධර්ම දේශනාව පවත්වන ලද්දේ කා හටද?", options: ["පස්වග මහණුන්ට", "බිම්බිසාර රජුට", "තපස්සු භල්ලුක වෙළඳුන්ට", "සාලිය කුමරුට"], correct: 0 },
-                    { q: "ත්‍රිපිටකයට අයත් නොවන කොටස කුමක්ද?", options: ["සූත්‍ර පිටකය", "විනය පිටකය", "අභිධර්ම පිටකය", "මහාවංශය"], correct: 3 },
-                    { q: "බුදුදහම අනුව 'වසලයෙකු' වන්නේ කෙසේද?", options: ["උපතින්", "ක්‍රියාවෙන්", "ධනයෙන්", "කුලයෙන්"], correct: 1 },
-                    { q: "ප්‍රථම ධර්ම සංගායනාව පැවැත්වුණේ කොහේද?", options: ["සප්තපන්නි ලෙන", "වාලිකාරාමය", "අලුවිහාරය", "මිහින්තලය"], correct: 0 },
-                    { q: "භික්ෂුණී ශාසනයේ ආරම්භකයා කවුද?", options: ["මහා ප්‍රජාපතී ගෝතමිය", "යසෝධරා", "විශාඛා", "උප්පලවණ්ණා"], correct: 0 },
-                    { q: "බුදුදහමේ මැදුම් පිළිවෙත ලෙස හඳුන්වන්නේ?", options: ["ආර්ය අෂ්ටාංගික මාර්ගය", "සතර අගතිය", "දස කුසල්", "පංච ශීලය"], correct: 0 },
-                    { q: "සිදුහත් තවුසා හදාළ 'නේවසඤ්ඤානාසඤ්ඤායතනය' කාගෙන් ඉගෙන ගත් එකක්ද?", options: ["ආළාර කාලාම", "උද්දකරාමපුත්ත", "සර්වමිත්‍ර", "කොණ්ඩඤ්ඤ"], correct: 1 },
-                    { q: "බුද්ධ කාලීන භාරතයේ වෛශ්‍ය කුලයට අයත් වූවන් කවුද?", options: ["පාලකයන්", "පූජකයන්", "වෙළඳුන් හා ගොවීන්", "කම්කරුවන්"], correct: 2 },
-                    { q: "සම්බුද්ධත්වයට පත්වීමට පෙර සිදුහත් තවුසා අනුගමනය කළ අන්තය?", options: ["කාමසුඛල්ලිකානුයෝගය", "අත්තකිලමතානුයෝගය", "මැදුම් පිළිවෙත", "ශාස්වතවාදය"], correct: 1 },
-                    { q: "බුදුරදුන් ලක්දිවට වැඩම කළ ප්‍රථම ස්ථානය?", options: ["මහියංගනය", "නාගදීපය", "කැලණිය", "සමනල කන්ද"], correct: 0 },
-                    { q: "අශෝක රජු බුදුදහම වැළඳගැනීමට හේතුව?", options: ["කාලිංග යුද්ධයේ විනාශය දැකීම", "සෙල්ලිපි කියවීම", "රාජ්‍ය බලය වැඩි කරගැනීම", "විනෝදයට"], correct: 0 },
-                    { q: "බුදුදහමේ 'අනිත්‍ය' සංකල්පය යනු?", options: ["සියල්ල වෙනස් වන බව", "සියල්ල ස්ථිර බව", "ආත්මයක් ඇති බව", "දුකක් නැති බව"], correct: 0 },
-                    { q: "වේද සාහිත්‍යයේ එන 'පුරුෂ සූක්තය' මගින් ඉදිරිපත් කළේ කුමක්ද?", options: ["කුල ක්‍රමයේ දේව නිර්මාණය", "සදාචාරය", "නිවන් මඟ", "සතුන්ට මෛත්‍රිය කිරීම"], correct: 0 },
-                    { q: "බුදුරදුන් පරිනිර්වාණයට පෙර කළ අවසාන දේශනාව?", options: ["අප්පමාදේන සම්පාදේථ", "මංගල සූත්‍රය", "වසල සූත්‍රය", "ධම්මචක්කප්පවත්තන සූත්‍රය"], correct: 0 },
-                    { q: "සිදුහත් කුමරු දුටු සතර පෙරනිමිතිවල 'ශ්‍රමණයෙක්' දැකීමෙන් ඇති වූ සිතුවිල්ල?", options: ["බිය", "පිළිකුල", "සංවේගය හා නිදහස් වීමේ ආසාව", "සතුට"], correct: 2 },
-                    { q: "බෞද්ධ කොඩියේ වර්ණ ෂඩ් වර්ණ ලෙස හැඳින්වෙන්නේ ඇයි?", options: ["එහි පාට 6ක් ඇති බැවින්", "එය බුදුරදුන්ගේ ශරීරයෙන් විහිදුණු රැස් මාලාව බැවින්", "එය ලස්සන බැවින්", "එය සාමයේ සංකේතය බැවින්"], correct: 1 },
-                    { q: "ත්‍රිලක්ඛණයට අයත් නොවන්නේ?", options: ["අනිත්‍ය", "දුක්ඛ", "අනාත්ම", "සංස්කාර"], correct: 3 },
-                    { q: "බුද්ධ කාලීන භාරතයේ පැවති විශාලතම ආරාමය?", options: ["ජේතවනය", "වේළුවනය", "ඝෝෂිතාරාමය", "නාලන්දා"], correct: 0 },
-                    { q: "සිද්ධාර්ථ කුමරු උපතින් සත් දිනකින් මියගිය මව කවුද?", options: ["මහාමායා දේවිය", "ප්‍රජාපතී ගෝතමිය", "යසෝධරා", "උප්පලවණ්ණා"], correct: 0 },
-                    { q: "බුදු දහමට අනුව ලෝකයේ සම්භවය පැහැදිලි කරන සූත්‍රය?", options: ["අග්ගඤ්ඤ සූත්‍රය", "සිඟාලෝවාද සූත්‍රය", "මහා මංගල සූත්‍රය", "ධම්මචක්කප්පවත්තන සූත්‍රය"], correct: 0 },
-                    { q: "බුදුදහමේ එන 'සම්මා වාචා' යනු?", options: ["නිවැරදි දැකීම", "නිවැරදි වචනය", "නිවැරදි උත්සාහය", "නිවැරදි සිහිය"], correct: 1 }
-                ],
-                "Unit 02: බෞද්ධ සමාජ හා ආර්ථික දර්ශනය": [
-                    { q: "ගිහියන්ගේ උභයලෝක සංවර්ධනය සඳහා දේශනා කළ සූත්‍රය?", options: ["ව්‍යග්ඝපජ්ජ සූත්‍රය", "මහා මංගල සූත්‍රය", "පරාභව සූත්‍රය", "ධජග්ග සූත්‍රය"], correct: 0 },
-                    { q: "සම්භජ්ජ අත්ථය (සමජීවිකතාව) යනු?", options: ["ආදායමට සරිලන වියදම පවත්වා ගැනීම", "අසීමිතව මුදල් සෙවීම", "ණය වීම", "තම සැපය පමණක් බැලීම"], correct: 0 },
-                    { q: "රාජ්‍ය පාලකයෙකු සතු විය යුතු දස රාජ ධර්ම වලට අයත් නොවන්නේ?", options: ["දානය", "සීලය", "අක්‍රෝධය", "මෝහය"], correct: 3 },
-                    { q: "බෞද්ධ ආර්ථික දර්ශනය අනුව ධනය රැස් කිරීම උපමා කර ඇත්තේ?", options: ["මීමැස්සෙකු මලෙන් රොන් ගැනීමට", "ගින්නක් ඇවිලීමට", "ගඟක් ගලා යෑමට", "කන්දක් ගිලා බැසීමට"], correct: 0 },
-                    { q: "බුදුදහම අනුව පවුලක සාමය පවතින්නේ?", options: ["සමානාත්මතාවය හා ගරුත්වය මත", "බලය පාවිච්චි කිරීමෙන්", "කුල මානය නිසා", "සල්ලි නිසා"], correct: 0 },
-                    { q: "මිථ්‍යා ආජීවයට අයත් නොවන්නේ?", options: ["ධාන්‍ය වෙළඳාම", "වස වෙළඳාම", "මස් වෙළඳාම", "අවි වෙළඳාම"], correct: 0 },
-                    { q: "බෞද්ධ පරිසර සංරක්ෂණයට පදනම?", options: ["සියලු සතුන්ට මෛත්‍රිය කිරීම", "ගස් කැපීම", "සතුන් දඩයම් කිරීම", "සම්පත් නාස්තිය"], correct: 0 },
-                    { q: "සිඟාලෝවාද සූත්‍රයට අනුව දරුවන් විසින් දෙමාපියන්ට කළ යුතු යුතුකම් ගණන?", options: ["5", "6", "4", "10"], correct: 0 },
-                    { q: "සතර සංග්‍රහ වස්තු වලට අයත් නොවන්නේ?", options: ["අහංකාරය", "දානය", "ප්‍රිය වචනය", "අර්ථචර්යාව"], correct: 0 },
-                    { q: "බුදුදහම කුල ක්‍රමය විවේචනය කළේ කවර පදනමක් මතද?", options: ["උපත නොව ක්‍රියාව මුල් කරගෙන", "ධනය මුල් කරගෙන", "පෙනුම මුල් කරගෙන", "ශක්තිය මුල් කරගෙන"], correct: 0 },
-                    { q: "භෝගවිභාගය අනුව ධනය කොටස් කීයකට බෙදිය යුතුද?", options: ["4", "3", "5", "2"], correct: 0 },
-                    { q: "අරපිරිමැස්ම (Frugality) බෞද්ධ ආර්ථිකයේ වැදගත් වන්නේ ඇයි?", options: ["නාස්තිය වළක්වා අනාගතය සුරක්ෂිත කිරීමට", "ලෝභකමට", "සල්ලි නැති නිසා", "රජයට බදු ගෙවීමට"], correct: 0 },
-                    { q: "සතර අගතියට අයත් නොවන්නේ?", options: ["ඡන්දය", "දෝසය", "භය", "ප්‍රඥාව"], correct: 3 },
-                    { q: "බෞද්ධ අධ්‍යාපනයේ මූලික පරමාර්ථය?", options: ["සර්වප්‍රකාරයෙන්ම පුද්ගල සංවර්ධනය", "රැකියාවක් ලබාගැනීම", "ධනය ඉපයීම", "කුලය රැකගැනීම"], correct: 0 },
-                    { q: "බෞද්ධ දේශපාලන දර්ශනයේ 'චක්කවත්ති' රජුගේ මූලික ලක්ෂණය?", options: ["ධර්මානුකූල පාලනය", "හමුදා බලය", "අසීමිත බදු අය කිරීම", "කුලවාදය"], correct: 0 },
-                    { q: "සප්ත අපරිහාණිය ධර්ම අනුගමනය කළේ කවුද?", options: ["ලිච්ඡවී රජවරු", "බිම්බිසාර රජු", "අශෝක රජු", "දුටුගැමුණු රජු"], correct: 0 },
-                    { q: "බෞද්ධ සන්නිවේදනයේ 'සම්මා වාචා' යන්නෙන් අදහස් කරන්නේ?", options: ["මුසාවාදයෙන් තොර සත්‍යවාදී බව", "කේලාම් කීම", "හිස් වචන කීම", "වැරදි ලෙස කතා කිරීම"], correct: 0 },
-                    { q: "බුදුදහම අනුව සාර්ථක විවාහ ජීවිතයකට අවශ්‍ය සාධකය?", options: ["සම සීල, සම ශ්‍රද්ධා, සම චාග, සම ප්‍රඥා", "කුලය සමාන වීම", "ධනය සමාන වීම", "රූපය සමාන වීම"], correct: 0 },
-                    { q: "බෞද්ධ ආර්ථිකයේ 'සම්මා ආජීවය' යනු?", options: ["දැහැමි ජීවනෝපාය", "සොරකම් කිරීම", "සතුන් මැරීම", "අවි වෙළඳාම"], correct: 1 },
-                    { q: "සිඟාලෝවාද සූත්‍රයේ 'උඩු දිශාව' නියෝජනය කරන්නේ?", options: ["මහණ බමුණන්", "දෙමාපියන්", "ගුරුවරුන්", "අඹුසැමියන්"], correct: 0 },
-                    { q: "බුදුදහම අනුව සැබෑ ධනය ලෙස සැලකෙන්නේ?", options: ["සතුට (සන්තුට්ඨි)", "රත්තරන්", "ඉඩම්", "මුදල්"], correct: 0 },
-                    { q: "පරිසරය ආරක්ෂා කිරීම පිණිස විනය නීති පැනවූයේ ඇයි?", options: ["ගහකොළ පවා ජීවීන් ලෙස සැලකූ නිසා", "ලස්සනට තබා ගැනීමට", "සෙවණ ලබා ගැනීමට", "පලතුරු ලබා ගැනීමට"], correct: 0 },
-                    { q: "රාජ්‍ය පාලකයා ජනතාවගේ ආර්ථිකය දියුණු කළ යුතු බව පෙන්වා දෙන සූත්‍රය?", options: ["කූටදන්ත සූත්‍රය", "වසල සූත්‍රය", "මංගල සූත්‍රය", "ධජග්ග සූත්‍රය"], correct: 0 },
-                    { q: "බෞද්ධ සමාජයේ ස්ත්‍රියට හිමි වූයේ?", options: ["පෞරුෂය හා නිදහස අගය කළ තැනක්", "පහත් තැනක්", "අවශ්‍ය නැති තැනක්", "වහල් තැනක්"], correct: 0 },
-                    { q: "බුදුදහම අනුව නායකයෙකු සතු විය යුතු ප්‍රධාන ලක්ෂණය?", options: ["ස්වයං පාලනය හා හික්මීම", "බලය පෙන්වීම", "සල්ලි වියදම් කිරීම", "කුලය පෙන්වීම"], correct: 0 }
-                ],
-                "Unit 03: ලාංකීය බෞද්ධ ශිෂ්ටාචාරය": [
-                    { q: "ලක්දිව වැවයි දාගැබයි සංකල්පය ආරම්භ වූයේ?", options: ["බුදුදහම ලැබීමෙන් පසු", "විජය රජු ආ පසු", "ඉංග්‍රීසි පාලන සමයේ", "දැන්"], correct: 0 },
-                    { q: "ප්‍රථම දාගැබ වන ථූපාරාමය කරවූ රජු?", options: ["දේවානම්පියතිස්ස", "දුටුගැමුණු", "වළගම්බා", "මහාසේන"], correct: 0 },
-                    { q: "සඳකඩපහණේ ඇති සතුන් හතරෙන් 'මරණය' සංකේතවත් කරන්නේ?", options: ["සිංහයා", "අශ්වයා", "ඇතා", "ගවයා"], correct: 0 },
-                    { q: "ත්‍රිපිටකය මුල්වරට ග්‍රන්ථාරූඪ කළේ කොහේද?", options: ["මාතලේ අලුවිහාරය", "අනුරාධපුරය", "මිහින්තලය", "කැලණිය"], correct: 0 },
-                    { q: "ලක්දිව බෞද්ධ අධ්‍යාපනයේ කේන්ද්‍රස්ථානය?", options: ["මහා විහාරය", "අභයගිරිය", "ජේතවනය", "සීගිරිය"], correct: 0 },
-                    { q: "සමාධි බුද්ධ ප්‍රතිමාව අයත් වන්නේ කුමන යුගයටද?", options: ["අනුරාධපුර යුගය", "පොළොන්නරු යුගය", "දඹදෙණි යුගය", "මහනුවර යුගය"], correct: 0 },
-                    { q: "දළදා වහන්සේ ලක්දිවට වැඩම කරවූයේ කවුද?", options: ["හේමමාලා සහ දන්ත කුමරු", "මහින්ද හිමි", "සංඝමිත්තා තෙරණිය", "විජය කුමරු"], correct: 0 },
-                    { q: "පන්සිය පනස් ජාතක පොත ලියවුණේ කුමන යුගයේද?", options: ["කුරුණෑගල", "අනුරාධපුර", "පොළොන්නරු", "කෝට්ටේ"], correct: 0 },
-                    { q: "ලක්දිව ඉදිවූ උසම ස්තූපය?", options: ["ජේතවනාරාමය", "අභයගිරිය", "රුවන්වැලිසෑය", "ථූපාරාමය"], correct: 0 },
-                    { q: "සංඝමිත්තා තෙරණිය ලක්දිවට වැඩම කළේ කුමක් සමඟද?", options: ["ශ්‍රී මහා බෝධීන් වහන්සේ", "ධාතූන් වහන්සේ", "ත්‍රිපිටකය", "දළදා වහන්සේ"], correct: 0 },
-                    { q: "ලක්දිව බෞද්ධ සන්නිවේදනයේ ප්‍රධාන මෙවලමක් වන්නේ?", options: ["හේවිසි හා බෙර වැයීම", "ටීවී", "පුවත්පත්", "දුරකථන"], correct: 0 },
-                    { q: "ලෝවාමහාපාය මහල් කීයකින් යුක්ත වූවක්ද?", options: ["9", "7", "5", "10"], correct: 0 },
-                    { q: "මිහින්තලය හඳුන්වන තවත් නමක්?", options: ["චේතියගිරිය", "සීගිරිය", "අටමස්ථානය", "ජය ශ්‍රී මහා බෝධිය"], correct: 0 },
-                    { q: "ලක්දිව ඉතිහාසය ලියැවුණු මහාවංශයේ කතුවරයා?", options: ["මහානාම හිමි", "මහින්ද හිමි", "ධර්මසේන හිමි", "ගුරුළුගෝමී"], correct: 0 },
-                    { q: "බෞද්ධ කලාවේ සඳකඩපහණේ මධ්‍යයේ ඇති නෙළුම් මලෙන් සංකේතවත් වන්නේ?", options: ["නිර්වාණය", "උපත", "සැපය", "දුක"], correct: 0 },
-                    { q: "පොළොන්නරු යුගයේ ඉදිවූ 'වටදාගෙය' පිහිටා ඇත්තේ?", options: ["දළදා මළුවේ", "සීගිරියේ", "මිහින්තලේ", "නුවර"], correct: 0 },
-                    { q: "ලක්දිව භික්ෂුණී ශාසනයේ ප්‍රථමයා?", options: ["අනුලා දේවිය", "සෝමා දේවිය", "විශාඛා", "යසෝධරා"], correct: 0 },
-                    { q: "පන්සල කේන්ද්‍ර කරගත් අධ්‍යාපනය?", options: ["පිරිවෙන් අධ්‍යාපනය", "විශ්වවිද්‍යාල", "පාසල්", "ගුරුකුල"], correct: 0 },
-                    { q: "බුද්ධ ප්‍රතිමාව නිර්මාණය වීමට පෙර බුදුන් සංකේතවත් කිරීමට භාවිත කළේ?", options: ["සිරිපතුල්, ධර්මචක්‍රය, බෝධිය", "රූප", "සිතුවම්", "මැටි පිළිම"], correct: 0 },
-                    { q: "අනුරාධපුර අටමස්ථානයට අයත් නොවන්නේ?", options: ["ගඩලාදෙණිය", "ථූපාරාමය", "රුවන්වැලිසෑය", "මිරිසවැටිය"], correct: 0 },
-                    { q: "ලාංකීය බෞද්ධ සංස්කෘතියේ පදනම?", options: ["සීලය හා සාමූහිකත්වය", "යුද්ධ කිරීම", "කුලය", "මුදල්"], correct: 0 },
-                    { q: "ලක්දිව ප්‍රථම ලිඛිත සාහිත්‍යය බිහිවීමට බලපෑවේ?", options: ["බුදුදහම ලැබීම", "ඉංග්‍රීසි අධ්‍යාපනය", "දැන්", "විනෝදයට"], correct: 0 },
-                    { q: "බෞද්ධ සන්නිවේදනයේ 'ධර්ම දේශනාව' යනු?", options: ["ධර්මය කියා දීම", "සින්දු කීම", "කතා පැවැත්වීම", "රඟපෑම"], correct: 0 },
-                    { q: "ලාංකීය කලාවේ 'මුරගල' මුලින්ම භාවිත කළේ ඇයි?", options: ["ගොඩනැගිල්ල ස්ථාවර කිරීමට", "ලස්සනට", "ආරක්ෂාවට", "බිය ගැන්වීමට"], correct: 0 },
-                    { q: "ලක්දිව බෞද්ධ ශිෂ්ටාචාරයේ ප්‍රධාන ලක්ෂණය?", options: ["ස්වභාවධර්මය සමඟ අනුකූල වීම", "පරිසරය විනාශ කිරීම", "යාන්ත්‍රිකකරණය", "කර්මාන්ත"], correct: 0 }
-                ]
-            },
-            "Political Science": {
-                "Unit 01: දේශපාලන විද්‍යාවේ ස්වභාවය": [
-                    { q: "දේශපාලන විද්‍යාවේ පියා කවුද?", options: ["ප්ලේටෝ", "සොක්‍රටීස්", "ඇරිස්ටෝටල්", "මැකියාවෙලී"], correct: 2 },
-                    { q: "දේශපාලන විද්‍යාව 'රාජ්‍යයෙන් ආරම්භ වී රාජ්‍යයෙන් අවසන් වේ' යයි පැවසුවේ?", options: ["ගාර්නර්", "ලැස්කි", "ඊස්ටන්", "දාල්"], correct: 0 },
-                    { q: "ආදාන-ප්‍රතිදාන ආකෘතිය ඉදිරිපත් කළේ?", options: ["ඩේවිඩ් ඊස්ටන්", "ඇමන්ඩ්", "මාක්ස්", "වේබර්"], correct: 0 },
-                    { q: "රාජ්‍යයක අත්‍යවශ්‍ය මූලිකාංග හතර කුමක්ද?", options: ["ජනගහනය, භූමිය, රජය, පරමාධිපත්‍යය", "ජනතාව, හමුදාව, නීතිය, මුදල්", "මැතිවරණ, පක්ෂ, රජය, භූමිය", "පරමාධිපත්‍යය, හමුදාව, රජය, ජනතාව"], correct: 0 },
-                    { q: "නූතන දේශපාලන විද්‍යාවේ ආරම්භකයා?", options: ["නිකොලෝ මැකියාවෙලී", "හොබ්ස්", "ලොක්", "මිල්"], correct: 0 },
-                    { q: "පරමාධිපත්‍යය (Sovereignty) සංකල්පය මුලින්ම ඉදිරිපත් කළේ?", options: ["ජීන් බෝඩින්", "ලොක්", "හොබ්ස්", "ඇරිස්ටෝටල්"], correct: 0 },
-                    { q: "සමාජ සම්මුතිවාදය ඉදිරිපත් කළේ?", options: ["හොබ්ස්, ලොක්, රූසෝ", "මාක්ස්, එංගල්ස්", "ප්ලේටෝ, ඇරිස්ටෝටල්", "මිල්, ස්මිත්"], correct: 0 },
-                    { q: "නෛතික පරමාධිපත්‍යය යනු?", options: ["ව්‍යවස්ථාව මගින් නීතිමය පාලනයට ඇති බලය", "ජනතාවගේ බලය", "හමුදා බලය", "පොලිස් බලය"], correct: 0 },
-                    { q: "බලය සහ අධිකාරිය අතර ප්‍රධාන වෙනස?", options: ["නීත්‍යානුකූල භාවය", "හමුදා ශක්තිය", "මුදල්", "ජනප්‍රියත්වය"], correct: 0 },
-                    { q: "දේශපාලන විද්‍යාව 'සමාජ විද්‍යාවක්' ලෙස හඳුන්වන්නේ ඇයි?", options: ["මිනිසාගේ දේශපාලන හැසිරීම අධ්‍යයනය කරන බැවින්", "එය පාසල් වල උගන්වන බැවින්", "එය ලස්සන බැවින්", "එය ඉතිහාසය හා සමාන බැවින්"], correct: 0 },
-                    { q: "රාජ්‍යයක් සහ ආණ්ඩුවක් අතර ඇති වෙනස?", options: ["රාජ්‍යය ස්ථිරය, ආණ්ඩුව තාවකාලිකය", "ආණ්ඩුව ස්ථිරය, රාජ්‍යය තාවකාලිකය", "වෙනසක් නැත", "දෙකම එකකි"], correct: 0 },
-                    { q: "දේශපාලන පද්ධතියක 'විසර්ජනය' (Output) ලෙස හඳුන්වන්නේ?", options: ["නීති සහ ප්‍රතිපත්ති", "ජනතාවගේ ඉල්ලීම්", "මැතිවරණ", "බදු"], correct: 0 },
-                    { q: "බලය බෙදීමේ න්‍යාය ඉදිරිපත් කළේ?", options: ["මොන්ටෙස්ක්‍යූ", "ලොක්", "රූසෝ", "හොබ්ස්"], correct: 0 },
-                    { q: "අධිකාරිය (Authority) යනුවෙන් අදහස් කරන්නේ?", options: ["නෛතිකව පිළිගත් බලය", "හමුදා බලය", "මුදල් බලය", "පවුලේ බලය"], correct: 0 },
-                    { q: "ජාතියක් (Nation) සහ රාජ්‍යයක් (State) අතර වෙනස?", options: ["ජාතිය යනු සංස්කෘතික බැඳීමකි, රාජ්‍යය දේශපාලන ඒකකයකි", "දෙකම එකකි", "ජාතියට භූමියක් අවශ්‍ය නැත", "රාජ්‍යයට පරමාධිපත්‍යය අවශ්‍ය නැත"], correct: 0 },
-                    { q: "දක්ෂිණාංශික දේශපාලනය (Right-wing) ලෙස හඳුන්වන්නේ?", options: ["ධනවාදය සහ සම්ප්‍රදාය ආරක්ෂා කිරීම", "සමාජවාදය", "විප්ලවය", "හමුදා පාලනය"], correct: 0 },
-                    { q: "දේශපාලන විද්‍යාවේ පර්යේෂණ සඳහා භාවිත කරන සංසන්දනාත්මක ප්‍රවේශය?", options: ["රටවල් දෙකක පාලන ක්‍රම සසඳා බැලීම", "ඉතිහාසය බැලීම", "චිත්‍රපට බැලීම", "පොත් කියවීම"], correct: 0 },
-                    { q: "බලහත්කාරය (Coercion) යනු?", options: ["බලහත්කාරයෙන් වැඩ ගැනීම", "ප්‍රජාතන්ත්‍රවාදය", "සහයෝගීතාවය", "ආදරය"], correct: 0 },
-                    { q: "දේශපාලන සංස්කෘතිය යනු?", options: ["දේශපාලනය ගැන ජනතාව තුළ ඇති ආකල්ප හා විශ්වාස", "ඇඳුම", "පක්ෂයක නම", "මැතිවරණයක්"], correct: 0 },
-                    { q: "දේශපාලන සමාජීකරණය යනු?", options: ["දේශපාලන ආකල්ප සමාජය තුළ ව්‍යාප්ත වීමේ ක්‍රියාවලිය", "සමාජය විනාශ කිරීම", "සල්ලි බෙදීම", "ඡන්දය දැමීම"], correct: 0 },
-                    { q: "දේශපාලන පද්ධතියක් පවතින පරිසරය හැඳින්වෙන්නේ?", options: ["පර්යන්තය (Environment)", "ආදානය", "ප්‍රතිදානය", "කළු පෙට්ටිය"], correct: 0 },
-                    { q: "දේශපාලන විද්‍යාව හැදෑරීමේ 'චර්යාවාදී' ප්‍රවේශය අවධාරණය කරන්නේ?", options: ["පුද්ගලයන්ගේ සැබෑ දේශපාලන හැසිරීම ගැන", "නීතිය ගැන", "ඉතිහාසය ගැන", "භූමිය ගැන"], correct: 0 },
-                    { q: "රාජ්‍යයේ උපත පිළිබඳ 'ඓතිහාසික' මතය පිළිගන්නේ?", options: ["එය දීර්ඝකාලීන පරිණාමයක ප්‍රතිඵලයක් බවයි", "දෙවියන් මැවූ බවයි", "යුද්ධයකින් බිහි වූ බවයි", "එක් රැයකින් බිහි වූ බවයි"], correct: 0 },
-                    { q: "පරමාධිපත්‍යය 'අවිභජ්‍ය' බව පැවසුවේ?", options: ["ජෝන් ඕස්ටින්", "ලැස්කි", "ලොක්", "රූසෝ"], correct: 0 },
-                    { q: "දේශපාලන බලය යනු 'සාරධර්ම අධිකාරී ලෙස බෙදාහැරීම' යයි පැවසුවේ?", options: ["ඩේවිඩ් ඊස්ටන්", "ලාස්වෙල්", "දාල්", "වේබර්"], correct: 0 }
-                ],
-                "Unit 02: ප්‍රජාතන්ත්‍රවාදය හා මතවාද": [
-                    { q: "ප්‍රජාතන්ත්‍රවාදය යනු 'ජනතාව විසින්, ජනතාව උදෙසා පවත්වන ජනතාවගේ පාලනය'?", options: ["ඒබ්‍රහම් ලින්කන්", "වොෂින්ටන්", "චර්චිල්", "කෙනඩි"], correct: 0 },
-                    { q: "සෘජු ප්‍රජාතන්ත්‍රවාදය පවතින්නේ?", options: ["ස්විට්සර්ලන්තය", "ඇමරිකාව", "බ්‍රිතාන්‍යය", "ඉන්දියාව"], correct: 0 },
-                    { q: "ලිබරල්වාදයේ පියා කවුද?", options: ["ජෝන් ලොක්", "ඇඩම් ස්මිත්", "මාක්ස්", "ලෙනින්"], correct: 0 },
-                    { q: "මාක්ස්වාදයට අනුව රාජ්‍යය යනු?", options: ["පන්ති පීඩක උපකරණයකි", "දෙවියන්ගේ නිර්මාණයකි", "පොදු යහපතකි", "සමාජ අවශ්‍යතාවයකි"], correct: 0 },
-                    { q: "සමාජවාදයේ මූලික පරමාර්ථය?", options: ["සම්පත් සාධාරණ ලෙස බෙදාහැරීම", "ලාභය ලැබීම", "පෞද්ගලික දේපල", "රජ පාලනය"], correct: 0 },
-                    { q: "ෆැසිස්ට්වාදයේ මූලික ලක්ෂණයක්?", options: ["තනි පක්ෂ ඒකාධිපති පාලනය", "බහු පක්ෂ ක්‍රමය", "මානව හිමිකම්", "සාමය"], correct: 0 },
-                    { q: "නියෝජිත ප්‍රජාතන්ත්‍රවාදයේ ලක්ෂණයක් වන්නේ?", options: ["නිදහස් මැතිවරණ", "ජනතාව සෘජුව නීති සෑදීම", "හමුදා බලය", "රජුගේ අණ"], correct: 0 },
-                    { q: "ස්ත්‍රීවාදය (Feminism) පෙනී සිටින්නේ?", options: ["සමානාත්මතාවය වෙනුවෙන්", "පිරිමින්ට එරෙහිව", "යුද්ධ කිරීමට", "බදු ගෙවීමට"], correct: 0 },
-                    { q: "නිෂේධාත්මක නිදහස (Negative Liberty) යනු?", options: ["බාධාවලින් තොර වීම", "නීතියට යටත් වීම", "බලයට යටත් වීම", "වහල් භාවය"], correct: 0 },
-                    { q: "සමාජ ප්‍රජාතන්ත්‍රවාදයේ (Social Democracy) ලක්ෂණයක්?", options: ["සුබසාධන රාජ්‍යය", "ධනවාදය තුරන් කිරීම", "විප්ලවය", "කම්කරු පාලනය"], correct: 0 },
-                    { q: "නීතියේ ආධිපත්‍යය (Rule of Law) යනු?", options: ["නීතිය සැමට සමාන වීම", "රජු නීතිය වීම", "හමුදාව නීතිය වීම", "පොලිසිය නීතිය වීම"], correct: 0 },
-                    { q: "නූතන ප්‍රජාතන්ත්‍රවාදයේ මූලික ලක්ෂණයක් නොවන්නේ?", options: ["තනි පක්ෂ ක්‍රමය", "ඡන්ද බලය", "මානව හිමිකම්", "මාධ්‍ය නිදහස"], correct: 0 },
-                    { q: "ධනවාදයේ (Capitalism) පදනම කුමක්ද?", options: ["ලාභය සහ පෞද්ගලික දේපල", "සමානත්වය", "රජයේ පාලනය", "දානය"], correct: 0 },
-                    { q: "මාක්ස්වාදය අනුව 'වර්ග රහිත සමාජයක්' බිහිවන්නේ කවදාද?", options: ["කොමියුනිස්ට් අවධියේදී", "ධනවාදී අවධියේදී", "වැඩවසම් අවධියේදී", "දැන්"], correct: 0 },
-                    { q: "නසීවාදය (Nazism) බිහි වූ රට කුමක්ද?", options: ["ජර්මනිය", "ඉතාලිය", "රුසියාව", "ජපානය"], correct: 0 },
-                    { q: "ලිබරල් ප්‍රජාතන්ත්‍රවාදය තුළ අගය කරන නිදහස?", options: ["දේශපාලන හා ආර්ථික නිදහස", "හමුදා නිදහස", "නීතියෙන් තොර නිදහස", "වහල් නිදහස"], correct: 0 },
-                    { q: "වෙස්ට්මිනිස්ටර් පාලන ක්‍රමය පදනම් වන්නේ?", options: ["පාර්ලිමේන්තු පරමාධිපත්‍යය මත", "ජනාධිපති පාලනය මත", "හමුදා පාලනය මත", "කම්කරු පාලනය මත"], correct: 0 },
-                    { q: "සංවර්ධිත රටවල වැඩියෙන්ම පවතින්නේ කුමන දේශපාලන මතවාදයද?", options: ["ලිබරල් ප්‍රජාතන්ත්‍රවාදය", "කොමියුනිස්ට්වාදය", "ෆැසිස්ට්වාදය", "රාජාණ්ඩුවාදය"], correct: 0 },
-                    { q: "ගෝලීයකරණය (Globalization) යනු කුමක්ද?", options: ["මුළු ලෝකයම එකට බැඳීම", "ලෝකය විනාශ වීම", "ඉඩම් බෙදීම", "ගස් වැවීම"], correct: 0 },
-                    { q: "මානව හිමිකම් ප්‍රකාශනය සම්මත වූයේ කවදාද?", options: ["1948", "1956", "1972", "1978"], correct: 0 },
-                    { q: "පරිසරවාදය (Environmentalism) දේශපාලනයට ආවේ ඇයි?", options: ["පරිසර විනාශය නිසා", "විනෝදයට", "යුද්ධ කිරීමට", "සල්ලි සෙවීමට"], correct: 0 },
-                    { q: "දේශපාලන විද්‍යාවේ 'අධිකාරීවාදී' පාලනය යනු?", options: ["ජනතාවට නිදහසක් නැති පාලනය", "වැඩි නිදහසක් ඇති පාලනය", "රජයක් නැති පාලනය", "සමාන පාලනය"], correct: 0 },
-                    { q: "බහු පක්ෂ ක්‍රමයක් පැවතීම වැදගත් වන්නේ ඇයි?", options: ["ජනතාවට විකල්ප තෝරාගැනීම් ඇති බැවින්", "සල්ලි ලැබෙන බැවින්", "යුද්ධ කිරීමට", "මැරීමට"], correct: 0 },
-                    { q: "ඡන්ද බලය යනු කුමක්ද?", options: ["පාලකයන් තෝරාගැනීමට ජනතාවට ඇති අයිතිය", "පොලිස් බලය", "හමුදා බලය", "මුදල් බලය"], correct: 0 },
-                    { q: "බහුත්වවාදය (Pluralism) යනු?", options: ["සමාජයේ විවිධ කණ්ඩායම් හා මත පැවතීම", "තනි මතයක් තිබීම", "පක්ෂ නැති වීම", "හමුදා පාලනය"], correct: 0 }
-                ],
-                "Unit 03: ශ්‍රී ලංකාවේ ආණ්ඩුක්‍රම": [
-                    { q: "ශ්‍රී ලංකාවට සර්වජන ඡන්ද බලය ලැබුණේ කවදාද?", options: ["1931", "1948", "1972", "1978"], correct: 0 },
-                    { q: "1978 ආණ්ඩුක්‍රම ව්‍යවස්ථාවේ ප්‍රධාන ලක්ෂණය?", options: ["විධායක ජනාධිපති ක්‍රමය", "වෙස්ට්මිනිස්ටර් පාලනය", "සෙනෙට් මණ්ඩලය", "රජ පාලනය"], correct: 0 },
-                    { q: "13 වන සංශෝධනය මගින් හඳුන්වා දුන්නේ?", options: ["පළාත් සභා ක්‍රමය", "විධායක ජනාධිපති", "සමානුපාතික ඡන්ද ක්‍රමය", "රාජ්‍ය භාෂාව"], correct: 0 },
-                    { q: "ශ්‍රී ලංකාව ජනරජයක් වූ වර්ෂය?", options: ["1972", "1948", "1956", "1978"], correct: 0 },
-                    { q: "පාර්ලිමේන්තුවේ කථානායකවරයා තෝරාගන්නේ කා විසින්ද?", options: ["පාර්ලිමේන්තු මන්ත්‍රීවරුන්", "ජනාධිපති", "අගමැති", "ජනතාව"], correct: 0 },
-                    { q: "ශ්‍රේෂ්ඨාධිකරණ විනිසුරුවරුන් පත් කරන්නේ?", options: ["ජනාධිපති", "අගමැති", "කථානායක", "පොලිසිය"], correct: 0 },
-                    { q: "ශ්‍රී ලංකාවේ නීති සම්පාදනය කරන්නේ?", options: ["පාර්ලිමේන්තුව", "ජනාධිපති", "උසාවිය", "හමුදාව"], correct: 0 },
-                    { q: "ප්‍රාදේශීය සභා අයත් වන්නේ කුමන පාලන මට්ටමටද?", options: ["පළාත් පාලන", "මධ්‍යම රජය", "පළාත් සභා", "ජාත්‍යන්තර"], correct: 0 },
-                    { q: "ව්‍යවස්ථාදායක සභාව (Constitutional Council) පිහිටුවීමේ අරමුණ?", options: ["ස්වාධීන කොමිෂන් සභා සඳහා පත්වීම් නිර්දේශ කිරීම", "පක්ෂ හැදීම", "ඡන්ද පැවැත්වීම", "යුද්ධ කිරීම"], correct: 0 },
-                    { q: "ශ්‍රී ලංකාවේ වත්මන් ඡන්ද ක්‍රමය කුමක්ද?", options: ["සමානුපාතික නියෝජන ක්‍රමය", "කේවල් කිරීමේ ක්‍රමය", "මිශ්‍ර ක්‍රමය", "සෘජු නියෝජන ක්‍රමය"], correct: 0 },
-                    { q: "ආණ්ඩුක්‍රම ව්‍යවස්ථාවක මූලික අයිතිවාසිකම් ඇතුළත් වන්නේ ඇයි?", options: ["පුද්ගල නිදහස නීතියෙන් තහවුරු කිරීමට", "රජය පාලනය කිරීමට", "සල්ලි සෙවීමට", "විනෝදයට"], correct: 0 },
-                    { q: "ශ්‍රී ලංකාවේ ප්‍රථම අගමැතිවරයා කවුද?", options: ["ඩී.එස්. සේනානායක", "එස්.ඩබ්.ආර්.ඩී. බණ්ඩාරනායක", "සිරිමාවෝ බණ්ඩාරනායක", "ජේ.ආර්. ජයවර්ධන"], correct: 0 },
-                    { q: "1972 ව්‍යවස්ථාව මගින් ලංකාවේ නම වෙනස් කළේ කෙසේද?", options: ["සීලෝන් සිට ශ්‍රී ලංකාව දක්වා", "ශ්‍රී ලංකාවේ සිට සීලෝන් දක්වා", "නම වෙනස් කළේ නැත", "තැප්‍රොබේන්"], correct: 0 },
-                    { q: "සෝල්බරි ආණ්ඩුක්‍රම ව්‍යවස්ථාව ක්‍රියාත්මක වූයේ?", options: ["1947 සිට 1972 දක්වා", "1931 සිට 1947 දක්වා", "1972 සිට 1978 දක්වා", "1978 සිට අද දක්වා"], correct: 0 },
-                    { q: "පළාත් සභාවක් විසුරුවා හැරීමේ බලය ඇත්තේ කාටද?", options: ["ආණ්ඩුකාරවරයාට", "ප්‍රධාන ඇමතිට", "කථානායකට", "පොලිසියට"], correct: 0 },
-                    { q: "රාජ්‍ය සේවා කොමිෂන් සභාවේ කාර්යය කුමක්ද?", options: ["රාජ්‍ය නිලධාරීන්ගේ පත්වීම් සහ විනය පාලනය", "ඡන්ද පැවැත්වීම", "පාරවල් හැදීම", "පාසල් හැදීම"], correct: 0 },
-                    { q: "ශ්‍රී ලංකාවේ පක්ෂ ක්‍රමය කුමන වර්ගයට අයත්ද?", options: ["බහු පක්ෂ ක්‍රමය", "තනි පක්ෂ ක්‍රමය", "ද්වි පක්ෂ ක්‍රමය", "පක්ෂ නැත"], correct: 0 },
-                    { q: "මනාප ඡන්ද ක්‍රමය යනු කුමක්ද?", options: ["පක්ෂයට අමතරව තමා කැමති අපේක්ෂකයන්ට ඡන්දය දීම", "පක්ෂයට පමණක් ඡන්දය දීම", "සල්ලි වලට ඡන්දය දීම", "බලහත්කාරයෙන් ඡන්දය දීම"], correct: 0 },
-                    { q: "ශ්‍රී ලංකාවේ විධායකයේ ප්‍රධානියා කවුද?", options: ["ජනාධිපති", "අගමැති", "කථානායක", "පොලිස්පති"], correct: 0 },
-                    { q: "කැබිනට් මණ්ඩලය (අමාත්‍ය මණ්ඩලය) වගකීම දරන්නේ කාටද?", options: ["පාර්ලිමේන්තුවට", "ජනාධිපතිට", "ජනතාවට", "උසාවියට"], correct: 0 },
-                    { q: "ජනමත විචාරණයක් පවත්වන්නේ ඇයි?", options: ["ඉතා වැදගත් ජාතික කරුණක් ගැන ජනතාවගේ සෘජු මනාපය දැනගැනීමට", "ඡන්දයක් නැති නිසා", "පක්ෂයක් තේරීමට", "සල්ලි බෙදීමට"], correct: 0 },
-                    { q: "ශ්‍රී ලංකාවේ ප්‍රථම කාන්තා අගමැතිවරිය කවුද?", options: ["සිරිමාවෝ බණ්ඩාරනායක", "චන්ද්‍රිකා කුමාරතුංග", "අනුලා දේවිය", "විශාඛා"], correct: 0 },
-                    { q: "ආණ්ඩුක්‍රම ව්‍යවස්ථාව 'රටේ උත්තරීතර නීතිය' ලෙස හඳුන්වන්නේ ඇයි?", options: ["අනෙක් සියලු නීති එයට යටත් විය යුතු බැවින්", "එය ලොකු පොතක් බැවින්", "එය රජය ලියූ බැවින්", "එය ඉංග්‍රීසියෙන් ඇති බැවින්"], correct: 0 },
-                    { q: "මැතිවරණ කොමිෂන් සභාවේ ප්‍රධාන කාර්යය?", options: ["නිදහස් හා සාධාරණ මැතිවරණ පැවැත්වීම", "සල්ලි බෙදීම", "පාරවල් හැදීම", "හමුදාව පාලනය කිරීම"], correct: 0 },
-                    { q: "ආණ්ඩුක්‍රම ව්‍යවස්ථා සංශෝධනයක් සම්මත වීමට පාර්ලිමේන්තුවේ කොපමණ බහුතරයක් අවශ්‍යද?", options: ["තුනෙන් දෙකක බහුතරයක් (2/3)", "සාමාන්්‍ය බහුතරයක්", "එක් ඡන්දයක්", "අවශ්‍ය නැත"], correct: 0 }
+                    { q: "සන්නිවේදනයේ 'රේඛීය ආකෘතිය' මුලින්ම ඉදිරිපත් කළේ කවුද?", options: ["ලැස්වෙල්", "ඇරිස්ටෝටල්", "ෂැනන් සහ වීවර්", "විල්බර් ශ්‍රාම්"], correct: 1 }
                 ]
             }
         };
 
+        const pastPapersData = {
+            "Media Studies": [{year:"2024/25 Paper", link:"#"}, {year:"2023 Paper", link:"#"}]
+        };
+
         let isLoginMode = true;
-        let currentSubject = "";
 
         function toggleAuthMode() {
             isLoginMode = !isLoginMode;
@@ -392,11 +203,11 @@ function markSubscribed() {
             document.getElementById('register-fields').classList.toggle('hidden');
         }
 
-        // මේ code එක copy කරලා පේළි 395 සිට 398 දක්වා වෙනුවට paste කරන්න
-async function handleAuth() { 
-    if (!hasSubscribed) {
-        alert("කරුණාකර ප්‍රථමයෙන් YouTube චැනලය Subscribe කරන්න.");
-        return;
+        async function handleAuth() {
+            if (!hasSubscribed) {
+                alert("කරුණාකර ප්‍රථමයෙන් YouTube චැනලය Subscribe කරන්න.");
+                return;
+            }
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
             const nameField = document.getElementById('reg-name');
@@ -416,22 +227,42 @@ async function handleAuth() {
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('dashboard').classList.remove('hidden');
                 document.getElementById('bottom-nav').classList.remove('hidden');
+                setDailyTip();
             }
         });
 
         function handleLogout() { auth.signOut().then(() => location.reload()); }
 
+        function setDailyTip() {
+            const randomIndex = Math.floor(Math.random() * studyTips.length);
+            document.getElementById('daily-tip').innerText = studyTips[randomIndex];
+        }
+
         function updateCountdown() {
             const gap = new Date("Aug 10, 2026").getTime() - new Date().getTime();
-            document.getElementById("cd-days").innerText = Math.floor(gap / (1000*60*60*24));
+            const days = Math.floor(gap / (1000*60*60*24));
+            document.getElementById("cd-days").innerText = days;
             document.getElementById("cd-hours").innerText = Math.floor((gap % (1000*60*60*24)) / (1000*60*60));
             document.getElementById("cd-mins").innerText = Math.floor((gap % (1000*60*60)) / (1000*60));
+            return days;
         }
         setInterval(updateCountdown, 60000); updateCountdown();
 
         function navClick(tab) {
-            document.getElementById('dashboard-content').classList.toggle('hidden', tab === 'calendar');
-            document.getElementById('calendar-view').classList.toggle('hidden', tab === 'home');
+            document.getElementById('home-view').classList.toggle('hidden', tab !== 'home');
+            document.getElementById('calendar-view').classList.toggle('hidden', tab !== 'calendar');
+            document.getElementById('profile-view').classList.toggle('hidden', tab !== 'profile');
+            
+            if(tab === 'profile') {
+                const user = auth.currentUser;
+                if(user) {
+                    document.getElementById('profile-email').innerText = user.email;
+                    db.collection("users").doc(user.uid).get().then(doc => {
+                        if(doc.exists) document.getElementById('profile-name').innerText = doc.data().name;
+                    });
+                    document.getElementById('profile-countdown').innerText = updateCountdown();
+                }
+            }
         }
 
         function openSubject(name) {
@@ -440,7 +271,7 @@ async function handleAuth() {
             document.getElementById('subject-screen').classList.remove('hidden');
             document.getElementById('selected-subject-name').innerText = name;
             document.getElementById('papers').innerHTML = pastPapersData[name].map(p => `
-                <div class="glass-card p-4 rounded-xl flex justify-between items-center">
+                <div class="glass-card p-4 rounded-xl flex justify-between items-center mb-2">
                     <span>${p.year}</span><i class="fas fa-file-pdf text-red-500"></i>
                 </div>`).join('');
             showLessonList();
@@ -449,7 +280,7 @@ async function handleAuth() {
         function showLessonList() {
             const lessons = allQuizData[currentSubject];
             const listDiv = document.getElementById('lesson-list');
-            listDiv.innerHTML = `<h2 class="text-xl font-bold mb-4 opacity-50">Units</h2>`;
+            listDiv.innerHTML = `<h2 class="text-sm font-bold mb-4 opacity-50 uppercase tracking-tighter">Units</h2>`;
             Object.keys(lessons).forEach(unit => {
                 listDiv.innerHTML += `<div onclick="startQuiz('${unit}')" class="glass-card p-5 rounded-2xl cursor-pointer border-l-4 border-yellow-500 mb-3">${unit}</div>`;
             });
@@ -459,23 +290,54 @@ async function handleAuth() {
 
         function startQuiz(unit) {
             const questions = allQuizData[currentSubject][unit];
+            currentScore = 0;
             const quizArea = document.getElementById('quiz-area');
             document.getElementById('lesson-list').classList.add('hidden');
             quizArea.classList.remove('hidden');
-            quizArea.innerHTML = `<button onclick="showLessonList()" class="mb-4 text-xs">Back</button>`;
+            quizArea.innerHTML = `<button onclick="showLessonList()" class="mb-4 text-xs text-gray-400">Back</button>`;
+            
             questions.forEach((q, i) => {
                 const card = document.createElement('div');
                 card.className = "glass-card p-5 rounded-2xl mb-4";
                 card.innerHTML = `<p class="mb-3 font-bold">${i+1}. ${q.q}</p>`;
+                
                 q.options.forEach((opt, idx) => {
                     const btn = document.createElement('button');
                     btn.className = "w-full text-left p-3 mb-2 rounded-xl bg-slate-800/50 border border-white/5";
                     btn.innerText = opt;
-                    btn.onclick = () => btn.classList.add(idx === q.correct ? 'bg-green-600' : 'bg-red-600');
+                    btn.onclick = () => {
+                        const allButtons = card.querySelectorAll('button');
+                        if (idx === q.correct) {
+                            btn.classList.add('bg-green-600', 'text-white');
+                            currentScore++;
+                        } else {
+                            btn.classList.add('bg-red-600', 'text-white');
+                            allButtons[q.correct].classList.add('correct-pulse', 'bg-green-600', 'text-white');
+                        }
+                        allButtons.forEach(b => b.disabled = true);
+                    };
                     card.appendChild(btn);
                 });
                 quizArea.appendChild(card);
             });
+            
+            const finishBtn = document.createElement('button');
+            finishBtn.className = "w-full p-4 bg-blue-600 text-white font-bold rounded-2xl mt-4";
+            finishBtn.innerText = "ප්‍රතිඵල බලන්න";
+            finishBtn.onclick = () => showResults(currentScore, questions.length);
+            quizArea.appendChild(finishBtn);
+        }
+
+        function showResults(score, total) {
+            const quizArea = document.getElementById('quiz-area');
+            const percentage = Math.round((score / total) * 100);
+            quizArea.innerHTML = `
+                <div class="glass-card p-8 rounded-3xl text-center border-2 border-yellow-500">
+                    <h2 class="text-2xl font-bold text-yellow-500 mb-4 sinhala-font">ප්‍රතිඵලය: ${percentage}%</h2>
+                    <p class="text-sm mb-6 text-gray-400">නිවැරදි පිළිතුරු ${score} / ${total}</p>
+                    <button onclick="showLessonList()" class="w-full p-4 bg-yellow-500 text-slate-900 font-bold rounded-xl mb-3">Back to Lessons</button>
+                    <button onclick="window.open('whatsapp://send?text=මම A/L Fast Track එකෙන් ${percentage}% ගත්තා!')" class="bg-green-600 text-white px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest">Share on WhatsApp</button>
+                </div>`;
         }
 
         function backToDashboard() {
