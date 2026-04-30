@@ -1425,7 +1425,7 @@
             quizArea.classList.remove('hidden');
             quizArea.innerHTML = `<button onclick="showLessonList()" class="mb-4 text-xs text-gray-500"><i class="fas fa-arrow-left"></i> back</button>`;
             
-            questions.forEach((q, qIdx) => {questions.forEach((q, qIdx) => {
+            questions.forEach((q, qIdx) => {
         // --- Shuffle Logic (මේක අලුතින් එකතු කරන කොටස) ---
         const correctValue = q.options[q.correct]; 
         
@@ -1440,9 +1440,7 @@
         const card = document.createElement('div');
         card.className = "glass-card p-6 rounded-2xl mb-4";
         card.innerHTML = `<p class="mb-4 font-bold text-gray-100">${qIdx+1}. ${q.q}</p>`;
-                const card = document.createElement('div');
-                card.className = "glass-card p-6 rounded-2xl mb-4";
-                card.innerHTML = `<p class="mb-4 font-bold text-gray-100">${qIdx+1}. ${q.q}</p>`;
+                
                 
                 q.options.forEach((opt, optIdx) => {
                     const btn = document.createElement('button');
