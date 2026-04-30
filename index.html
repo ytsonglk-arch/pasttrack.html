@@ -13,36 +13,48 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Abhaya+Libre:wght@700&display=swap');
         body { font-family: 'Poppins', sans-serif; background-color: #0f172a; color: white; overflow-x: hidden; }
         .sinhala-font { font-family: 'Abhaya Libre', serif; }
-        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); transition: 0.3s; }
+        .glass-card:hover { background: rgba(255, 255, 255, 0.08); transform: translateY(-2px); }
         .tab-content { display: none; }
         .active-tab { display: block; }
         .countdown-box { background: linear-gradient(135deg, #f59e0b, #d97706); }
-        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
-        .correct-pulse { animation: pulse-green 2s infinite; border: 2px solid #22c55e !important; }
+        
+        /* නිවැරදි උත්තරය පෙන්වන Animation එක */
+        @keyframes pulse-green {
+            0% { background-color: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); }
+            50% { background-color: rgba(34, 197, 94, 0.7); border-color: #22c55e; box-shadow: 0 0 15px #22c55e; }
+            100% { background-color: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); }
+        }
+        .show-correct { animation: pulse-green 1.5s infinite; color: white !important; font-weight: bold; }
+        .wrong-shake { animation: shake 0.4s; background-color: #ef4444 !important; border-color: #dc2626 !important; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
     </style>
 </head>
 <body>
     <!-- Auth Screen -->
     <div id="auth-screen" class="min-h-screen flex flex-col items-center justify-center p-6 text-center">
-        <h1 class="text-4xl font-extrabold text-yellow-500 mb-2">A/L Fast Track</h1>
+        <h1 class="text-4xl font-extrabold text-yellow-500 mb-2 tracking-tighter">A/L Fast Track</h1>
+        <p class="text-[10px] text-gray-500 uppercase mb-8 tracking-[0.2em]">Future Success Starts Here</p>
+        
         <div class="w-full max-w-sm glass-card p-8 rounded-3xl shadow-2xl">
-            <h2 id="auth-title" class="text-xl font-bold mb-6">Login</h2>
+            <h2 id="auth-title" class="text-xl font-bold mb-6">ඇතුළු වන්න</h2>
             
-            <div id="sub-check-area" class="mb-5 p-4 rounded-2xl bg-red-600/10 border border-red-500/30 text-center">
-                <p class="text-[10px] text-red-400 mb-3 sinhala-font">ඇප් එක පාවිච්චි කිරීමට ප්‍රථම අපේ YouTube චැනලය Subscribe කර පසුව Login වන්න.</p>
-                <a href="https://youtube.com/@ඔයාගේ_චැනල්_ලින්ක්_එක" target="_blank" onclick="markSubscribed()" class="inline-flex items-center justify-center bg-red-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs">
+            <!-- YouTube Section (Promotion Only) -->
+            <div id="sub-check-area" class="mb-5 p-4 rounded-2xl bg-red-600/10 border border-red-500/20 text-center">
+                <p class="text-[10px] text-red-400 mb-3 sinhala-font">වැඩිදුර පාඩම් සඳහා අපේ YouTube චැනලය Subscribe කරන්න.</p>
+                <a href="https://youtube.com/@ඔයාගේ_චැනල්_නම" target="_blank" class="inline-flex items-center justify-center bg-red-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-lg">
                     <i class="fab fa-youtube mr-2"></i> Subscribe Now
                 </a>
             </div>
 
             <div id="register-fields" class="hidden">
-                <input type="text" id="reg-name" placeholder="ඔබේ නම" class="w-full p-4 mb-4 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-yellow-500 text-white">
+                <input type="text" id="reg-name" placeholder="ඔබේ නම" class="w-full p-4 mb-4 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-yellow-500 text-white transition-all">
             </div>
             
-            <input type="email" id="auth-email" placeholder="Email ලිපිනය" class="w-full p-4 mb-4 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-yellow-500 text-white">
-            <input type="password" id="auth-password" placeholder="Password" class="w-full p-4 mb-6 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-yellow-500 text-white">
+            <input type="email" id="auth-email" placeholder="Email ලිපිනය" class="w-full p-4 mb-4 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-yellow-500 text-white transition-all">
+            <input type="password" id="auth-password" placeholder="Password" class="w-full p-4 mb-6 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-yellow-500 text-white transition-all">
             
-            <button onclick="handleAuth()" id="auth-btn" class="w-full p-4 bg-yellow-500 text-slate-900 font-bold rounded-xl shadow-lg hover:bg-yellow-400 transition">Login</button>
+            <button onclick="handleAuth()" id="auth-btn" class="w-full p-4 bg-yellow-500 text-slate-900 font-bold rounded-xl shadow-lg hover:bg-yellow-400 transition transform active:scale-95">Login</button>
             <p class="text-sm text-gray-400 mt-4"><span id="toggle-text">ගිණුමක් නොමැතිද?</span> <button onclick="toggleAuthMode()" id="toggle-btn" class="text-yellow-500 font-bold">Register</button></p>
         </div>
     </div>
@@ -50,86 +62,85 @@
     <!-- Dashboard -->
     <div id="dashboard" class="hidden min-h-screen p-6 pb-24">
         <header class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold text-yellow-500 sinhala-font">A/L Fast Track</h1>
+            <div>
+                <h1 class="text-2xl font-bold text-yellow-500 sinhala-font">A/L Fast Track</h1>
+                <p class="text-[10px] text-gray-500" id="welcome-msg">Welcome Student!</p>
+            </div>
             <button onclick="handleLogout()" class="text-red-400 text-xs bg-red-400/10 px-3 py-1 rounded-lg">Logout</button>
         </header>
 
         <!-- Home View -->
         <div id="home-view">
-            <div class="countdown-box p-6 rounded-3xl mb-6 shadow-2xl text-slate-900">
-                <h2 class="text-center font-bold text-sm uppercase mb-3 italic">2026 A/L විභාගයට තව...</h2>
+            <div class="countdown-box p-6 rounded-3xl mb-6 shadow-2xl text-slate-900 relative overflow-hidden">
+                <h2 class="font-bold text-sm uppercase mb-3 italic">2026 A/L විභාගයට තව...</h2>
                 <div class="flex justify-around items-center">
-                    <div class="text-center"><span id="cd-days" class="text-4xl font-black block">00</span><span class="text-[10px] font-bold uppercase">Days</span></div>
+                    <div class="text-center"><span id="cd-days" class="text-4xl font-black block">00</span><span class="text-[10px] font-bold">Days</span></div>
                     <div class="text-3xl font-bold">:</div>
-                    <div class="text-center"><span id="cd-hours" class="text-4xl font-black block">00</span><span class="text-[10px] font-bold uppercase">Hours</span></div>
+                    <div class="text-center"><span id="cd-hours" class="text-4xl font-black block">00</span><span class="text-[10px] font-bold">Hours</span></div>
                     <div class="text-3xl font-bold">:</div>
-                    <div class="text-center"><span id="cd-mins" class="text-4xl font-black block">00</span><span class="text-[10px] font-bold uppercase">Mins</span></div>
+                    <div class="text-center"><span id="cd-mins" class="text-4xl font-black block">00</span><span class="text-[10px] font-bold">Mins</span></div>
                 </div>
             </div>
 
             <!-- Daily Tip -->
             <div class="glass-card p-4 rounded-2xl mb-8 border-l-4 border-yellow-500">
                 <div class="flex items-center mb-2">
-                    <i class="fas fa-lightbulb text-yellow-400 mr-2"></i>
-                    <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">අද දවසේ උපදෙස</span>
+                    <i class="fas fa-lightbulb text-yellow-400 mr-2 text-xs"></i>
+                    <span class="text-[10px] font-bold uppercase text-gray-400 tracking-widest">Study Tip</span>
                 </div>
-                <p id="daily-tip" class="text-sm sinhala-font leading-relaxed">"සාර්ථකත්වයේ රහස වන්නේ අද පටන් ගැනීමයි!"</p>
+                <p id="daily-tip" class="text-sm sinhala-font leading-relaxed">"පසුබට නොවන්න, අද දින ඔබ කරන කැපවීම හෙට දින ඔබේ ජයග්‍රහණයයි!"</p>
             </div>
 
-            <div class="space-y-4">
+            <div class="grid grid-cols-1 gap-4">
                 <div onclick="openSubject('Media Studies')" class="glass-card p-5 rounded-2xl flex items-center cursor-pointer">
-                    <div class="bg-purple-600 p-4 rounded-xl mr-4"><i class="fas fa-video"></i></div>
+                    <div class="bg-purple-600/20 text-purple-400 p-4 rounded-xl mr-4"><i class="fas fa-video"></i></div>
                     <span class="text-lg font-bold">Media Studies</span>
                 </div>
                 <div onclick="openSubject('Buddhist Civilization')" class="glass-card p-5 rounded-2xl flex items-center cursor-pointer">
-                    <div class="bg-orange-600 p-4 rounded-xl mr-4"><i class="fas fa-dharmachakra"></i></div>
+                    <div class="bg-orange-600/20 text-orange-400 p-4 rounded-xl mr-4"><i class="fas fa-dharmachakra"></i></div>
                     <span class="text-lg font-bold">Buddhist Civilization</span>
                 </div>
                 <div onclick="openSubject('Political Science')" class="glass-card p-5 rounded-2xl flex items-center cursor-pointer">
-                    <div class="bg-blue-600 p-4 rounded-xl mr-4"><i class="fas fa-gavel"></i></div>
+                    <div class="bg-blue-600/20 text-blue-400 p-4 rounded-xl mr-4"><i class="fas fa-gavel"></i></div>
                     <span class="text-lg font-bold">Political Science</span>
                 </div>
+                
+                <!-- Coming Soon Subjects -->
+                <div onclick="showComingSoon('History')" class="glass-card p-5 rounded-2xl flex items-center cursor-pointer opacity-60">
+                    <div class="bg-red-600/20 text-red-400 p-4 rounded-xl mr-4"><i class="fas fa-history"></i></div>
+                    <span class="text-lg font-bold">History</span>
+                </div>
+                <!-- ... (Add Agriculture, Logic etc. as previously shown) -->
             </div>
         </div>
 
-        <!-- Calendar View -->
+        <!-- Calendar & Profile Views (Hidden initially) -->
         <div id="calendar-view" class="hidden">
             <h2 class="text-xl font-bold mb-6 text-yellow-500 sinhala-font">Exam Calendar - 2026</h2>
-            <div class="glass-card p-4 rounded-2xl border-l-4 border-yellow-500 mb-4">
-                <h3>විභාගය ආරම්භය</h3>
-                <p class="text-sm text-gray-400">2026 අගෝස්තු 10 (අනුමාන)</p>
+            <div class="glass-card p-5 rounded-2xl border-l-4 border-yellow-500 mb-4">
+                <h3 class="font-bold uppercase text-xs text-gray-500">Predicted Date</h3>
+                <p class="text-lg font-bold">2026 අගෝස්තු 10</p>
             </div>
         </div>
 
-        <!-- Profile View -->
         <div id="profile-view" class="hidden">
-            <h2 class="text-xl font-bold mb-6 text-yellow-500 sinhala-font text-center">My Profile</h2>
+            <h2 class="text-xl font-bold mb-6 text-yellow-500 text-center">My Profile</h2>
             <div class="glass-card p-8 rounded-3xl text-center border-b-4 border-yellow-500 mb-6">
                 <div class="w-20 h-20 bg-yellow-500 rounded-full mx-auto mb-4 flex items-center justify-center text-slate-900 text-3xl font-bold">
-                    <i class="fas fa-user"></i>
+                    <i class="fas fa-user-graduate"></i>
                 </div>
-                <h3 id="profile-name" class="text-xl font-bold text-white mb-1">Loading...</h3>
-                <p id="profile-email" class="text-xs text-gray-400">email@example.com</p>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div class="glass-card p-4 rounded-2xl text-center">
-                    <span class="text-[10px] uppercase text-gray-500">විභාගයට තව</span>
-                    <p class="text-lg font-bold text-yellow-500"><span id="profile-countdown">0</span> Days</p>
-                </div>
-                <div class="glass-card p-4 rounded-2xl text-center">
-                    <span class="text-[10px] uppercase text-gray-500">තත්ත්වය</span>
-                    <p class="text-lg font-bold text-green-500">Active</p>
-                </div>
+                <h3 id="profile-name" class="text-xl font-bold">Student</h3>
+                <p id="profile-email" class="text-xs text-gray-500">email@example.com</p>
             </div>
         </div>
     </div>
 
     <!-- Subject Screen -->
     <div id="subject-screen" class="hidden min-h-screen p-6 pb-24">
-        <button onclick="backToDashboard()" class="mb-6 text-gray-400"><i class="fas fa-arrow-left"></i> ආපසු</button>
-        <h1 id="selected-subject-name" class="text-3xl font-bold text-yellow-500 mb-6 uppercase tracking-wider">Subject</h1>
+        <button onclick="backToDashboard()" class="mb-6 text-gray-500 transition"><i class="fas fa-arrow-left mr-2"></i> back</button>
+        <h1 id="selected-subject-name" class="text-3xl font-bold text-yellow-500 mb-6 uppercase tracking-widest">Subject</h1>
         <div class="flex space-x-2 mb-6 bg-slate-800 p-1 rounded-xl">
-            <button onclick="showTab('papers')" id="btn-papers" class="flex-1 py-3 rounded-lg font-bold bg-yellow-500 text-slate-900">Papers</button>
+            <button onclick="showTab('papers')" id="btn-papers" class="flex-1 py-3 rounded-lg font-bold bg-yellow-500 text-slate-900 transition">Papers</button>
             <button onclick="showTab('quiz')" id="btn-quiz" class="flex-1 py-3 rounded-lg font-bold text-gray-400 transition">Quiz</button>
         </div>
         <div id="papers" class="tab-content active-tab space-y-3"></div>
@@ -140,26 +151,14 @@
     </div>
 
     <!-- Bottom Nav -->
-    <div id="bottom-nav" class="hidden fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-white/10 flex justify-around p-4 z-50">
-        <button onclick="navClick('home')" class="text-yellow-500 flex flex-col items-center"><i class="fas fa-home"></i><span class="text-[10px] mt-1 font-bold">Home</span></button>
-        <button onclick="navClick('calendar')" class="text-gray-400 flex flex-col items-center"><i class="fas fa-calendar-alt"></i><span class="text-[10px] mt-1">Calendar</span></button>
-        <button onclick="navClick('profile')" class="text-gray-400 flex flex-col items-center"><i class="fas fa-user-circle"></i><span class="text-[10px] mt-1 font-bold">Profile</span></button>
+    <div id="bottom-nav" class="hidden fixed bottom-0 left-0 right-0 bg-slate-900/90 backdrop-blur border-t border-white/10 flex justify-around p-4 z-50">
+        <button onclick="navClick('home')" id="nav-home" class="text-yellow-500 flex flex-col items-center"><i class="fas fa-home"></i><span class="text-[10px] mt-1">Home</span></button>
+        <button onclick="navClick('calendar')" id="nav-calendar" class="text-gray-400 flex flex-col items-center"><i class="fas fa-calendar-alt"></i><span class="text-[10px] mt-1">Calendar</span></button>
+        <button onclick="navClick('profile')" id="nav-profile" class="text-gray-400 flex flex-col items-center"><i class="fas fa-user-circle"></i><span class="text-[10px] mt-1">Profile</span></button>
     </div>
 
     <script>
-        let hasSubscribed = false;
-        let currentScore = 0;
-        let currentSubject = "";
-
-        function markSubscribed() {
-            hasSubscribed = true;
-            const area = document.getElementById('sub-check-area');
-            if(area) {
-                area.innerHTML = `<p class="text-green-500 text-xs font-bold sinhala-font animate-pulse"><i class="fas fa-check-circle mr-2"></i> දැන් ඔබට ඇතුළු විය හැක!</p>`;
-                area.classList.replace('border-red-500/30', 'border-green-500/30');
-            }
-        }
-
+        // --- 1. CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyB_10UzdkgZPlu-P361PYbEQjTwbKjjWx0",
             authDomain: "al-fast-track.firebaseapp.com",
@@ -172,46 +171,49 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        const studyTips = [
-            "පාඩම් කරන අතරතුර විනාඩි 5ක විවේකයක් ගන්න. එය මතකය තබා ගැනීමට උදව් වේ.",
-            "අමාරු විෂයන් උදෑසන කාලයේදී පාඩම් කරන්න.",
-            "පසුගිය විභාග ප්‍රශ්න පත්‍ර (Past Papers) වැඩිපුර පුහුණු වන්න.",
-            "හොඳින් ජලය පානය කරන්න. එය මොළයේ ක්‍රියාකාරිත්වය වැඩි කරයි.",
-            "ඔබ ඉගෙන ගත් දේ තවත් කෙනෙකුට කියා දෙන්න."
-        ];
+        let currentSubject = "";
+        let currentScore = 0;
+        let isLoginMode = true;
 
-        // [All Quiz Data and Past Papers Data මෙතැනට ඇතුළත් වේ]
+        // --- 2. DATA (ADD ALL YOUR 900+ QUESTIONS HERE) ---
         const allQuizData = {
             "Media Studies": {
-                "Unit 01: සන්නිවේදනය හඳුන්වාදීම": [
-                    { q: "මානව සන්නිවේදනයේ මූලිකම ඒකකය කුමක්ද?", options: ["සංකේතය", "භාෂාව", "මාධ්‍යය", "පණිවිඩය"], correct: 0 },
-                    { q: "සන්නිවේදනයේ 'රේඛීය ආකෘතිය' මුලින්ම ඉදිරිපත් කළේ කවුද?", options: ["ලැස්වෙල්", "ඇරිස්ටෝටල්", "ෂැනන් සහ වීවර්", "විල්බර් ශ්‍රාම්"], correct: 1 }
-                ]
+                "Unit 01: සන්නිවේදන අධ්‍යයනයේ ආරම්භය": [
+                    { q: "මානව සන්නිවේදනයේ මුල්ම සලකුණු ලෙස සැලකෙන්නේ?", options: ["ගුහා සිතුවම්", "මුද්‍රණ කලාව", "ගුවන් විදුලිය", "ටෙලිග්‍රාෆ්"], correct: 0 },
+                    // ... (Add all 25 questions)
+                ],
+                // ... (Add all 12 units)
+            },
+            "Buddhist Civilization": {
+                "01. ප්‍රාග් බෞද්ධ භාරතය": [
+                    { q: "බුද්ධ කාලීන භාරතයේ පැවති ප්‍රධානතම දේශපාලන ක්‍රම දෙක කුමක්ද?", options: ["රාජාණ්ඩු සහ සමූහාණ්ඩු", "ඒකාධිපති සහ ප්‍රජාතන්ත්‍රවාදී", "වැඩවසම් සහ ගෝත්‍රික", "රාජ්‍ය සහ අධිරාජ්‍ය"], correct: 0 },
+                    // ... (Add all 25 questions)
+                ],
+                // ... (Add all 11 units)
+            },
+            "Political Science": {
+                "01. දේශපාලන විද්‍යාවේ ස්වභාවය": [
+                    { q: "දේශපාලන විද්‍යාවේ පියා ලෙස සැලකෙන්නේ කවුද?", options: ["ප්ලේටෝ", "ඇරිස්ටෝටල්", "සොක්‍රටීස්", "මැකියාවෙලී"], correct: 1 },
+                    // ... (Add all 25 questions)
+                ],
+                // ... (Add all 15 units)
             }
         };
 
-        const pastPapersData = {
-            "Media Studies": [{year:"2024/25 Paper", link:"#"}, {year:"2023 Paper", link:"#"}]
-        };
+        const studyTips = ["සන්නිවේදන ආකෘති ඇඳ පාඩම් කරන්න.", "Past Papers අවම 3 පාරක් කරන්න.", "පාඩම් කරන විට විවේකය වැදගත්.", "අමාරු විෂයන් උදෑසන පාඩම් කරන්න."];
 
-        let isLoginMode = true;
-
+        // --- 3. AUTH & NAVIGATION ---
         function toggleAuthMode() {
             isLoginMode = !isLoginMode;
-            document.getElementById('auth-title').innerText = isLoginMode ? "Login" : "Register";
+            document.getElementById('auth-title').innerText = isLoginMode ? "ඇතුළු වන්න" : "ලියාපදිංචි වන්න";
             document.getElementById('auth-btn').innerText = isLoginMode ? "Login" : "Register";
             document.getElementById('register-fields').classList.toggle('hidden');
         }
 
         async function handleAuth() {
-            if (!hasSubscribed) {
-                alert("කරුණාකර ප්‍රථමයෙන් YouTube චැනලය Subscribe කරන්න.");
-                return;
-            }
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
-            const nameField = document.getElementById('reg-name');
-            const name = nameField ? nameField.value : "";
+            const name = document.getElementById('reg-name').value;
             if(!email || !password) return alert("විස්තර ඇතුළත් කරන්න.");
             try {
                 if(isLoginMode) await auth.signInWithEmailAndPassword(email, password);
@@ -228,59 +230,51 @@
                 document.getElementById('dashboard').classList.remove('hidden');
                 document.getElementById('bottom-nav').classList.remove('hidden');
                 setDailyTip();
+                updateCountdown();
             }
         });
 
         function handleLogout() { auth.signOut().then(() => location.reload()); }
 
-        function setDailyTip() {
-            const randomIndex = Math.floor(Math.random() * studyTips.length);
-            document.getElementById('daily-tip').innerText = studyTips[randomIndex];
-        }
-
-        function updateCountdown() {
-            const gap = new Date("Aug 10, 2026").getTime() - new Date().getTime();
-            const days = Math.floor(gap / (1000*60*60*24));
-            document.getElementById("cd-days").innerText = days;
-            document.getElementById("cd-hours").innerText = Math.floor((gap % (1000*60*60*24)) / (1000*60*60));
-            document.getElementById("cd-mins").innerText = Math.floor((gap % (1000*60*60)) / (1000*60));
-            return days;
-        }
-        setInterval(updateCountdown, 60000); updateCountdown();
-
         function navClick(tab) {
-            document.getElementById('home-view').classList.toggle('hidden', tab !== 'home');
-            document.getElementById('calendar-view').classList.toggle('hidden', tab !== 'calendar');
-            document.getElementById('profile-view').classList.toggle('hidden', tab !== 'profile');
-            
+            const views = ['home', 'calendar', 'profile'];
+            views.forEach(v => {
+                document.getElementById(v + '-view').classList.add('hidden');
+                document.getElementById('nav-' + v).classList.replace('text-yellow-500', 'text-gray-400');
+            });
+            document.getElementById(tab + '-view').classList.remove('hidden');
+            document.getElementById('nav-' + tab).classList.replace('text-gray-400', 'text-yellow-500');
             if(tab === 'profile') {
                 const user = auth.currentUser;
-                if(user) {
-                    document.getElementById('profile-email').innerText = user.email;
-                    db.collection("users").doc(user.uid).get().then(doc => {
-                        if(doc.exists) document.getElementById('profile-name').innerText = doc.data().name;
-                    });
-                    document.getElementById('profile-countdown').innerText = updateCountdown();
-                }
+                document.getElementById('profile-email').innerText = user.email;
+                db.collection("users").doc(user.uid).get().then(doc => {
+                    if(doc.exists) document.getElementById('profile-name').innerText = doc.data().name;
+                });
             }
         }
 
+        // --- 4. SUBJECT & QUIZ CORE (NEW LOGIC) ---
         function openSubject(name) {
             currentSubject = name;
             document.getElementById('dashboard').classList.add('hidden');
             document.getElementById('subject-screen').classList.remove('hidden');
             document.getElementById('selected-subject-name').innerText = name;
-            document.getElementById('papers').innerHTML = pastPapersData[name].map(p => `
-                <div class="glass-card p-4 rounded-xl flex justify-between items-center mb-2">
-                    <span>${p.year}</span><i class="fas fa-file-pdf text-red-500"></i>
-                </div>`).join('');
             showLessonList();
+            
+            // Default papers (Static)
+            document.getElementById('papers').innerHTML = `<div class="p-4 text-center opacity-30">Papers loading...</div>`;
+            setTimeout(() => {
+                document.getElementById('papers').innerHTML = `
+                    <div class="glass-card p-4 rounded-xl flex justify-between items-center mb-2"><span>2024/25 Paper</span><i class="fas fa-file-pdf text-red-500"></i></div>
+                    <div class="glass-card p-4 rounded-xl flex justify-between items-center mb-2"><span>2023 Paper</span><i class="fas fa-file-pdf text-red-500"></i></div>
+                `;
+            }, 500);
         }
 
         function showLessonList() {
-            const lessons = allQuizData[currentSubject];
+            const lessons = allQuizData[currentSubject] || {};
             const listDiv = document.getElementById('lesson-list');
-            listDiv.innerHTML = `<h2 class="text-sm font-bold mb-4 opacity-50 uppercase tracking-tighter">Units</h2>`;
+            listDiv.innerHTML = `<h2 class="text-xs font-bold mb-4 opacity-50 uppercase tracking-widest">Units / පාඩම්</h2>`;
             Object.keys(lessons).forEach(unit => {
                 listDiv.innerHTML += `<div onclick="startQuiz('${unit}')" class="glass-card p-5 rounded-2xl cursor-pointer border-l-4 border-yellow-500 mb-3">${unit}</div>`;
             });
@@ -294,50 +288,79 @@
             const quizArea = document.getElementById('quiz-area');
             document.getElementById('lesson-list').classList.add('hidden');
             quizArea.classList.remove('hidden');
-            quizArea.innerHTML = `<button onclick="showLessonList()" class="mb-4 text-xs text-gray-400">Back</button>`;
+            quizArea.innerHTML = `<button onclick="showLessonList()" class="mb-4 text-xs text-gray-500"><i class="fas fa-arrow-left"></i> back</button>`;
             
-            questions.forEach((q, i) => {
+            questions.forEach((q, qIdx) => {
                 const card = document.createElement('div');
-                card.className = "glass-card p-5 rounded-2xl mb-4";
-                card.innerHTML = `<p class="mb-3 font-bold">${i+1}. ${q.q}</p>`;
+                card.className = "glass-card p-6 rounded-2xl mb-4";
+                card.innerHTML = `<p class="mb-4 font-bold text-gray-100">${qIdx+1}. ${q.q}</p>`;
                 
-                q.options.forEach((opt, idx) => {
+                q.options.forEach((opt, optIdx) => {
                     const btn = document.createElement('button');
-                    btn.className = "w-full text-left p-3 mb-2 rounded-xl bg-slate-800/50 border border-white/5";
+                    btn.className = "w-full text-left p-4 mb-2 rounded-xl bg-slate-800/50 border border-white/5 transition-all duration-300";
                     btn.innerText = opt;
+                    
                     btn.onclick = () => {
                         const allButtons = card.querySelectorAll('button');
-                        if (idx === q.correct) {
-                            btn.classList.add('bg-green-600', 'text-white');
+                        
+                        // උත්තරය හරි නම්
+                        if (optIdx === q.correct) {
+                            btn.classList.add('bg-green-600', 'border-green-400');
                             currentScore++;
-                        } else {
-                            btn.classList.add('bg-red-600', 'text-white');
-                            allButtons[q.correct].classList.add('correct-pulse', 'bg-green-600', 'text-white');
+                        } 
+                        // උත්තරය වැරදි නම්
+                        else {
+                            btn.classList.add('wrong-shake');
+                            // හරි උත්තරය Pulse කරලා පෙන්වනවා
+                            allButtons[q.correct].classList.add('show-correct');
                         }
+                        
+                        // එකපාරක් එබුවම ඔක්කොම buttons disable කරනවා
                         allButtons.forEach(b => b.disabled = true);
                     };
                     card.appendChild(btn);
                 });
                 quizArea.appendChild(card);
             });
-            
+
             const finishBtn = document.createElement('button');
-            finishBtn.className = "w-full p-4 bg-blue-600 text-white font-bold rounded-2xl mt-4";
-            finishBtn.innerText = "ප්‍රතිඵල බලන්න";
+            finishBtn.className = "w-full p-5 bg-blue-600 text-white font-bold rounded-2xl mt-4 shadow-xl active:scale-95";
+            finishBtn.innerText = "ප්‍රතිඵලය බලන්න";
             finishBtn.onclick = () => showResults(currentScore, questions.length);
             quizArea.appendChild(finishBtn);
         }
 
         function showResults(score, total) {
-            const quizArea = document.getElementById('quiz-area');
             const percentage = Math.round((score / total) * 100);
-            quizArea.innerHTML = `
-                <div class="glass-card p-8 rounded-3xl text-center border-2 border-yellow-500">
-                    <h2 class="text-2xl font-bold text-yellow-500 mb-4 sinhala-font">ප්‍රතිඵලය: ${percentage}%</h2>
-                    <p class="text-sm mb-6 text-gray-400">නිවැරදි පිළිතුරු ${score} / ${total}</p>
-                    <button onclick="showLessonList()" class="w-full p-4 bg-yellow-500 text-slate-900 font-bold rounded-xl mb-3">Back to Lessons</button>
-                    <button onclick="window.open('whatsapp://send?text=මම A/L Fast Track එකෙන් ${percentage}% ගත්තා!')" class="bg-green-600 text-white px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest">Share on WhatsApp</button>
+            document.getElementById('quiz-area').innerHTML = `
+                <div class="glass-card p-10 rounded-3xl text-center border-2 border-yellow-500">
+                    <div class="text-6xl font-black text-yellow-500 mb-2">${percentage}%</div>
+                    <h2 class="text-xl font-bold mb-6">Score: ${score} / ${total}</h2>
+                    <button onclick="showLessonList()" class="w-full p-4 bg-yellow-500 text-slate-900 font-bold rounded-xl mb-4">නැවත උත්සාහ කරන්න</button>
+                    <button onclick="window.open('whatsapp://send?text=මම A/L Fast Track ඇප් එකෙන් ${percentage}% ගත්තා!')" class="text-green-500 text-xs font-bold uppercase tracking-widest"><i class="fab fa-whatsapp mr-1"></i> Share results</button>
                 </div>`;
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        // --- 5. EXTRA HELPERS ---
+        function setDailyTip() {
+            const tip = studyTips[Math.floor(Math.random() * studyTips.length)];
+            document.getElementById('daily-tip').innerText = `"${tip}"`;
+        }
+
+        function updateCountdown() {
+            const gap = new Date("Aug 10, 2026").getTime() - new Date().getTime();
+            const d = Math.floor(gap / (1000*60*60*24));
+            const h = Math.floor((gap % (1000*60*60*24)) / (1000*60*60));
+            const m = Math.floor((gap % (1000*60*60)) / (1000*60));
+            document.getElementById("cd-days").innerText = d;
+            document.getElementById("cd-hours").innerText = h;
+            document.getElementById("cd-mins").innerText = m;
+        }
+        setInterval(updateCountdown, 60000);
+
+        function showComingSoon(subject) {
+            alert(subject + " පාඩම් සහ ප්‍රශ්න පත්‍ර ඉක්මනින්ම ඇතුළත් කෙරේ!");
         }
 
         function backToDashboard() {
