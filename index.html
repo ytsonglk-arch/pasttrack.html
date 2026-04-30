@@ -102,6 +102,16 @@
     </div>
 
     <script>
+        let hasSubscribed = false;
+
+function markSubscribed() {
+    hasSubscribed = true;
+    const area = document.getElementById('sub-check-area');
+    if(area) {
+        area.innerHTML = `<p class="text-green-500 text-xs font-bold sinhala-font animate-pulse"><i class="fas fa-check-circle mr-2"></i> දැන් ඔබට ඇතුළු විය හැක!</p>`;
+        area.classList.replace('border-red-500/30', 'border-green-500/30');
+    }
+}
         const firebaseConfig = {
             apiKey: "AIzaSyB_10UzdkgZPlu-P361PYbEQjTwbKjjWx0",
             authDomain: "al-fast-track.firebaseapp.com",
@@ -382,7 +392,11 @@
             document.getElementById('register-fields').classList.toggle('hidden');
         }
 
-        async function handleAuth() {
+        // මේ code එක copy කරලා පේළි 395 සිට 398 දක්වා වෙනුවට paste කරන්න
+async function handleAuth() { 
+    if (!hasSubscribed) {
+        alert("කරුණාකර ප්‍රථමයෙන් YouTube චැනලය Subscribe කරන්න.");
+        return;
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
             const nameField = document.getElementById('reg-name');
