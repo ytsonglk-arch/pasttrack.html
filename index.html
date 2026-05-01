@@ -201,13 +201,17 @@
 // Firestore එකට දත්ත යවන function එක
 async function saveUserScore(subject, score, total) {
     try {
-        await db.collection("user_results").add({
-            subject: subject,
-            score: score,
-            totalQuestions: total,
-            date: new Date().toLocaleString(),
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        const user = firebase.auth().currentUser;
+    const studentName = user ? (user.displayName || user.email) : "Guest Student";
+
+    await db.collection("user_results").add({
+        userName: studentName,
+        subject: subject,
+        score: score,
+        totalQuestions: total,
+        date: new Date().toLocaleString(),
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
         console.log("දත්ත සාර්ථකව සේව් වුණා!");
     } catch (error) {
         console.error("දත්ත සේව් කිරීමේදී දෝෂයක් ආවා: ", error);
