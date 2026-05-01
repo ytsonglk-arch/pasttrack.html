@@ -198,7 +198,21 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-
+// Firestore එකට දත්ත යවන function එක
+async function saveUserScore(subject, score, total) {
+    try {
+        await db.collection("user_results").add({
+            subject: subject,
+            score: score,
+            totalQuestions: total,
+            date: new Date().toLocaleString(),
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        console.log("දත්ත සාර්ථකව සේව් වුණා!");
+    } catch (error) {
+        console.error("දත්ත සේව් කිරීමේදී දෝෂයක් ආවා: ", error);
+    }
+}
         let currentSubject = "";
         let currentScore = 0;
         let isLoginMode = true;
@@ -1490,6 +1504,8 @@
 
         function showResults(score, total) {
             const percentage = Math.round((score / total) * 100);
+            // Firebase Firestore එකට දත්ත යවන පේළිය
+    saveUserScore(currentSubject, score, total);
             document.getElementById('quiz-area').innerHTML = `
                 <div class="glass-card p-10 rounded-3xl text-center border-2 border-yellow-500">
                     <div class="text-6xl font-black text-yellow-500 mb-2">${percentage}%</div>
