@@ -159,14 +159,23 @@
         <button onclick="backToDashboard()" class="mb-6 text-gray-500 transition"><i class="fas fa-arrow-left mr-2"></i> back</button>
         <h1 id="selected-subject-name" class="text-3xl font-bold text-yellow-500 mb-6 uppercase tracking-widest">Subject</h1>
         <div class="flex space-x-2 mb-6 bg-slate-800 p-1 rounded-xl">
-            <button onclick="showTab('papers')" id="btn-papers" class="flex-1 py-3 rounded-lg font-bold bg-yellow-500 text-slate-900 transition">Papers</button>
-            <button onclick="showTab('quiz')" id="btn-quiz" class="flex-1 py-3 rounded-lg font-bold text-gray-400 transition">Quiz</button>
-        </div>
-        <div id="papers" class="tab-content active-tab space-y-3"></div>
-        <div id="quiz" class="tab-content">
-            <div id="lesson-list" class="space-y-4"></div>
-            <div id="quiz-area" class="hidden space-y-6"></div>
-        </div>
+    <!-- Quiz බට්න් එක දැන් මුලට සහ කහ පාටට -->
+    <button onclick="showTab('quiz')" id="btn-quiz" class="flex-1 py-3 rounded-lg font-bold bg-yellow-500 text-slate-900 transition-all">
+        QUIZ
+    </button>
+    <!-- Papers බට්න් එක දෙවැනියට -->
+    <button onclick="showTab('papers')" id="btn-papers" class="flex-1 py-3 rounded-lg font-bold text-gray-400 transition-all">
+        PAPERS
+    </button>
+</div>
+
+<!-- Default පේන කොටස පල්ලෙහා විදියට මාරු කරන්න -->
+<div id="quiz" class="tab-content active-tab">
+    <div id="lesson-list" class="space-y-4"></div>
+    <div id="quiz-area" class="hidden space-y-6"></div>
+</div>
+
+<div id="papers" class="tab-content hidden space-y-3"></div>
     </div>
 
     <!-- Bottom Nav -->
@@ -1415,6 +1424,8 @@
             });
             document.getElementById('quiz-area').classList.add('hidden');
             listDiv.classList.remove('hidden');
+            // විෂයක් ඇතුළට ගිය ගමන් 'Quiz' ටැබ් එක ඇක්ටිව් කරන්න
+    showTab('quiz');
         }
 
         function startQuiz(unit) {
