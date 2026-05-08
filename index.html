@@ -166,18 +166,23 @@
             document.getElementById('auth-btn').innerText = isReg ? "REGISTER" : "LOGIN";
         }
         async function handleAuth() {
-            const email = document.getElementById('auth-email').value;
-            const password = document.getElementById('auth-password').value;
-            const name = document.getElementById('reg-name').value;
-            try {
-                if(document.getElementById('auth-btn').innerText === "LOGIN") await auth.signInWithEmailAndPassword(email, password);
-                else {
-                    const res = await auth.createUserWithEmailAndPassword(email, password);
-                    await res.user.updateProfile({displayName: name});
-                    await db.collection("users").doc(res.user.uid).set({name, email, streak: 1, lastLogin: new Date().toDateString()});
-                }
-            } catch(e) { alert(e.message); }
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
+    const name = document.getElementById('reg-name').value;
+    try {
+        if(document.getElementById('auth-btn').innerText === "LOGIN") {
+            await auth.signInWithEmailAndPassword(email, password);
+        } else {
+            const res = await auth.createUserWithEmailAndPassword(email, password);
+            // Register වෙනකොට නම ඇතුළත් කිරීම
+            await res.user.updateProfile({displayName: name});
+            await db.collection("users").doc(res.user.uid).set({name, email, streak: 1, lastLogin: new Date().toDateString()});
+            
+            // වැදගත්: නම update වුණාට පස්සේ page එක reload කරන්න එවිට පද්ධතියට නම හඳුනාගත හැක
+            location.reload(); 
         }
+    } catch(e) { alert(e.message); }
+}
         auth.onAuthStateChanged(user => {
             if(user) {
                 document.getElementById('auth-screen').classList.add('hidden');
@@ -337,10 +342,36 @@
             await db.collection("feedbacks").add({name: auth.currentUser.displayName, message: document.getElementById('feedback-text').value, timestamp: firebase.firestore.FieldValue.serverTimestamp()});
             alert("Sent! Thank you."); closeFeedback();
         }
-        function showResultPopup(score, total, subjectName) {
+        async function showResultPopup(score, total, subjectName) {
+    // ලකුණු සහ විෂය පෙන්වීම
     document.getElementById('res-score').innerText = `${score}/${total}`;
     document.getElementById('res-subject').innerText = subjectName;
-    document.getElementById('res-user-name').innerText = firebase.auth().currentUser.displayName || "Student";
+
+    let nameToShow = "Student"; // default නම
+
+    try {
+        const user = firebase.auth().currentUser;
+        if (user) {
+            // 1. මුලින්ම Auth Profile එකේ නම බලනවා
+            if (user.displayName) {
+                nameToShow = user.displayName;
+            } 
+            // 2. Auth එකේ නම නැතිනම් Firestore එකේ 'users' collection එකෙන් බලනවා
+            else {
+                const userDoc = await firebase.firestore().collection("users").doc(user.uid).get();
+                if (userDoc.exists && userDoc.data().name) {
+                    nameToShow = userDoc.data().name;
+                }
+            }
+        }
+    } catch (error) {
+        console.log("Error fetching name:", error);
+    }
+
+    // අවසාන නම Card එකට ඇතුළත් කිරීම
+    document.getElementById('res-user-name').innerText = nameToShow;
+    
+    // Popup එක පෙන්වීම
     document.getElementById('result-popup').classList.remove('hidden');
 }
 
