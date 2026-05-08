@@ -243,42 +243,50 @@
         }
 
         function startQuiz(key, type) {
-            const questions = type === 'unit' ? unitQuizData[currentSubject][key] : pastPaperQuizData[currentSubject][key];
-            const area = type === 'unit' ? document.getElementById('quiz-area') : document.getElementById('paper-quiz-area');
-            const list = type === 'unit' ? document.getElementById('lesson-list') : document.getElementById('paper-list');
-            list.classList.add('hidden');
-            area.classList.remove('hidden');
-            area.innerHTML = `<button onclick="showTab('${type === 'unit' ? 'quiz' : 'papers'}')" class="mb-6 opacity-50"><i class="fas fa-arrow-left"></i> BACK</button>`;
-            
-            let score = 0;
-            questions.forEach((q, idx) => {
-                const card = document.createElement('div'); card.className = "glass-card p-8 mb-6";
-                card.innerHTML = `<p class="mb-6 font-bold text-lg">${idx+1}. ${q.q}</p>`;
-                q.options.forEach((opt, oIdx) => {
-                    const btn = document.createElement('button');
-                    btn.className = "w-full text-left p-5 mb-3 rounded-2xl bg-slate-900 border border-white/5 transition-all";
-                    btn.innerText = opt;
-                    btn.onclick = () => {
-                        const allBtns = card.querySelectorAll('button');
-                        if(oIdx === q.correct) { btn.classList.add('bg-green-600'); score++; }
-                        else { btn.classList.add('wrong-shake'); allBtns[q.correct].classList.add('show-correct'); }
-                        allBtns.forEach(b => b.disabled = true);
-                    };
-                    card.appendChild(btn);
-                });
-                area.appendChild(card);
-            });
-            const fBtn = document.createElement('button');
-            fBtn.className = "w-full p-5 bg-yellow-500 text-black font-black rounded-3xl mt-6";
-            fBtn.innerText = "FINISH & SAVE";
-            fBtn.onclick = async () => {
-                await db.collection("user_results").add({name: auth.currentUser.displayName, score, total: questions.length, subject: currentSubject, timestamp: firebase.firestore.FieldValue.serverTimestamp()});
-                alert(`ලකුණු: ${score}/${questions.length}`);
-                showTab(type === 'unit' ? 'quiz' : 'papers');
+    const questions = type === 'unit' ? unitQuizData[currentSubject][key] : pastPaperQuizData[currentSubject][key];
+    const area = type === 'unit' ? document.getElementById('quiz-area') : document.getElementById('paper-quiz-area');
+    const list = type === 'unit' ? document.getElementById('lesson-list') : document.getElementById('paper-list');
+    list.classList.add('hidden');
+    area.classList.remove('hidden');
+    area.innerHTML = `<button onclick="showTab('${type === 'unit' ? 'quiz' : 'papers'}')" class="mb-6 opacity-50"><i class="fas fa-arrow-left"></i> BACK</button>`;
+    
+    let score = 0;
+    questions.forEach((q, idx) => {
+        const card = document.createElement('div'); card.className = "glass-card p-8 mb-6";
+        card.innerHTML = `<p class="mb-6 font-bold text-lg">${idx+1}. ${q.q}</p>`;
+        q.options.forEach((opt, oIdx) => {
+            const btn = document.createElement('button');
+            btn.className = "w-full text-left p-5 mb-3 rounded-2xl bg-slate-900 border border-white/5 transition-all";
+            btn.innerText = opt;
+            btn.onclick = () => {
+                const allBtns = card.querySelectorAll('button');
+                if(oIdx === q.correct) { btn.classList.add('bg-green-600'); score++; }
+                else { btn.classList.add('wrong-shake'); allBtns[q.correct].classList.add('show-correct'); }
+                allBtns.forEach(b => b.disabled = true);
             };
-            area.appendChild(fBtn);
-        }
+            card.appendChild(btn);
+        });
+        area.appendChild(card);
+    });
 
+    const fBtn = document.createElement('button');
+    fBtn.className = "w-full p-5 bg-yellow-500 text-black font-black rounded-3xl mt-6";
+    fBtn.innerText = "FINISH & SAVE";
+    fBtn.onclick = async () => {
+        // Firebase එකට Data Save කිරීම
+        await db.collection("user_results").add({
+            name: auth.currentUser.displayName, 
+            score, 
+            total: questions.length, 
+            subject: currentSubject, 
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        // පරණ alert එක වෙනුවට අලුත් Result Popup එක පෙන්වීම
+        showResultPopup(score, questions.length, currentSubject);
+    };
+    area.appendChild(fBtn);
+}
         // --- HELPERS ---
         function timer() {
             const gap = new Date("Aug 10, 2026").getTime() - new Date().getTime();
