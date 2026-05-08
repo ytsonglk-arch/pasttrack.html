@@ -89,7 +89,20 @@
             </div>
         </div>
 
-        <div id="rank-view" class="hidden"><div id="rank-list" class="space-y-4"></div></div>
+<!-- Leaderboard View -->
+<div id="rank-view" class="hidden p-6 pb-24">
+    <!-- Header කොටස -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-black text-white">TOP RANKERS</h1>
+        <p class="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">Global Leaderboard</p>
+    </div>
+
+    <!-- ලකුණු ලැයිස්තුව වැටෙන තැන -->
+    <div id="rank-list" class="space-y-4">
+        <!-- මෙතැනට තමයි JavaScript එකෙන් දත්ත එවන්නේ -->
+        <div class="text-center p-10 opacity-50 italic">Rankings will appear here...</div>
+    </div>
+</div>
 
         <div id="profile-view" class="hidden text-center">
             <h2 id="user-display-name-profile" class="text-2xl font-black">Student</h2>
@@ -397,6 +410,51 @@ function downloadResult() {
         link.href = canvas.toDataURL("image/png");
         link.click();
     });
+}
+        async function fetchRank() {
+    const list = document.getElementById('rank-list');
+    if (!list) return;
+
+    list.innerHTML = `<div class="text-center p-10"><i class="fas fa-spinner fa-spin text-yellow-500 text-2xl"></i><br><span class="text-xs opacity-50 mt-2 block">Loading Rankings...</span></div>`;
+
+    try {
+        // Firebase එකෙන් ලකුණු වැඩිම 10 දෙනා ලබාගැනීම
+        const snap = await db.collection("user_results").orderBy("score", "desc").limit(10).get();
+        list.innerHTML = "";
+
+        if (snap.empty) {
+            list.innerHTML = "<p class='text-center opacity-50 p-10'>No records found yet!</p>";
+            return;
+        }
+
+        let i = 1;
+        snap.forEach((doc) => {
+            const d = doc.data();
+            // Undefined දත්ත සඳහා ආරක්ෂිත පියවර
+            const name = d.name ? d.name : "Student";
+            const score = d.score !== undefined ? d.score : 0;
+            const total = d.total !== undefined ? d.total : 0;
+            const subject = d.subject ? d.subject : "Quiz";
+
+            list.innerHTML += `
+                <div class="glass-card p-5 flex justify-between items-center mb-3 border-l-4 border-yellow-500">
+                    <div class="flex items-center gap-4">
+                        <span class="font-black text-xl ${i <= 3 ? 'text-yellow-500' : 'text-slate-600'}">#${i}</span>
+                        <div class="flex flex-col">
+                            <span class="font-bold text-sm">${name}</span>
+                            <span class="text-[10px] opacity-40 uppercase font-black">${subject}</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-yellow-500 font-black text-lg">${score}/${total}</span>
+                    </div>
+                </div>`;
+            i++;
+        });
+    } catch (e) {
+        console.error(e);
+        list.innerHTML = "<div class='text-red-400 text-center p-5 text-xs'>ලීඩර්බෝඩ් එක පෙන්වීමට නොහැක. <br> Firebase Index එක සෑදිය යුතුයි.</div>";
+    }
 }
     </script>
     <div id="result-popup" class="hidden fixed inset-0 z-[200] flex flex-col items-center justify-center p-6 bg-black/95 backdrop-blur-md">
