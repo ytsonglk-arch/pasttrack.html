@@ -280,19 +280,30 @@
     const fBtn = document.createElement('button');
     fBtn.className = "w-full p-5 bg-yellow-500 text-black font-black rounded-3xl mt-6";
     fBtn.innerText = "FINISH & SAVE";
-    fBtn.onclick = async () => {
-        // Firebase එකට Data Save කිරීම
-        await db.collection("user_results").add({
-            name: auth.currentUser.displayName, 
-            score, 
-            total: questions.length, 
-            subject: currentSubject, 
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
+   fBtn.onclick = async () => {
+    // නම null ද කියලා බලලා, එහෙම නම් Firestore එකෙන් නම ගන්නවා
+    let currentUserName = auth.currentUser.displayName;
+    
+    if (!currentUserName || currentUserName === "null") {
+        const userDoc = await db.collection("users").doc(auth.currentUser.uid).get();
+        if (userDoc.exists) {
+            currentUserName = userDoc.data().name;
+        } else {
+            currentUserName = "Student"; // නම කොහෙත්ම නැත්නම් Student කියලා දානවා
+        }
+    }
 
-        // පරණ alert එක වෙනුවට අලුත් Result Popup එක පෙන්වීම
-        showResultPopup(score, questions.length, currentSubject);
-    };
+    // දැන් ලස්සනට දත්ත සේව් කරනවා
+    await db.collection("user_results").add({
+        name: currentUserName, 
+        score: score, 
+        total: questions.length, 
+        subject: currentSubject, 
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    showResultPopup(score, questions.length, currentSubject);
+};
     area.appendChild(fBtn);
 }
         // --- HELPERS ---
