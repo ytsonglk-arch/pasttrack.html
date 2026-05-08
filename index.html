@@ -161,10 +161,13 @@
         let currentSubject = "";
 
         // --- AUTH LOGIC ---
-        function toggleAuthMode() {
-            const isReg = document.getElementById('register-fields').classList.toggle('hidden');
-            document.getElementById('auth-btn').innerText = isReg ? "REGISTER" : "LOGIN";
-        }
+       function toggleAuthMode() {
+    const isRegHidden = document.getElementById('register-fields').classList.toggle('hidden');
+    
+    // මෙතන isReg පරීක්ෂා කරන විදිය මාරු කරන්න
+    // සැඟවී තිබේ නම් (true) -> LOGIN | පෙනේ නම් (false) -> REGISTER
+    document.getElementById('auth-btn').innerText = isRegHidden ? "LOGIN" : "REGISTER";
+}
         async function handleAuth() {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
