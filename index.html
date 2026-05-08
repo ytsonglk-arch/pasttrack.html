@@ -155,8 +155,7 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // --- 2. DATA (ADD ALL YOUR 900+ QUESTIONS HERE) ---
-        const allQuizData = {
+        const unitQuizData = { // මෙතන නම unitQuizData ලෙස තිබිය යුතුයි
           "Media Studies": {
     "01. සන්නිවේදන අධ්‍යයනයේ ආරම්භය": [
         { q: "මානව සන්නිවේදනයේ මුල්ම අවධිය කුමක්ද?", options: ["සංකේත අවධිය", "වාචික අවධිය", "මුද්‍රණ අවධිය", "විද්‍යුත් අවධිය"], correct: 1 },
