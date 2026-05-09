@@ -2573,37 +2573,19 @@
 async function askGemini() {
     const input = document.getElementById('ai-input'); 
     const output = document.getElementById('ai-chat-output');
-    
-    // 3. ඔයාගේ අලුත්ම Proxy URL එක මෙතැනට දාන්න
-    const proxyUrl = "https://script.google.com/macros/s/AKfycbwhTBnGSJOgUKJ8kaF8t45GawvSIIGRgmp1reWHjZ7vm5-IDqMV7GeZmSsi2Se7aGF5ZA/exec"; 
+    const proxyUrl = "https://script.google.com/macros/s/AKfycbwZ5e7R9lGTS3soetzLxTP_xfwMWAN5jfoaaQwpmE_h0qCqYEsLEd6N9Qhk0pvo9uNZ/exec"; // මෙතැනට අලුත් URL එක දාන්න
 
     if(!input.value.trim()) return;
     const msg = input.value; 
 
     // User Message පෙන්වීම
-    output.innerHTML += `
-        <div class='flex justify-end mb-4'>
-            <div class='bg-yellow-500 text-black p-3 rounded-2xl rounded-tr-none max-w-[80%] font-bold shadow-md'>
-                ${msg}
-            </div>
-        </div>`;
+    output.innerHTML += `<div class='flex justify-end mb-4'><div class='bg-yellow-500 p-3 rounded-2xl'>${msg}</div></div>`;
     input.value = "";
-    output.scrollTop = output.scrollHeight;
-
-    // Loading පෙන්වීම
-    const loadingId = "loading-" + Date.now();
-    output.innerHTML += `
-        <div id='${loadingId}' class='flex justify-start mb-4'>
-            <div class='glass-card p-3 rounded-2xl inline-block text-xs italic opacity-70 text-white'>
-                පිළිතුර සකස් කරමින් පවතී...
-            </div>
-        </div>`;
-    output.scrollTop = output.scrollHeight;
 
     try {
+        // ඉතා සරල Fetch එකක් - Headers නැතිව
         const res = await fetch(proxyUrl, {
             method: 'POST',
-            // Apps Script වලට POST කරද්දී Headers දැමීම අවශ්‍ය නොවේ
             body: JSON.stringify({
                 "contents": [{ "parts": [{ "text": msg + " (සිංහලෙන්)" }] }]
             })
@@ -2611,28 +2593,15 @@ async function askGemini() {
 
         const d = await res.json();
         
-        // Loading අයින් කිරීම
-        const loadingEl = document.getElementById(loadingId);
-        if(loadingEl) loadingEl.remove();
-
-        // පිළිතුර පරීක්ෂා කිරීම
-        if (d.candidates && d.candidates[0] && d.candidates[0].content) {
+        if (d.candidates && d.candidates[0].content) {
             const aiText = d.candidates[0].content.parts[0].text;
-            output.innerHTML += `
-                <div class='flex justify-start mb-4'>
-                    <div class='glass-card p-4 rounded-2xl rounded-tl-none max-w-[90%] border border-white/10 shadow-xl text-white'>
-                        ${aiText.replace(/\n/g, '<br>')}
-                    </div>
-                </div>`;
+            output.innerHTML += `<div class='flex justify-start mb-4'><div class='glass-card p-4 rounded-2xl text-white'>${aiText.replace(/\n/g, '<br>')}</div></div>`;
         } else {
-            // Google වෙතින් එන නියම Error එක Chat එකේම පෙන්වන්න
-            const errorDetail = d.error ? d.error.message : "නොදන්නා දෝෂයකි.";
-            output.innerHTML += `<div class='text-center text-red-400 text-[10px] mb-4'>API Error: ${errorDetail}</div>`;
+            output.innerHTML += `<div class='text-center text-red-400'>Error: ${d.error || 'දත්ත නැත'}</div>`;
         }
     } catch(e) { 
-        const loadingEl = document.getElementById(loadingId);
-        if(loadingEl) loadingEl.remove();
-        output.innerHTML += `<div class='text-center text-red-400 text-[10px] mb-4'>සම්බන්ධතාවය බිඳ වැටුණි. කරුණාකර නැවත උත්සාහ කරන්න.</div>`;
+        output.innerHTML += `<div class='text-center text-red-400'>සම්බන්ධතාවය බිඳ වැටුණි. කරුණාකර Proxy URL එක පරීක්ෂා කරන්න.</div>`;
+        console.error(e);
     }
     output.scrollTop = output.scrollHeight;
 }
