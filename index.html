@@ -2573,33 +2573,68 @@
 async function askGemini() {
     const input = document.getElementById('ai-input'); 
     const output = document.getElementById('ai-chat-output');
-    const proxyUrl = "https://script.google.com/macros/s/AKfycbxDoS01C9OBiE7yCAb-njT-G7FFIKN22qly2V6ZVjwlgB3Syjkc-oA_F05BtGtFEVez/exec"; // /exec URL එක
+    const proxyUrl = "https://script.google.com/macros/s/AKfycbxDoS01C9OBiE7yCAb-njT-G7FFIKN22qly2V6ZVjwlgB3Syjkc-oA_F05BtGtFEVez/exec";
 
     if(!input.value.trim()) return;
     const msg = input.value; 
-    input.value = "";
+
+    // 1. අපි යවන පණිවිඩය Chat එකේ පෙන්වීම (දකුණු පැත්තේ)
+    output.innerHTML += `
+        <div class='flex justify-end mb-4'>
+            <div class='bg-yellow-500 text-black p-3 rounded-2xl rounded-tr-none max-w-[80%] font-bold shadow-md'>
+                ${msg}
+            </div>
+        </div>`;
+    
+    input.value = ""; // Input එක හිස් කිරීම
+    output.scrollTop = output.scrollHeight; // පහළටම Scroll කිරීම
+
+    // 2. Loading පණිවිඩයක් පෙන්වීම (AI උත්තර දෙනකම්)
+    const loadingId = "loading-" + Date.now();
+    output.innerHTML += `
+        <div id='${loadingId}' class='flex justify-start mb-4'>
+            <div class='glass-card p-3 rounded-2xl inline-block text-xs italic opacity-70 text-white'>
+                AI පිළිතුර සකස් කරමින් පවතී...
+            </div>
+        </div>`;
+    output.scrollTop = output.scrollHeight;
 
     try {
-       // මේ විදිහටම fetch එක ලියන්න
-const res = await fetch(proxyUrl, {
-    method: 'POST',
-    // Headers කිසිවක් ඇතුළත් කරන්න එපා.
-    // එවිට Browser එක "Simple Request" එකක් ලෙස සලකා බ්ලොක් නොකර යවයි.
-    body: JSON.stringify({
-        "contents": [{ "parts": [{ "text": msg + " (සිංහලෙන්)" }] }]
-    })
-});
+        const res = await fetch(proxyUrl, {
+            method: 'POST',
+            body: JSON.stringify({
+                "contents": [{ "parts": [{ "text": msg + " (සිංහලෙන්)" }] }]
+            })
+        });
 
-const d = await res.json();
+        const d = await res.json();
         
+        // Loading පණිවිඩය ඉවත් කිරීම
+        const loadingEl = document.getElementById(loadingId);
+        if(loadingEl) loadingEl.remove();
+
+        // 3. AI ගේ පිළිතුර පෙන්වීම (වම් පැත්තේ)
         if (d.candidates && d.candidates[0].content) {
             const aiText = d.candidates[0].content.parts[0].text;
-            output.innerHTML += `<div class='flex justify-start mb-4'><div class='glass-card p-4 rounded-2xl text-white'>${aiText.replace(/\n/g, '<br>')}</div></div>`;
+            output.innerHTML += `
+                <div class='flex justify-start mb-4'>
+                    <div class='glass-card p-4 rounded-2xl rounded-tl-none max-w-[90%] border border-white/10 shadow-xl text-white'>
+                        ${aiText.replace(/\n/g, '<br>')}
+                    </div>
+                </div>`;
+        } else {
+            output.innerHTML += `<div class='text-center text-red-400 text-[10px] mb-4'>AI Error: පිළිතුර ලබාගත නොහැකි විය.</div>`;
         }
     } catch(e) { 
+        // Error එකක් ආවොත් Loading එක අයින් කරලා පණිවිඩය පෙන්වීම
+        const loadingEl = document.getElementById(loadingId);
+        if(loadingEl) loadingEl.remove();
+        
         console.error("Error details:", e);
-        output.innerHTML += `<div class='text-center text-red-400'>සම්බන්ධතාවය බිඳ වැටුණි.</div>`;
+        output.innerHTML += `<div class='text-center text-red-400 text-[10px] mb-4'>සම්බන්ධතාවය බිඳ වැටුණි. කරුණාකර නැවත උත්සාහ කරන්න.</div>`;
     }
+    
+    output.scrollTop = output.scrollHeight;
 }
         function showFeedback() { document.getElementById('feedback-modal').classList.remove('hidden'); }
         function closeFeedback() { document.getElementById('feedback-modal').classList.add('hidden'); }
