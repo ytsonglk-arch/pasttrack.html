@@ -2573,23 +2573,24 @@
 async function askGemini() {
     const input = document.getElementById('ai-input'); 
     const output = document.getElementById('ai-chat-output');
-    const proxyUrl = "https://script.google.com/macros/s/AKfycbxLXfSSUQaqhuW2OWCNch-r9a-lGRN8oZskzHGw2yj7Cn1S8175_lGG7cD1nfKFvVVm/exec"; // /exec URL එක
+    const proxyUrl = "https://script.google.com/macros/s/AKfycbxDoS01C9OBiE7yCAb-njT-G7FFIKN22qly2V6ZVjwlgB3Syjkc-oA_F05BtGtFEVez/exec"; // /exec URL එක
 
     if(!input.value.trim()) return;
     const msg = input.value; 
     input.value = "";
 
     try {
-        const res = await fetch(proxyUrl, {
-            method: 'POST',
-            // මෙතන headers ඇතුළත් කරන්න එපා!
-            // Header එකක් නැතිව යැවූ විට Browser එක CORS බ්ලොක් එකක් දාන්නේ නැහැ.
-            body: JSON.stringify({
-                "contents": [{ "parts": [{ "text": msg + " (සිංහලෙන්)" }] }]
-            })
-        });
+       // මේ විදිහටම fetch එක ලියන්න
+const res = await fetch(proxyUrl, {
+    method: 'POST',
+    // Headers කිසිවක් ඇතුළත් කරන්න එපා.
+    // එවිට Browser එක "Simple Request" එකක් ලෙස සලකා බ්ලොක් නොකර යවයි.
+    body: JSON.stringify({
+        "contents": [{ "parts": [{ "text": msg + " (සිංහලෙන්)" }] }]
+    })
+});
 
-        const d = await res.json();
+const d = await res.json();
         
         if (d.candidates && d.candidates[0].content) {
             const aiText = d.candidates[0].content.parts[0].text;
