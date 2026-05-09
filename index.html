@@ -2607,11 +2607,7 @@ async function askGemini() {
     }
     output.scrollTop = output.scrollHeight;
 }
-        catch(e) { 
-        console.error("Catch Error:", e);
-        output.innerHTML += `<div class='text-center text-red-400 text-[10px] mb-4 italic'>AI Error: ${e.message}</div>`;
-    }
-}
+
         function showFeedback() { document.getElementById('feedback-modal').classList.remove('hidden'); }
         function closeFeedback() { document.getElementById('feedback-modal').classList.add('hidden'); }
         async function submitFeedback() {
