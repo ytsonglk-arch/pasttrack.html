@@ -2593,14 +2593,22 @@ async function askGemini() {
         });
 
         const d = await res.json();
-        
-        if (d.candidates && d.candidates[0].content.parts[0].text) {
-            const aiText = d.candidates[0].content.parts[0].text;
-            output.innerHTML += `<div class='text-left mb-4'><div class='glass-card p-4'>${aiText.replace(/\n/g, '<br>')}</div></div>`;
-        } else {
-            console.log(d); // මොකක් හරි වැරදුනොත් console එකේ බලන්න පුළුවන්
-            output.innerHTML += `<div class='text-left mb-4 text-red-500'>AI Error: පිළිතුරක් ලැබුණේ නැත.</div>`;
-        }
+
+// පරීක්ෂා කිරීම: දත්ත නිවැරදිව ලැබී තිබේද?
+if (d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts) {
+    const aiText = d.candidates[0].content.parts[0].text;
+    output.innerHTML += `
+        <div class='text-left mb-4'>
+            <div class='glass-card p-4 rounded-2xl border border-white/10'>
+                ${aiText.replace(/\n/g, '<br>')}
+            </div>
+        </div>`;
+} else {
+    // මොකක් හරි වැරදුනොත් සම්පූර්ණ Error එකම මෙතනින් බලාගන්න පුළුවන්
+    console.error("Full Response:", d);
+    let errorMsg = d.error ? d.error.message : "පිළිතුරක් ලැබුණේ නැත.";
+    output.innerHTML += `<div class='text-left mb-4 text-red-500 text-[10px] italic'>AI Error: ${errorMsg}</div>`;
+}
 
     } catch(e) { 
         output.innerHTML += `<div class='text-center text-red-400 text-[10px] mb-4 italic'>AI Error: ${e.message}</div>`;
