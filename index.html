@@ -2574,69 +2574,66 @@ async function askGemini() {
     const input = document.getElementById('ai-input'); 
     const output = document.getElementById('ai-chat-output');
     
-    // ඔයා එවපු නිවැරදි Proxy URL එක
-    const proxyUrl = "https://script.google.com/macros/s/AKfycbxTpoesPdcTdNkWOSuzquhiABDy7P0Qm_9gwolcAnvaFgPhlDMqCUY5-SyzDxskKhTZ/exec"; 
+    // 3. ඔයාගේ අලුත්ම Proxy URL එක මෙතැනට දාන්න
+    const proxyUrl = "https://script.google.com/macros/s/AKfycbwhTBnGSJOgUKJ8kaF8t45GawvSIIGRgmp1reWHjZ7vm5-IDqMV7GeZmSsi2Se7aGF5ZA/exec"; 
 
     if(!input.value.trim()) return;
     const msg = input.value; 
 
-    // 1. User ගේ පණිවිඩය Chat එකේ පෙන්වීම
+    // User Message පෙන්වීම
     output.innerHTML += `
-        <div class='flex justify-end mb-4 animate-in fade-in slide-in-from-right-4 duration-300'>
-            <div class='bg-yellow-500 text-black p-3 rounded-2xl rounded-tr-none max-w-[85%] font-bold shadow-lg'>
+        <div class='flex justify-end mb-4'>
+            <div class='bg-yellow-500 text-black p-3 rounded-2xl rounded-tr-none max-w-[80%] font-bold shadow-md'>
                 ${msg}
             </div>
         </div>`;
     input.value = "";
     output.scrollTop = output.scrollHeight;
 
-    // 2. AI පිළිතුර ලැබෙන තෙක් Loading පණිවිඩයක් පෙන්වීම
+    // Loading පෙන්වීම
     const loadingId = "loading-" + Date.now();
     output.innerHTML += `
         <div id='${loadingId}' class='flex justify-start mb-4'>
-            <div class='glass-card p-3 rounded-2xl inline-flex items-center gap-2 text-xs italic text-white/70'>
-                <span class='w-2 h-2 bg-white rounded-full animate-bounce'></span>
-                AI පිළිතුර සකස් කරමින් පවතී...
+            <div class='glass-card p-3 rounded-2xl inline-block text-xs italic opacity-70 text-white'>
+                පිළිතුර සකස් කරමින් පවතී...
             </div>
         </div>`;
     output.scrollTop = output.scrollHeight;
 
     try {
-        // 3. Proxy URL එක හරහා Google Script එකට දත්ත යැවීම
         const res = await fetch(proxyUrl, {
-            method: 'POST', 
+            method: 'POST',
+            // Apps Script වලට POST කරද්දී Headers දැමීම අවශ්‍ය නොවේ
             body: JSON.stringify({
-                "contents": [{ "parts": [{ "text": msg + " (සරල සිංහලෙන් කරුණු සහිතව පිළිතුරු දෙන්න)" }] }]
+                "contents": [{ "parts": [{ "text": msg + " (සිංහලෙන්)" }] }]
             })
         });
 
         const d = await res.json();
         
-        // Loading එක ඉවත් කිරීම
+        // Loading අයින් කිරීම
         const loadingEl = document.getElementById(loadingId);
         if(loadingEl) loadingEl.remove();
 
-        // 4. AI පිළිතුර සාර්ථකව ලැබුණහොත් එය පෙන්වීම
-        if (d.candidates && d.candidates[0].content) {
+        // පිළිතුර පරීක්ෂා කිරීම
+        if (d.candidates && d.candidates[0] && d.candidates[0].content) {
             const aiText = d.candidates[0].content.parts[0].text;
             output.innerHTML += `
-                <div class='flex justify-start mb-4 animate-in fade-in slide-in-from-left-4 duration-300'>
-                    <div class='glass-card p-4 rounded-2xl rounded-tl-none max-w-[95%] border border-white/10 shadow-2xl text-white'>
+                <div class='flex justify-start mb-4'>
+                    <div class='glass-card p-4 rounded-2xl rounded-tl-none max-w-[90%] border border-white/10 shadow-xl text-white'>
                         ${aiText.replace(/\n/g, '<br>')}
                     </div>
                 </div>`;
         } else {
-            // Google පැත්තෙන් එන Error පණිවිඩය පෙන්වීම
-            output.innerHTML += `<div class='text-center text-red-400 text-[10px] mb-4'>Google Error: ${d.error ? d.error.message : 'දත්ත ලබාගත නොහැක'}</div>`;
+            // Google වෙතින් එන නියම Error එක Chat එකේම පෙන්වන්න
+            const errorDetail = d.error ? d.error.message : "නොදන්නා දෝෂයකි.";
+            output.innerHTML += `<div class='text-center text-red-400 text-[10px] mb-4'>API Error: ${errorDetail}</div>`;
         }
     } catch(e) { 
-        // සම්බන්ධතාවයේ දෝෂයක් ඇති වුවහොත්
         const loadingEl = document.getElementById(loadingId);
         if(loadingEl) loadingEl.remove();
         output.innerHTML += `<div class='text-center text-red-400 text-[10px] mb-4'>සම්බන්ධතාවය බිඳ වැටුණි. කරුණාකර නැවත උත්සාහ කරන්න.</div>`;
     }
-    
-    // සැමවිටම Chat එකේ පහළටම scroll කිරීම
     output.scrollTop = output.scrollHeight;
 }
         function showFeedback() { document.getElementById('feedback-modal').classList.remove('hidden'); }
