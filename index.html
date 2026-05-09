@@ -2570,21 +2570,54 @@
                 } else document.getElementById('streak-count').innerText = d.streak;
             }
         }
-        async function askGemini() {
-            const input = document.getElementById('ai-input'); const output = document.getElementById('ai-chat-output');
-            const key = "AIzaSyAuzqbLhKuSkYg6Gea-HACcj-KoX_IeCUU"; if(!input.value) return;
-            const msg = input.value; output.innerHTML += `<div class='text-right'><span class='bg-yellow-500 text-black p-3 rounded-2xl'>${msg}</span></div>`;
-            input.value = "";
-            try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${key}`, {
-                    method:'POST', headers:{'Content-Type':'application/json'},
-                    body:JSON.stringify({"contents":[{"parts":[{"text": msg + " (සිංහලෙන් සරලව පැහැදිලි කරන්න)"}]}]})
-                });
-                const d = await res.json();
-                output.innerHTML += `<div class='text-left'><div class='glass-card p-4'>${d.candidates[0].content.parts[0].text}</div></div>`;
-                output.scrollTop = output.scrollHeight;
-            } catch(e) { alert("AI Error"); }
+       async function askGemini() {
+    const input = document.getElementById('ai-input'); 
+    const output = document.getElementById('ai-chat-output');
+    // ඔයාගේ API Key එක මෙතන තියෙනවා, මම ඒක එහෙමම තිබ්බා
+    const key = "AIzaSyAuzqbLhKuSkYg6Gea-HACcj-KoX_IeCUU"; 
+
+    if(!input.value.trim()) return;
+
+    const msg = input.value; 
+    // User ගේ message එක පෙන්වීම
+    output.innerHTML += `<div class='text-right mb-4'><span class='bg-yellow-500 text-black p-3 rounded-2xl inline-block'>${msg}</span></div>`;
+    input.value = "";
+    output.scrollTop = output.scrollHeight;
+
+    try {
+        // මෙතන තමයි වෙනස: 'gemini-pro' වෙනුවට 'gemini-1.5-flash' දාලා තියෙන්නේ
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                "contents": [{
+                    "parts": [{ "text": msg + " (සිංහලෙන් සරලව පැහැදිලි කරන්න)" }]
+                }]
+            })
+        });
+
+        // Response එක ආවේ නැත්නම් error එකක් පෙන්වන්න
+        if (!res.ok) {
+            const errorData = await res.json();
+            console.error("API Error Detail:", errorData);
+            throw new Error(errorData.error.message || "Failed to connect to AI");
         }
+
+        const d = await res.json();
+        
+        if (d.candidates && d.candidates[0].content.parts[0].text) {
+            const aiText = d.candidates[0].content.parts[0].text;
+            output.innerHTML += `<div class='text-left mb-4'><div class='glass-card p-4'>${aiText.replace(/\n/g, '<br>')}</div></div>`;
+        } else {
+            output.innerHTML += `<div class='text-left mb-4 text-red-500'>AI එකෙන් පිළිතුරක් ලැබුණේ නැත.</div>`;
+        }
+
+        output.scrollTop = output.scrollHeight;
+    } catch(e) { 
+        console.error("Catch Error:", e);
+        output.innerHTML += `<div class='text-center text-red-400 text-[10px] mb-4 italic'>AI Error: ${e.message}</div>`;
+    }
+}
         function showFeedback() { document.getElementById('feedback-modal').classList.remove('hidden'); }
         function closeFeedback() { document.getElementById('feedback-modal').classList.add('hidden'); }
         async function submitFeedback() {
