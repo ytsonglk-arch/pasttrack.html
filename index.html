@@ -2573,7 +2573,7 @@
 async function askGemini() {
     const input = document.getElementById('ai-input'); 
     const output = document.getElementById('ai-chat-output');
-    const key = "AIzaSyAuzqbLhKuSkYg6Gea-HACcj-KoX_IeCUU"; // ඔයාගේ Key එක
+    const key = "AIzaSyAuzqbLhKuSkYg6Gea-HACcj-KoX_IeCUU"; 
 
     if(!input.value.trim()) return;
     const msg = input.value; 
@@ -2581,8 +2581,8 @@ async function askGemini() {
     input.value = "";
 
     try {
-        // මෙන්න මෙතන තමයි වැදගත්ම දේ: v1beta පාවිච්චි කරමු, හැබැයි URL එකේ අකුරු හරියටම තියෙන්න ඕනේ
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+        // බොහෝ දෙනෙකුට වැඩ කරන Stable URL එක
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${key}`, {
             method: 'POST', 
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -2596,25 +2596,18 @@ async function askGemini() {
         
         if (d.candidates && d.candidates[0] && d.candidates[0].content) {
             const aiText = d.candidates[0].content.parts[0].text;
-            output.innerHTML += `
-                <div class='text-left mb-4'>
-                    <div class='glass-card p-4 rounded-2xl border border-white/10 shadow-lg'>
-                        ${aiText.replace(/\n/g, '<br>')}
-                    </div>
-                </div>`;
+            output.innerHTML += `<div class='text-left mb-4'><div class='glass-card p-4 rounded-2xl border border-white/10'>${aiText.replace(/\n/g, '<br>')}</div></div>`;
         } else {
-            // දත්ත ලැබුණේ නැත්නම් මොකක්ද ප්‍රශ්නය කියලා මෙතනින් පෙන්වනවා
-            console.error("Full Error Data:", d);
-            const errorMsg = d.error ? d.error.message : "නැවත උත්සාහ කරන්න.";
-            output.innerHTML += `<div class='text-center text-red-400 text-[10px] mb-4'>AI Error: ${errorMsg}</div>`;
+            // Error එකේ නම මෙතනින් බලාගන්න පුළුවන්
+            const errorInfo = d.error ? d.error.message : "Undefined Error";
+            output.innerHTML += `<div class='text-center text-red-400 text-[10px] mb-4 font-bold'>AI දෝෂය: ${errorInfo}</div>`;
         }
 
     } catch(e) { 
-        output.innerHTML += `<div class='text-center text-red-400 text-[10px] mb-4 italic text-xs'>සම්බන්ධතාවය බිඳ වැටුණි.</div>`;
+        output.innerHTML += `<div class='text-center text-red-400 text-[10px] mb-4'>සම්බන්ධතාවයේ දෝෂයකි.</div>`;
     }
     output.scrollTop = output.scrollHeight;
 }
-
         function showFeedback() { document.getElementById('feedback-modal').classList.remove('hidden'); }
         function closeFeedback() { document.getElementById('feedback-modal').classList.add('hidden'); }
         async function submitFeedback() {
