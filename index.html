@@ -198,20 +198,96 @@
     </nav>
 
     <script>
-        // --- QUIZ DATA GOR 900 QUESTIONS ---
-        const allQuizData = {
-            "Media Studies": {
-                "Unit 01": [
-                    { q: "පළමු ප්‍රශ්නය මෙතනට?", options: ["A", "B", "C", "D"], correct: 0 },
-                    // ප්‍රශ්න 900ක් දක්වා මෙතනට ඇඩ් කළ හැක
-                ]
-            },
-            "Political Science": {},
-            "Logic": {},
-            "Sinhala": {},
-            "Geography": {},
-            "Buddhist Civilization": {}
-        };
+        // විෂයයන්ට අදාළ දත්ත (මෙතැනට ප්‍රශ්න 900 ම ඇතුළත් කළ හැක)
+const allQuizData = {
+    "Media Studies": {
+        units: ["Unit 01: මාධ්‍ය හැඳින්වීම", "Unit 02: සන්නිවේදන ආකෘති", "Unit 03: ජනමාධ්‍ය පද්ධතිය"],
+        pastPapers: ["2023 Past Paper", "2022 Past Paper", "2021 Past Paper"]
+    },
+    "Political Science": {
+        units: ["Unit 01: දේශපාලන විද්‍යාවේ ස්වභාවය", "Unit 02: රාජ්‍යය", "Unit 03: ආණ්ඩුව"],
+        pastPapers: ["2023 Past Paper", "2022 Past Paper"]
+    },
+    // අනෙක් විෂයන් සඳහාද මේ ආකාරයටම දත්ත එක් කරන්න...
+};
+
+let currentSubject = "";
+let currentQuizType = ""; // 'unit' or 'pastpaper'
+
+// විෂයයක් ක්ලික් කළ විට ක්‍රියාත්මක වන function එක
+function openSubject(subjectName) {
+    currentSubject = subjectName;
+    const data = allQuizData[subjectName];
+    
+    if (!data) {
+        alert("මෙම විෂයට අදාළ දත්ත තවමත් ඇතුළත් කර නැත.");
+        return;
+    }
+
+    // Dashboard එකේ Subject List එක ඉවත් කර අලුත් View එක පෙන්වීම
+    const container = document.getElementById('subject-list-container');
+    container.innerHTML = `
+        <div class="mb-6 flex items-center gap-4">
+            <button onclick="reloadHome()" class="text-yellow-500 font-bold"><i class="fas fa-arrow-left"></i> Back</button>
+            <h2 class="text-xl font-black text-white">${subjectName}</h2>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4 mb-8">
+            <div id="tab-units" onclick="toggleQuizTab('unit')" class="glass-card p-4 text-center cursor-pointer border-b-2 border-yellow-500 text-yellow-500 font-bold">Unit Quiz</div>
+            <div id="tab-past" onclick="toggleQuizTab('pastpaper')" class="glass-card p-4 text-center cursor-pointer border-b-2 border-transparent opacity-50 font-bold">Past Papers</div>
+        </div>
+
+        <div id="quiz-list-display" class="space-y-3">
+            <!-- මෙතැනට Units හෝ Past Papers පෙන්වයි -->
+        </div>
+    `;
+    
+    toggleQuizTab('unit'); // මුලින්ම Unit ටැබ් එක පෙන්වන්න
+}
+
+function toggleQuizTab(type) {
+    currentQuizType = type;
+    const listDisplay = document.getElementById('quiz-list-display');
+    const data = allQuizData[currentSubject];
+    
+    // Tab active style මාරු කිරීම
+    if(type === 'unit') {
+        document.getElementById('tab-units').classList.add('border-yellow-500', 'text-yellow-500', 'opacity-100');
+        document.getElementById('tab-past').classList.replace('border-yellow-500', 'border-transparent');
+        document.getElementById('tab-past').classList.add('opacity-50');
+        
+        // Units පෙන්වීම
+        listDisplay.innerHTML = data.units.map((unit, i) => `
+            <div onclick="startQuiz('${unit}')" class="glass-card p-5 flex justify-between items-center bg-white/5 border border-white/10 hover:border-yellow-500 transition cursor-pointer">
+                <span class="text-sm font-bold">${unit}</span>
+                <i class="fas fa-play-circle text-yellow-500"></i>
+            </div>
+        `).join('');
+    } else {
+        document.getElementById('tab-past').classList.add('border-yellow-500', 'text-yellow-500', 'opacity-100');
+        document.getElementById('tab-units').classList.replace('border-yellow-500', 'border-transparent');
+        document.getElementById('tab-units').classList.add('opacity-50');
+
+        // Past Papers පෙන්වීම
+        listDisplay.innerHTML = data.pastPapers.map((paper, i) => `
+            <div onclick="startQuiz('${paper}')" class="glass-card p-5 flex justify-between items-center bg-white/5 border border-white/10 hover:border-red-500 transition cursor-pointer">
+                <span class="text-sm font-bold text-red-200">${paper}</span>
+                <i class="fas fa-file-invoice text-red-500"></i>
+            </div>
+        `).join('');
+    }
+}
+
+// Home එකට ආපසු යාම සඳහා
+function reloadHome() {
+    location.reload(); // හෝ subject-list-container එකේ තිබූ පරණ HTML එක නැවත ජනනය කරන්න
+}
+
+// ප්‍රශ්න පත්‍රය ආරම්භ කිරීම (Quiz Logic මෙතැනින් පටන් ගනී)
+function startQuiz(title) {
+    alert(title + " ප්‍රශ්න පත්‍රය දැන් ආරම්භ වේ!");
+    // මෙතැනදී ප්‍රශ්න 50 පෙන්වන Screen එකට යාමට අවශ්‍ය logic එක ලියන්න
+}
 
         const firebaseConfig = {
             apiKey: "AIzaSyB_10UzdkgZPlu-P361PYbEQjTwbKjjWx0",
