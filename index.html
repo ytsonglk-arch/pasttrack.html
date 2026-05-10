@@ -2135,28 +2135,34 @@ function downloadResultImage() {
             } catch(e) { alert(e.message); }
         }
 
-        auth.onAuthStateChanged(user => {
+      auth.onAuthStateChanged(user => {
     if(user) {
+        // Dashboard එක පෙන්වීම
         document.getElementById('auth-screen').classList.add('hidden');
         document.getElementById('dashboard').classList.remove('hidden');
         document.getElementById('bottom-nav').classList.remove('hidden');
         
+        // නම් පෙන්වීම
         document.getElementById('user-display-name-header').innerText = user.displayName;
         document.getElementById('user-display-name-profile').innerText = user.displayName;
 
-        // Default avatar එකක් හදාගමු
+        // පින්තූරය සෙට් කිරීම
         const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName)}&background=d4af37&color=fff`;
         const userImg = user.photoURL || defaultAvatar;
 
-        // පින්තූර පෙන්වන තැන් දෙක Update කරමු
         const avatarHeader = document.getElementById('user-avatar');
         const avatarProfile = document.getElementById('profile-pic-large');
 
         if(avatarHeader) avatarHeader.src = userImg;
         if(avatarProfile) avatarProfile.src = userImg;
+
+    } else {
+        // User ලොග් වෙලා නැත්නම් හෝ Logout වුණොත්
+        document.getElementById('auth-screen').classList.remove('hidden');
+        document.getElementById('dashboard').classList.add('hidden');
+        document.getElementById('bottom-nav').classList.add('hidden');
     }
 });
-
         function handleLogout() { auth.signOut().then(() => location.reload()); }
     </script>
 </body>
