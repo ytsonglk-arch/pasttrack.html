@@ -75,7 +75,7 @@
     <div id="dashboard" class="hidden p-6 max-w-2xl mx-auto">
         <header class="flex justify-between items-center mb-10">
             <div class="flex items-center gap-4">
-                <img id="user-avatar" src="https://ui-avatars.com/api/?name=User" class="profile-img">
+                <img id="user-avatar" referrerpolicy="no-referrer" src="https://ui-avatars.com/api/?name=User&background=d4af37&color=fff" class="w-10 h-10 rounded-full border-2 border-yellow-500/20 object-cover">
                 <div><p class="text-[10px] text-yellow-500 font-black uppercase mb-1">Hello,</p><h1 id="user-display-name-header" class="text-xl font-black">Student</h1></div>
             </div>
             <div class="flex gap-2">
@@ -168,7 +168,7 @@
         <div id="profile-view" class="hidden">
             <div class="text-center mb-8">
                 <div class="relative inline-block">
-                    <img id="profile-pic-large" src="https://ui-avatars.com/api/?name=User" class="w-24 h-24 rounded-full border-4 border-yellow-500 object-cover mx-auto mb-4">
+                    <img id="profile-pic-large" referrerpolicy="no-referrer" src="https://ui-avatars.com/api/?name=User&background=d4af37&color=fff" class="w-24 h-24 rounded-full border-4 border-yellow-500 shadow-xl object-cover mx-auto">
                     <label class="absolute bottom-1 right-0 bg-yellow-500 p-2 rounded-full cursor-pointer"><i class="fas fa-camera text-black text-xs"></i><input type="file" class="hidden" onchange="uploadProfilePic(this)"></label>
                 </div>
                 <h2 id="user-display-name-profile" class="text-2xl font-black">Student</h2>
@@ -251,7 +251,7 @@
 
             <div class="relative inline-block mb-6">
                 <div class="p-[3px] rounded-full bg-gradient-to-tr from-[#d4af37] to-yellow-100">
-                    <img id="res-card-img" src="" class="w-24 h-24 rounded-full border-4 border-[#0a0f1d] object-cover mx-auto">
+                  <img id="res-card-img" referrerpolicy="no-referrer" crossorigin="anonymous" src="" class="w-24 h-24 rounded-full border-4 border-[#0a0f1d] object-cover mx-auto"> 
                 </div>
                 <div class="absolute -bottom-1 -right-1 bg-[#d4af37] text-[#0a0f1d] w-7 h-7 flex items-center justify-center rounded-full border-[3px] border-[#0a0f1d] text-[10px] shadow-lg">
                     <i class="fas fa-check"></i>
@@ -2136,18 +2136,26 @@ function downloadResultImage() {
         }
 
         auth.onAuthStateChanged(user => {
-            if(user) {
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('dashboard').classList.remove('hidden');
-                document.getElementById('bottom-nav').classList.remove('hidden');
-                document.getElementById('user-display-name-header').innerText = user.displayName;
-                document.getElementById('user-display-name-profile').innerText = user.displayName;
-                if(user.photoURL) {
-                    document.getElementById('user-avatar').src = user.photoURL;
-                    document.getElementById('profile-pic-large').src = user.photoURL;
-                }
-            }
-        });
+    if(user) {
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+        document.getElementById('bottom-nav').classList.remove('hidden');
+        
+        document.getElementById('user-display-name-header').innerText = user.displayName;
+        document.getElementById('user-display-name-profile').innerText = user.displayName;
+
+        // Default avatar එකක් හදාගමු
+        const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName)}&background=d4af37&color=fff`;
+        const userImg = user.photoURL || defaultAvatar;
+
+        // පින්තූර පෙන්වන තැන් දෙක Update කරමු
+        const avatarHeader = document.getElementById('user-avatar');
+        const avatarProfile = document.getElementById('profile-pic-large');
+
+        if(avatarHeader) avatarHeader.src = userImg;
+        if(avatarProfile) avatarProfile.src = userImg;
+    }
+});
 
         function handleLogout() { auth.signOut().then(() => location.reload()); }
     </script>
