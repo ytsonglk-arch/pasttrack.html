@@ -20,157 +20,120 @@
         .btn-grad { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); transition: 0.3s; }
         .active-nav { color: var(--primary); filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6)); }
         
-        /* Professional Login UI */
-        .auth-card { background: linear-gradient(180deg, rgba(30, 41, 59, 0.5) 0%, rgba(2, 6, 23, 1) 100%); border: 1px solid rgba(251, 191, 36, 0.1); }
-        
-        /* Result Card Background */
-        #result-download-area {
-            background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80');
+        /* Countdown Box with Image */
+        .countdown-bg { 
+            background: linear-gradient(rgba(2, 6, 23, 0.8), rgba(2, 6, 23, 0.8)), url('https://images.unsplash.com/photo-1501503060443-ef4ed66d1b4a?auto=format&fit=crop&q=80');
             background-size: cover; background-position: center;
+            border: 1px solid rgba(251, 191, 36, 0.2);
         }
+
+        /* Quiz Feedback */
+        .option-correct { background: rgba(34, 197, 94, 0.2) !important; border-color: #22c55e !important; color: #22c55e; }
+        .option-wrong { background: rgba(239, 68, 68, 0.2) !important; border-color: #ef4e4e !important; color: #ef4e4e; }
+
+        /* Animation */
+        .modal-animate { animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body class="pb-24">
 
-    <!-- LOGIN SCREEN -->
+    <!-- Auth Screen -->
     <div id="auth-screen" class="min-h-screen flex items-center justify-center p-6 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-amber-900/20 via-slate-950 to-black">
-        <div class="w-full max-w-md auth-card p-10 rounded-[2.5rem] text-center shadow-2xl">
-            <div class="mb-8">
-                <div class="w-20 h-20 bg-amber-500/10 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-amber-500/20">
-                    <i class="fas fa-bolt text-3xl text-amber-500"></i>
-                </div>
-                <h1 class="text-3xl font-black text-white tracking-tight italic">FAST TRACK <span class="text-amber-500">PRO</span></h1>
-                <p class="text-[10px] tracking-[0.4em] text-slate-500 uppercase mt-2">Premium Student Portal</p>
-            </div>
-
+        <div class="w-full max-w-md glass p-10 rounded-[2.5rem] text-center shadow-2xl border-white/5">
+            <h1 class="text-3xl font-black text-white italic mb-8">FAST TRACK <span class="text-amber-500">PRO</span></h1>
             <div id="reg-fields" class="hidden">
-                <div class="relative mb-4">
-                    <i class="fas fa-user absolute left-4 top-4 text-slate-500"></i>
-                    <input type="text" id="user-name" placeholder="Full Name" class="w-full p-4 pl-12 glass bg-slate-900/50 outline-none focus:border-amber-500 transition-all">
-                </div>
+                <input type="text" id="user-name" placeholder="Full Name" class="w-full p-4 mb-4 glass bg-slate-900/50 outline-none focus:border-amber-500">
             </div>
-            
-            <div class="relative mb-4">
-                <i class="fas fa-envelope absolute left-4 top-4 text-slate-500"></i>
-                <input type="email" id="email" placeholder="Email Address" class="w-full p-4 pl-12 glass bg-slate-900/50 outline-none focus:border-amber-500 transition-all">
-            </div>
-
-            <div class="relative mb-8">
-                <i class="fas fa-lock absolute left-4 top-4 text-slate-500"></i>
-                <input type="password" id="pass" placeholder="Password" class="w-full p-4 pl-12 glass bg-slate-900/50 outline-none focus:border-amber-500 transition-all">
-            </div>
-
-            <button onclick="handleAuth()" class="w-full p-4 btn-grad text-black font-black rounded-2xl shadow-lg hover:opacity-90 active:scale-95 transition-all uppercase tracking-wider">Get Started</button>
-            <button onclick="toggleAuth()" id="toggle-txt" class="mt-6 text-sm text-slate-400">Don't have an account? <span class="text-amber-500 font-bold">Sign Up</span></button>
+            <input type="email" id="email" placeholder="Email" class="w-full p-4 mb-4 glass bg-slate-900/50 outline-none">
+            <input type="password" id="pass" placeholder="Password" class="w-full p-4 mb-8 glass bg-slate-900/50 outline-none">
+            <button onclick="handleAuth()" class="w-full p-4 btn-grad text-black font-black rounded-2xl">GET STARTED</button>
+            <button onclick="toggleAuth()" id="toggle-txt" class="mt-6 text-sm text-slate-400">නව ගිණුමක් සාදන්න</button>
         </div>
     </div>
 
-    <!-- MAIN DASHBOARD -->
+    <!-- Dashboard -->
     <div id="dashboard" class="hidden p-6 max-w-2xl mx-auto">
-        <!-- Header -->
-        <header class="flex justify-between items-center mb-10">
+        <header class="flex justify-between items-center mb-8">
             <div class="flex items-center gap-4">
                 <div class="w-14 h-14 rounded-2xl border-2 border-amber-500/50 p-1 bg-slate-900">
                     <img id="header-avatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-full h-full object-cover rounded-xl">
                 </div>
                 <div>
-                    <h2 id="display-name" class="font-black text-xl text-white">Student</h2>
-                    <p class="text-[10px] text-amber-500 font-bold flex items-center gap-1 uppercase tracking-widest"><i class="fas fa-check-circle"></i> Verified Candidate</p>
+                    <h2 id="display-name" class="font-black text-xl">Student</h2>
+                    <p class="text-[10px] text-amber-500 font-bold uppercase tracking-widest">A/L 2026 Batch</p>
                 </div>
             </div>
-            <div class="glass px-5 py-3 border-amber-500/20 text-center">
-                <span id="user-points" class="block font-black text-amber-400 text-lg">0</span>
-                <span class="text-[8px] text-slate-500 font-bold uppercase tracking-tighter">Points Earned</span>
-            </div>
+            <div class="glass px-5 py-3 border-amber-500/20"><span id="user-points" class="font-black text-amber-400 text-lg">0</span><span class="text-[8px] text-slate-500 ml-1 font-bold">PTS</span></div>
         </header>
 
         <!-- Home View -->
         <div id="home-view">
-            <!-- Countdown -->
-            <div class="glass p-8 mb-8 relative overflow-hidden group">
-                <div class="absolute inset-0 bg-amber-500/5 opacity-0 group-hover:opacity-100 transition-all"></div>
-                <p class="text-center text-[10px] font-bold text-slate-500 mb-4 uppercase tracking-[0.3em]">Countdown to Exam</p>
-                <div class="flex justify-around items-center">
-                    <div class="text-center"><span id="d-days" class="text-4xl font-black">00</span><p class="text-[8px] mt-1 text-slate-500 font-bold">DAYS</p></div>
-                    <div class="text-center text-amber-500 font-black text-2xl">:</div>
-                    <div class="text-center"><span id="d-hrs" class="text-4xl font-black text-amber-500">00</span><p class="text-[8px] mt-1 text-slate-500 font-bold">HOURS</p></div>
-                    <div class="text-center text-amber-500 font-black text-2xl">:</div>
-                    <div class="text-center"><span id="d-min" class="text-4xl font-black">00</span><p class="text-[8px] mt-1 text-slate-500 font-bold">MINUTES</p></div>
+            <div class="countdown-bg p-8 rounded-[2rem] mb-6 text-center shadow-2xl overflow-hidden relative">
+                <div class="flex justify-around items-center relative z-10">
+                    <div class="text-center"><span id="d-days" class="text-4xl font-black">00</span><p class="text-[8px] mt-1 opacity-60">DAYS</p></div>
+                    <div class="text-center"><span id="d-hrs" class="text-4xl font-black text-amber-400">00</span><p class="text-[8px] mt-1 opacity-60">HRS</p></div>
+                    <div class="text-center"><span id="d-min" class="text-4xl font-black">00</span><p class="text-[8px] mt-1 opacity-60">MINS</p></div>
                 </div>
             </div>
 
-            <!-- Subject Grid -->
-            <h3 class="text-xs font-black text-slate-500 mb-4 uppercase tracking-widest px-2">Library & Courses</h3>
+            <!-- Study Tips (Moved here) -->
+            <div class="flex gap-2 overflow-x-auto pb-6 no-scrollbar">
+                <div class="glass p-4 min-w-[200px] border-l-4 border-amber-500">
+                    <p class="text-[10px] font-black text-amber-500 mb-1">TIP #1</p>
+                    <p class="text-[11px] leading-relaxed">උදෑසන කාලය පාඩම් කිරීමට යොදාගන්න.</p>
+                </div>
+                <div class="glass p-4 min-w-[200px] border-l-4 border-green-500">
+                    <p class="text-[10px] font-black text-green-500 mb-1">TIP #2</p>
+                    <p class="text-[11px] leading-relaxed">කෙටි සටහන් (Short Notes) භාවිතා කරන්න.</p>
+                </div>
+            </div>
+
+            <h3 class="text-xs font-black text-slate-500 mb-4 uppercase tracking-widest">Subjects</h3>
             <div class="grid grid-cols-1 gap-4 mb-8" id="subjects-container"></div>
-
-            <!-- University Info Shortcut -->
-            <div onclick="nav('uni')" class="glass p-6 mb-8 border-l-4 border-cyan-500 flex justify-between items-center cursor-pointer hover:bg-white/5">
-                <div>
-                    <h4 class="font-black text-sm">University Info 2026</h4>
-                    <p class="text-[10px] text-slate-500">Z-Scores and Course Details</p>
-                </div>
-                <i class="fas fa-university text-cyan-500 text-xl"></i>
-            </div>
-
-            <!-- Study Tips -->
-            <h3 class="text-xs font-black text-slate-500 mb-4 uppercase tracking-widest px-2">Daily Study Tips</h3>
-            <div class="space-y-4">
-                <div class="glass p-5 flex gap-4 items-start border-white/5">
-                    <div class="w-10 h-10 bg-amber-500/10 rounded-xl flex-shrink-0 flex items-center justify-center text-amber-500"><i class="fas fa-lightbulb"></i></div>
-                    <p class="text-xs text-slate-300 leading-relaxed"><strong class="text-white block mb-1">Active Recall (ක්‍රියාකාරී මතකය):</strong> පාඩම් කරන විට පොත වසා කියවූ දේ නැවත මතක් කිරීමට උත්සාහ කරන්න. මෙය විභාගයට මතකය ඉතා හොඳින් දියුණු කරයි.</p>
-                </div>
-                <div class="glass p-5 flex gap-4 items-start border-white/5">
-                    <div class="w-10 h-10 bg-green-500/10 rounded-xl flex-shrink-0 flex items-center justify-center text-green-500"><i class="fas fa-clock"></i></div>
-                    <p class="text-xs text-slate-300 leading-relaxed"><strong class="text-white block mb-1">Pomodoro Technique:</strong> විනාඩි 25ක් පාඩම් කරන්න, විනාඩි 5ක විවේකයක් ගන්න. මෙය මොළයේ විඩාව අඩු කරයි.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Submenu View -->
-        <div id="submenu-view" class="hidden">
-            <button onclick="nav('home')" class="mb-6 text-slate-500 text-xs font-bold flex items-center gap-2"><i class="fas fa-chevron-left"></i> BACK TO CAMPUS</button>
-            <h2 id="submenu-title" class="text-3xl font-black mb-8 text-white italic">SUBJECT</h2>
             
-            <div class="flex gap-2 mb-8 p-1.5 glass rounded-2xl">
-                <button onclick="toggleSubMenu('units')" id="btn-units" class="flex-1 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-amber-500 text-black shadow-lg">By Units</button>
-                <button onclick="toggleSubMenu('papers')" id="btn-papers" class="flex-1 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest text-slate-500">Past Papers</button>
+            <div onclick="nav('uni')" class="glass p-6 border-l-4 border-cyan-500 flex justify-between items-center cursor-pointer mb-8">
+                <div><h4 class="font-black text-sm">University Z-Scores 2026</h4><p class="text-[10px] text-slate-500">සරසවි තොරතුරු මෙතැනින්</p></div>
+                <i class="fas fa-university text-cyan-500"></i>
             </div>
-
-            <div id="units-list" class="space-y-3"></div>
-            <div id="papers-list" class="hidden space-y-3"></div>
         </div>
 
-        <!-- Quiz View (One by One List) -->
+        <!-- Quiz View -->
         <div id="quiz-view" class="hidden">
-            <div class="flex justify-between items-center mb-8 sticky top-0 bg-black/80 backdrop-blur-md py-4 z-10">
+            <div class="sticky top-0 bg-black/80 py-4 z-20 flex justify-between items-center mb-6">
                 <button onclick="nav('home')" class="text-slate-500"><i class="fas fa-times"></i></button>
-                <h3 id="quiz-sub-name" class="font-black text-sm uppercase text-amber-500">EXAM MODE</h3>
+                <h3 id="quiz-sub-name" class="font-black text-sm text-amber-500 italic">EXAM MODE</h3>
                 <div class="w-8"></div>
             </div>
-            
-            <div id="questions-list-container" class="space-y-10 pb-10">
-                <!-- 50 Questions will be listed here -->
-            </div>
+            <div id="questions-list-container" class="space-y-10 pb-10"></div>
+            <button onclick="showResult()" class="w-full p-5 btn-grad text-black font-black rounded-2xl shadow-2xl mb-10">CHECK RESULT</button>
+        </div>
 
-            <button onclick="showResult()" class="w-full p-5 btn-grad text-black font-black rounded-2xl shadow-2xl mb-10">CHECK MY RESULT</button>
+        <!-- Chat View -->
+        <div id="ai-view" class="hidden">
+            <div class="glass p-4 mb-4 flex items-center gap-3 border-amber-500/20">
+                <i class="fas fa-robot text-amber-500"></i>
+                <p class="text-[10px] text-slate-400 font-bold uppercase">AL Fast Track AI (Sinhala)</p>
+            </div>
+            <div id="chat-box" class="h-[400px] overflow-y-auto space-y-4 mb-4 p-2"></div>
+            <div class="flex gap-2 p-2 glass">
+                <input type="text" id="chat-input" placeholder="ප්‍රශ්නය මෙතන අසන්න..." class="flex-1 bg-transparent p-2 outline-none text-sm">
+                <button onclick="askAI()" id="send-ai-btn" class="w-12 h-12 bg-amber-500 text-black rounded-xl"><i class="fas fa-paper-plane"></i></button>
+            </div>
         </div>
 
         <!-- University View -->
         <div id="uni-view" class="hidden">
-            <button onclick="nav('home')" class="mb-6 text-slate-500 font-bold flex items-center gap-2"><i class="fas fa-arrow-left"></i> BACK</button>
-            <h2 class="text-2xl font-black mb-6 text-white italic">University <span class="text-cyan-500">Info</span></h2>
+            <button onclick="nav('home')" class="mb-6 text-slate-500 text-xs font-bold"><i class="fas fa-arrow-left mr-2"></i>BACK</button>
+            <h2 class="text-2xl font-black mb-6 italic">University <span class="text-cyan-500">Info</span></h2>
             <div class="space-y-4">
                 <div class="glass p-6 border-l-4 border-cyan-500">
-                    <h4 class="font-bold mb-2">University of Colombo</h4>
-                    <p class="text-xs text-slate-400">Arts: 1.621 | Media: 1.890 | Law: 2.100</p>
+                    <h4 class="font-bold mb-1">University of Colombo</h4>
+                    <p class="text-[10px] text-slate-400">Arts: 1.621 | Media: 1.890</p>
                 </div>
                 <div class="glass p-6 border-l-4 border-cyan-500">
-                    <h4 class="font-bold mb-2">University of Sri Jayewardenepura</h4>
-                    <p class="text-xs text-slate-400">Management: 1.950 | Arts: 1.550</p>
-                </div>
-                <div class="glass p-6 border-l-4 border-cyan-500">
-                    <h4 class="font-bold mb-2">University of Kelaniya</h4>
-                    <p class="text-xs text-slate-400">Humanities: 1.480 | Commerce: 1.820</p>
+                    <h4 class="font-bold mb-1">University of Kelaniya</h4>
+                    <p class="text-[10px] text-slate-400">Media: 1.750 | Arts: 1.480</p>
                 </div>
             </div>
         </div>
@@ -179,8 +142,8 @@
         <div id="profile-view" class="hidden">
             <div class="text-center mb-10">
                 <div class="relative w-32 h-32 mx-auto mb-6">
-                    <img id="profile-img-big" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-full h-full rounded-[2rem] border-4 border-amber-500/20 object-cover bg-slate-900 shadow-2xl">
-                    <label class="absolute -bottom-2 -right-2 w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center cursor-pointer border-4 border-slate-950 shadow-lg">
+                    <img id="profile-img-big" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-full h-full rounded-[2rem] border-4 border-amber-500/20 object-cover shadow-2xl">
+                    <label class="absolute -bottom-2 -right-2 w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center cursor-pointer border-4 border-slate-950">
                         <i class="fas fa-camera text-sm text-black"></i>
                         <input type="file" class="hidden" accept="image/*" onchange="uploadImage(this)">
                     </label>
@@ -190,85 +153,73 @@
             </div>
 
             <!-- Social Buttons -->
-            <div class="grid grid-cols-3 gap-3 mb-8">
-                <a href="https://whatsapp.com" target="_blank" class="glass p-4 text-center rounded-2xl hover:bg-green-500/10 border-green-500/20">
-                    <i class="fab fa-whatsapp text-2xl text-green-500 mb-1"></i>
-                    <span class="block text-[8px] font-bold text-slate-400 uppercase">Channel</span>
-                </a>
-                <a href="https://facebook.com" target="_blank" class="glass p-4 text-center rounded-2xl hover:bg-blue-600/10 border-blue-600/20">
-                    <i class="fab fa-facebook text-2xl text-blue-600 mb-1"></i>
-                    <span class="block text-[8px] font-bold text-slate-400 uppercase">Page</span>
-                </a>
-                <a href="https://youtube.com" target="_blank" class="glass p-4 text-center rounded-2xl hover:bg-red-600/10 border-red-600/20">
-                    <i class="fab fa-youtube text-2xl text-red-600 mb-1"></i>
-                    <span class="block text-[8px] font-bold text-slate-400 uppercase">YouTube</span>
-                </a>
+            <div class="grid grid-cols-3 gap-3 mb-8 text-center">
+                <a href="#" class="glass p-4 rounded-2xl hover:bg-green-500/10 border-green-500/20"><i class="fab fa-whatsapp text-2xl text-green-500"></i></a>
+                <a href="#" class="glass p-4 rounded-2xl hover:bg-blue-600/10 border-blue-600/20"><i class="fab fa-facebook text-2xl text-blue-600"></i></a>
+                <a href="#" class="glass p-4 rounded-2xl hover:bg-red-600/10 border-red-600/20"><i class="fab fa-youtube text-2xl text-red-600"></i></a>
             </div>
 
             <div class="space-y-3">
-                <button onclick="toggleModal('pass-modal')" class="w-full glass p-5 flex justify-between items-center hover:bg-white/5 transition-all">
-                    <div class="flex items-center gap-4"><i class="fas fa-shield-alt text-slate-500"></i> <span class="text-sm font-bold">Privacy & Password</span></div>
-                    <i class="fas fa-chevron-right text-[10px] text-slate-800"></i>
-                </button>
+                <button onclick="openModal('pass-modal')" class="w-full glass p-5 flex justify-between"><span>Password Reset</span> <i class="fas fa-key text-slate-700"></i></button>
+                <button onclick="openModal('feed-modal')" class="w-full glass p-5 flex justify-between"><span>Feedback & Help</span> <i class="fas fa-envelope text-slate-700"></i></button>
                 <div class="p-8 glass text-center border-amber-500/10 mt-10">
-                    <p class="text-[10px] text-slate-600 mb-2 font-bold uppercase tracking-[0.2em]">Crafted by</p>
-                    <h4 class="font-black text-amber-500 text-xl italic tracking-tighter">KD CREATION</h4>
+                    <h4 class="font-black text-amber-500 text-xl italic">KD CREATION</h4>
                 </div>
-                <button onclick="logout()" class="w-full p-4 text-red-500 font-black text-xs opacity-40 uppercase tracking-widest mt-4">Sign Out</button>
+                <button onclick="logout()" class="w-full p-4 text-red-500 font-bold opacity-30 text-xs">LOGOUT</button>
             </div>
         </div>
         
-        <!-- Rank View -->
         <div id="rank-view" class="hidden">
-            <h2 class="text-2xl font-black text-center mb-8 italic">World <span class="text-amber-500">Ranking</span></h2>
+            <h2 class="text-2xl font-black text-center mb-8 italic text-amber-500">Leaderboard</h2>
             <div id="leaderboard-list" class="space-y-3"></div>
         </div>
     </div>
 
+    <!-- MODALS (Professional Slide-up) -->
+    <div id="pass-modal" class="hidden fixed inset-0 z-[200] bg-black/80 flex items-end">
+        <div class="w-full glass p-10 rounded-t-[3rem] modal-animate border-t border-amber-500/30">
+            <h3 class="text-xl font-bold mb-2">Password Reset</h3>
+            <p class="text-xs text-slate-400 mb-8">නව මුරපදයක් සැකසීම සඳහා Link එක Email එකට එවන්නද?</p>
+            <button onclick="changePass()" class="w-full p-5 btn-grad text-black font-bold rounded-2xl mb-4">RESET NOW</button>
+            <button onclick="closeModal('pass-modal')" class="w-full text-slate-500 font-bold text-xs">CANCEL</button>
+        </div>
+    </div>
+
+    <div id="feed-modal" class="hidden fixed inset-0 z-[200] bg-black/80 flex items-end">
+        <div class="w-full glass p-10 rounded-t-[3rem] modal-animate border-t border-amber-500/30">
+            <h3 class="text-xl font-bold mb-6">Send Feedback</h3>
+            <textarea id="feed-text" class="w-full h-32 glass bg-slate-900/50 p-4 mb-4 outline-none border border-white/5" placeholder="ඔබේ අදහස මෙතැන ලියන්න..."></textarea>
+            <button onclick="sendFeedback()" class="w-full p-5 btn-grad text-black font-bold rounded-2xl mb-4">SEND FEEDBACK</button>
+            <button onclick="closeModal('feed-modal')" class="w-full text-slate-500 font-bold text-xs">CLOSE</button>
+        </div>
+    </div>
+
     <!-- RESULT MODAL -->
-    <div id="result-modal" class="hidden fixed inset-0 bg-black/98 z-[100] flex flex-col items-center justify-center p-6 backdrop-blur-2xl">
-        <!-- Result Area to Capture -->
-        <div id="result-download-area" class="p-10 border-[10px] border-amber-500/20 rounded-[3rem] w-full max-w-sm text-center relative overflow-hidden">
-            <div class="absolute top-0 right-0 p-4 opacity-20"><i class="fas fa-book text-6xl text-white"></i></div>
+    <div id="result-modal" class="hidden fixed inset-0 bg-black/98 z-[100] flex flex-col items-center justify-center p-6">
+        <div id="result-download-area" class="p-10 border-[10px] border-amber-500/20 rounded-[3rem] w-full max-w-sm text-center bg-slate-950 relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
             <h2 class="text-amber-500 font-black text-2xl mb-2 italic">A/L Fast Track</h2>
-            <p class="text-[8px] text-slate-400 font-bold tracking-[0.3em] uppercase mb-8">Official Result Card</p>
-            
+            <p class="text-[8px] text-slate-500 font-bold tracking-[0.3em] uppercase mb-8">Official Result Card</p>
             <div class="w-20 h-20 rounded-2xl mx-auto mb-4 border-2 border-amber-500 p-1 shadow-2xl">
                 <img id="res-student-img" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-full h-full object-cover rounded-xl">
             </div>
-            
             <p id="res-student-name" class="text-white font-black text-xl mb-6 uppercase">Student Name</p>
-            
             <div class="py-6 border-y border-white/10">
-                <span class="text-[10px] text-amber-500 font-bold uppercase block mb-1">Score Obtained</span>
+                <span class="text-[10px] text-amber-500 font-bold uppercase block mb-1">Quiz Score</span>
                 <h1 id="res-score-text" class="text-7xl font-black text-white">00<span class="text-2xl">/50</span></h1>
             </div>
-            
-            <div class="mt-8 flex justify-between items-center text-left">
-                <div>
-                    <p class="text-[8px] text-slate-500 font-bold uppercase">Date</p>
-                    <p id="res-date" class="text-[10px] text-white font-bold">2026.05.10</p>
-                </div>
-                <div class="text-right">
-                    <p class="text-[8px] text-slate-500 font-bold uppercase">Status</p>
-                    <p class="text-[10px] text-green-500 font-bold">COMPLETED</p>
-                </div>
-            </div>
-            
-            <p class="text-[8px] text-slate-600 mt-10 font-bold uppercase">Developed by KD Creation</p>
+            <p class="text-[8px] text-slate-600 mt-10 font-bold">Developed by KD Creation</p>
         </div>
-        
-        <button onclick="downloadResult()" class="mt-8 w-full max-w-sm p-5 btn-grad text-black font-black rounded-2xl shadow-xl flex items-center justify-center gap-3">
-            <i class="fas fa-download"></i> SAVE TO GALLERY
-        </button>
-        <button onclick="location.reload()" class="mt-6 text-slate-500 text-xs font-bold uppercase tracking-widest">Done / Close</button>
+        <button onclick="downloadResult()" class="mt-8 w-full max-w-sm p-5 btn-grad text-black font-black rounded-2xl flex items-center justify-center gap-3"><i class="fas fa-download"></i> DOWNLOAD PNG</button>
+        <button onclick="location.reload()" class="mt-6 text-slate-500 text-xs font-bold uppercase">CLOSE</button>
     </div>
 
     <!-- Navbar -->
     <nav id="navbar" class="hidden fixed bottom-6 left-6 right-6 h-20 glass rounded-[2rem] flex justify-around items-center px-4 z-[50] shadow-2xl border-white/5">
-        <button onclick="nav('home')" id="n-home" class="p-4 active-nav"><i class="fas fa-home text-lg"></i></button>
-        <button onclick="nav('rank')" id="n-rank" class="p-4 text-slate-700"><i class="fas fa-trophy text-lg"></i></button>
-        <button onclick="nav('profile')" id="n-profile" class="p-4 text-slate-700"><i class="fas fa-user-circle text-xl"></i></button>
+        <button onclick="nav('home')" id="n-home" class="p-4 active-nav"><i class="fas fa-home"></i></button>
+        <button onclick="nav('ai')" id="n-ai" class="p-4 text-slate-700"><i class="fas fa-robot"></i></button>
+        <button onclick="nav('rank')" id="n-rank" class="p-4 text-slate-700"><i class="fas fa-trophy"></i></button>
+        <button onclick="nav('profile')" id="n-profile" class="p-4 text-slate-700"><i class="fas fa-user-circle"></i></button>
     </nav>
 
     <script>
@@ -281,31 +232,27 @@
             appId: "1:272353911468:web:07c22eb0c9f167fce37509"
         };
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const storage = firebase.storage();
+        const auth = firebase.auth(); const db = firebase.firestore(); const storage = firebase.storage();
 
         const subjects = [
             { id: 'media', name: 'Media Studies', si: 'මාධ්‍ය අධ්‍යයනය', color: 'purple' },
-            { id: 'bc', name: 'Buddhist Civ', si: 'බෞද්ධ ශිෂ්ටාචාරය', color: 'orange' },
             { id: 'political', name: 'Political Science', si: 'දේශපාලන විද්‍යාව', color: 'blue' },
-            { id: 'geo', name: 'Geography', si: 'භූගෝල විද්‍යාව', color: 'cyan' },
             { id: 'history', name: 'History', si: 'ඉතිහාසය', color: 'red' },
-            { id: 'agri', name: 'Agri Science', si: 'කෘෂි විද්‍යාව', color: 'green' }
+            { id: 'geo', name: 'Geography', si: 'භූගෝල විද්‍යාව', color: 'cyan' }
         ];
 
-        let score = 0;
-        let userData = {};
+        let currentScore = 0;
 
+        // Modal Functions
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
         function toggleAuth() { document.getElementById('reg-fields').classList.toggle('hidden'); }
-        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
 
         async function handleAuth() {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('pass').value;
             const name = document.getElementById('user-name').value;
             const isReg = !document.getElementById('reg-fields').classList.contains('hidden');
-            if(!email || !pass) return alert("Please fill all fields!");
             try {
                 if(isReg) {
                     const res = await auth.createUserWithEmailAndPassword(email, pass);
@@ -327,18 +274,15 @@
 
         function loadUserData(uid) {
             db.collection("users").doc(uid).onSnapshot(doc => {
-                const d = doc.data();
-                if(d) {
-                    userData = d;
-                    document.getElementById('display-name').innerText = d.name || "Student";
-                    document.getElementById('profile-name-display').innerText = d.name || "Student";
-                    document.getElementById('profile-email').innerText = d.email || "";
-                    document.getElementById('user-points').innerText = d.points || 0;
-                    if(d.photo) {
-                        document.getElementById('header-avatar').src = d.photo;
-                        document.getElementById('profile-img-big').src = d.photo;
-                        document.getElementById('res-student-img').src = d.photo;
-                    }
+                const d = doc.data(); if(!d) return;
+                document.getElementById('display-name').innerText = d.name;
+                document.getElementById('profile-name-display').innerText = d.name;
+                document.getElementById('profile-email').innerText = d.email;
+                document.getElementById('user-points').innerText = d.points || 0;
+                if(d.photo) {
+                    document.getElementById('header-avatar').src = d.photo;
+                    document.getElementById('profile-img-big').src = d.photo;
+                    document.getElementById('res-student-img').src = d.photo;
                 }
             });
         }
@@ -354,105 +298,92 @@
         function renderSubs() {
             const con = document.getElementById('subjects-container'); con.innerHTML = "";
             subjects.forEach(s => {
-                con.innerHTML += `<div onclick="openSub('${s.id}', '${s.name}')" class="glass p-5 border-l-4 border-${s.color}-500 flex justify-between items-center cursor-pointer hover:translate-x-2 transition-all">
+                con.innerHTML += `<div onclick="startQuiz('${s.name}')" class="glass p-5 border-l-4 border-${s.color}-500 flex justify-between items-center cursor-pointer hover:translate-x-2 transition-all">
                     <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-xl bg-${s.color}-500/10 flex items-center justify-center text-${s.color}-500"><i class="fas fa-book-open"></i></div>
+                        <div class="w-10 h-10 rounded-xl bg-${s.color}-500/10 flex items-center justify-center text-${s.color}-500"><i class="fas fa-book"></i></div>
                         <div><h4 class="font-bold text-sm">${s.name}</h4><p class="text-[10px] text-slate-500 font-bold uppercase">${s.si}</p></div>
-                    </div><i class="fas fa-chevron-right text-[10px] text-slate-800"></i></div>`;
+                    </div><i class="fas fa-play text-[10px] text-slate-800"></i></div>`;
             });
         }
 
-        function openSub(id, name) {
-            nav('submenu');
-            document.getElementById('submenu-title').innerText = name;
-            const unitsList = document.getElementById('units-list');
-            unitsList.innerHTML = "";
-            for(let i=1; i<=5; i++) {
-                unitsList.innerHTML += `<div onclick="startQuiz('${name} - Unit ${i}')" class="glass p-5 border-l-4 border-amber-500 flex justify-between items-center cursor-pointer">
-                    <span class="text-sm font-bold">Unit 0${i} Lessons</span><i class="fas fa-play text-[10px] text-amber-500"></i>
-                </div>`;
-            }
-        }
-
         function startQuiz(title) {
-            nav('quiz');
-            score = 0;
+            nav('quiz'); currentScore = 0;
             document.getElementById('quiz-sub-name').innerText = title;
             const container = document.getElementById('questions-list-container');
             container.innerHTML = "";
             
-            // Generating 50 Questions as a list
             for(let i=1; i<=50; i++) {
+                const options = shuffle(["නිවැරදි පිළිතුර", "වැරදි පිළිතුර 1", "වැරදි පිළිතුර 2", "වැරදි පිළිතුර 3"]);
                 container.innerHTML += `
                 <div class="glass p-6 border-white/5">
                     <p class="text-[10px] text-amber-500 font-black mb-2 uppercase tracking-widest">Question ${i}</p>
-                    <h3 class="text-md font-bold mb-6 leading-relaxed">ප්‍රශ්නය මෙතැන දිස්වේ. නිවැරදි පිළිතුර තෝරන්න?</h3>
-                    <div class="space-y-3">
-                        ${[1,2,3,4].map(opt => `
-                            <label class="flex items-center gap-4 p-4 glass rounded-xl cursor-pointer border-white/5 hover:border-amber-500/30 transition-all">
-                                <input type="radio" name="q${i}" value="${opt === 1 ? 'correct' : 'wrong'}" class="w-4 h-4 accent-amber-500">
-                                <span class="text-sm">පිළිතුර ${opt}</span>
-                            </label>
+                    <h3 class="text-md font-bold mb-6">${title} ප්‍රශ්නය ${i} ?</h3>
+                    <div class="space-y-3" id="q-block-${i}">
+                        ${options.map(opt => `
+                            <button onclick="checkAns(this, '${opt === 'නිවැරදි පිළිතුර' ? 'correct' : 'wrong'}', ${i})" class="w-full text-left p-4 glass rounded-xl border border-white/5 transition-all text-sm">
+                                ${opt}
+                            </button>
                         `).join('')}
                     </div>
                 </div>`;
             }
         }
 
-        function showResult() {
-            // Check Score
-            const inputs = document.querySelectorAll('input[type="radio"]:checked');
-            inputs.forEach(input => { if(input.value === 'correct') score++; });
-            
-            document.getElementById('res-score-text').innerHTML = `${score}<span class="text-2xl">/50</span>`;
-            document.getElementById('res-student-name').innerText = userData.name || "Student";
-            document.getElementById('res-date').innerText = new Date().toLocaleDateString();
-            
-            // Save Points to DB
-            db.collection("users").doc(auth.currentUser.uid).update({ 
-                points: firebase.firestore.FieldValue.increment(score) 
-            });
-            
-            document.getElementById('result-modal').classList.remove('hidden');
+        function checkAns(btn, status, qId) {
+            const block = document.getElementById(`q-block-${qId}`);
+            const buttons = block.getElementsByTagName('button');
+            for(let b of buttons) {
+                b.disabled = true;
+                if(b.innerText === "නිවැරදි පිළිතුර") b.classList.add('option-correct');
+            }
+            if(status === 'wrong') btn.classList.add('option-wrong');
+            else currentScore++;
         }
 
-        function downloadResult() {
-            const area = document.getElementById('result-download-area');
-            html2canvas(area, { backgroundColor: "#000", scale: 2 }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `FastTrack_Result_${userData.name}.png`;
-                link.href = canvas.toDataURL("image/png");
-                link.click();
-            });
+        function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
+
+        function showResult() {
+            document.getElementById('res-score-text').innerHTML = `${currentScore}<span class="text-2xl">/50</span>`;
+            document.getElementById('res-student-name').innerText = auth.currentUser.displayName;
+            db.collection("users").doc(auth.currentUser.uid).update({ points: firebase.firestore.FieldValue.increment(currentScore) });
+            openModal('result-modal');
+        }
+
+        async function askAI() {
+            const input = document.getElementById('chat-input');
+            const box = document.getElementById('chat-box');
+            if(!input.value) return;
+            const q = input.value; input.value = "";
+            box.innerHTML += `<div class="flex justify-end"><p class="bg-amber-500 text-black p-3 rounded-2xl text-sm font-bold">${q}</p></div>`;
+            
+            try {
+                const res = await fetch("https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill", {
+                    headers: { Authorization: "Bearer hf_VvYmYpXfNIsVdQGZpYQpXfNIsVdQGZpYQ" },
+                    method: "POST", body: JSON.stringify({ inputs: q }),
+                });
+                const data = await res.json();
+                const reply = data[0]?.generated_text || "සමාවෙන්න, මට පිළිතුරු සෙවීමට අපහසුයි.";
+                box.innerHTML += `<div class="flex justify-start"><div class="glass p-4 rounded-2xl text-sm border-amber-500/20">${reply}</div></div>`;
+            } catch(e) { box.innerHTML += `<p class="text-red-500 text-xs text-center">AI Error</p>`; }
+            box.scrollTop = box.scrollHeight;
         }
 
         function nav(v) {
-            ['home','rank','profile','submenu','quiz','uni'].forEach(x => {
-                const el = document.getElementById(x+'-view');
-                if(el) el.classList.add('hidden');
-                const btn = document.getElementById('n-'+x);
-                if(btn) btn.className = "p-4 text-slate-700";
+            ['home','ai','rank','profile','quiz','uni'].forEach(x => {
+                if(document.getElementById(x+'-view')) document.getElementById(x+'-view').classList.add('hidden');
+                if(document.getElementById('n-'+x)) document.getElementById('n-'+x).className = "p-4 text-slate-700";
             });
             document.getElementById(v+'-view').classList.remove('hidden');
-            const ab = document.getElementById('n-'+v);
-            if(ab) ab.className = "p-4 active-nav";
+            if(document.getElementById('n-'+v)) document.getElementById('n-'+v).className = "p-4 active-nav";
             window.scrollTo(0,0);
         }
 
-        function toggleSubMenu(type) {
-            const u = document.getElementById('units-list'); const p = document.getElementById('papers-list');
-            const bu = document.getElementById('btn-units'); const bp = document.getElementById('btn-papers');
-            if(type === 'units') {
-                u.classList.remove('hidden'); p.classList.add('hidden');
-                bu.className = "flex-1 py-4 rounded-xl font-black text-[10px] bg-amber-500 text-black shadow-lg";
-                bp.className = "flex-1 py-4 rounded-xl font-black text-[10px] text-slate-500";
-            } else {
-                p.classList.remove('hidden'); u.classList.add('hidden');
-                bp.className = "flex-1 py-4 rounded-xl font-black text-[10px] bg-amber-500 text-black shadow-lg";
-                bu.className = "flex-1 py-4 rounded-xl font-black text-[10px] text-slate-500";
-            }
+        function downloadResult() {
+            html2canvas(document.getElementById('result-download-area')).then(c => {
+                const l = document.createElement('a'); l.download = 'Result.png'; l.href = c.toDataURL(); l.click();
+            });
         }
-
+        function changePass() { auth.sendPasswordResetEmail(auth.currentUser.email).then(() => { closeModal('pass-modal'); alert("Link Sent!"); }); }
         function logout() { auth.signOut().then(() => location.reload()); }
 
         setInterval(() => {
