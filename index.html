@@ -336,12 +336,23 @@
             } catch(e) { console.log(e); }
         }
 
-        // Auth Logic
         function toggleAuthMode() {
-            const isReg = document.getElementById('register-fields').classList.toggle('hidden');
-            document.getElementById('auth-btn').innerText = isReg ? "REGISTER" : "LOGIN";
-            document.getElementById('toggle-btn').innerText = isReg ? "Back to Login" : "Register";
-        }
+    const regFields = document.getElementById('register-fields');
+    const authBtn = document.getElementById('auth-btn');
+    const toggleBtn = document.getElementById('toggle-btn');
+    
+    const isRegistering = regFields.classList.toggle('hidden');
+
+    if (!isRegistering) {
+        // Register mode එකේදී (fields පේනවා නම්)
+        authBtn.innerText = "REGISTER";
+        toggleBtn.innerText = "Back to Login";
+    } else {
+        // Login mode එකේදී (fields සැඟවී ඇති විට)
+        authBtn.innerText = "LOGIN";
+        toggleBtn.innerText = "Register";
+    }
+}
 
         async function handleAuth() {
             const email = document.getElementById('auth-email').value;
