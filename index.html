@@ -259,88 +259,61 @@
     </nav>
 
     <script>
-       // --- 1. DATA STRUCTURE (ප්‍රශ්න මෙතැනට ඇතුළත් කරන්න) ---
+// --- 1. DATA STRUCTURE ---
 const unitQuizData = {
-    "Media Studies": { 
-        "Unit 01: පදනම": [
-            { q: "සන්නිවේදනයේ මූලික අංගය කුමක්ද?", options: ["මූලාශ්‍රය", "පෑන", "පොත", "කැලෑව"], correct: 0 },
-            { q: "ප්‍රශ්න 50 ක් මෙතැනට ඇතුළත් කළ හැක...", options: ["A", "B", "C", "D"], correct: 1 }
-        ],
-        "Unit 02: සන්නිවේදන ආකෘති": [] 
-    },
+    "Media Studies": { "Unit 01: පදනම": [{ q: "සන්නිවේදනයේ මූලික අංගය කුමක්ද?", options: ["මූලාශ්‍රය", "පෑන", "පොත", "කැලෑව"], correct: 0 }] },
     "Buddhist Civilization": { "Unit 01: හැඳින්වීම": [] },
     "Political Science": { "Unit 01": [] },
     "Logic": { "Unit 01": [] },
-    "History": { "Unit 01": [] },
+    "Sinhala": { "Unit 01": [] },
     "Geography": { "Unit 01": [] }
 };
 
 const pastPaperQuizData = {
-    "Media Studies": { 
-        "2023 Media Past Paper": [
-            { q: "2023 පළමු ප්‍රශ්නය?", options: ["පිළිතුර 1", "පිළිතුර 2", "පිළිතුර 3", "පිළිතුර 4"], correct: 2 }
-        ] 
-    },
+    "Media Studies": { "2023 Media Past Paper": [{ q: "2023 පළමු ප්‍රශ්නය?", options: ["A", "B", "C", "D"], correct: 2 }] },
     "Buddhist Civilization": { "2023 Political Paper": [] },
-    "Political Science": {}, "Logic": {}, "History": {}, "Geography": {}
 };
 
-// --- 2. GLOBAL VARIABLES ---
 let currentSubject = "";
 let currentSelectedTitle = "";
 
-// --- 3. VIEW CONTROLLER ---
+// --- 2. VIEW CONTROLLER (වැදගත්ම කොටස) ---
 function changeView(view) {
-    const views = ['home', 'ai', 'rank', 'profile', 'subject'];
-    views.forEach(v => {
-        const el = document.getElementById(v + '-view');
-        if(el) el.classList.add('hidden');
-        
-        const nav = document.getElementById('nav-' + v);
-        if(nav) nav.classList.replace('nav-active', 'text-slate-500');
+    // ඔක්කොම Sections ටික මෙතන List කරන්න
+    const allSections = ['home-view', 'ai-view', 'rank-view', 'profile-view', 'subject-view'];
+    
+    // හැම එකක්ම Hidden කරන්න
+    allSections.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
     });
-    
-    document.getElementById(view + '-view').classList.remove('hidden');
-    const activeNav = document.getElementById('nav-' + view);
-    if(activeNav) activeNav.classList.replace('text-slate-500', 'nav-active');
-    
-    if(view === 'rank') fetchRank();
-    window.scrollTo(0,0);
-}
 
-// --- 4. NEW TAB SYSTEM LOGIC ---
-
-// Tab දෙක මාරු කරන Function එක
-function switchTab(tab) {
-    const quizBtn = document.getElementById('tab-quiz');
-    const paperBtn = document.getElementById('tab-paper');
-    const quizContent = document.getElementById('units-tab-content');
-    const paperContent = document.getElementById('papers-tab-content');
-    const quizArea = document.getElementById('quiz-area');
-
-    // Quiz එකක් කරමින් සිටියදී Tab එකක් එබුවොත් Quiz එක සඟවනවා
-    quizArea.classList.add('hidden');
-    
-    if (tab === 'quiz') {
-        quizBtn.classList.add('bg-yellow-500', 'text-black');
-        quizBtn.classList.remove('text-slate-400');
-        paperBtn.classList.remove('bg-yellow-500', 'text-black');
-        paperBtn.classList.add('text-slate-400');
-        
-        quizContent.classList.remove('hidden');
-        paperContent.classList.add('hidden');
+    // Dashboard එකේ පේන කොටස් තීරණය කිරීම
+    if (view === 'subject') {
+        document.getElementById('home-view').classList.add('hidden');
+        document.getElementById('subject-view').classList.remove('hidden');
     } else {
-        paperBtn.classList.add('bg-yellow-500', 'text-black');
-        paperBtn.classList.remove('text-slate-400');
-        quizBtn.classList.remove('bg-yellow-500', 'text-black');
-        quizBtn.classList.add('text-slate-400');
-        
-        paperContent.classList.remove('hidden');
-        quizContent.classList.add('hidden');
+        // අනිත් Views පෙන්වීම (Home, AI, Rank, Profile)
+        const activeView = document.getElementById(view + '-view');
+        if (activeView) activeView.classList.remove('hidden');
     }
+
+    // Navigation Icons Update
+    const navIcons = ['home', 'ai', 'rank', 'profile'];
+    navIcons.forEach(n => {
+        const navEl = document.getElementById('nav-' + n);
+        if (navEl) navEl.classList.replace('nav-active', 'text-slate-500');
+    });
+
+    const activeNav = document.getElementById('nav-' + view);
+    if (activeNav) activeNav.classList.replace('text-slate-500', 'nav-active');
+
+    // Rank එකට යනකොට විතරක් Leaderboard data load කරන්න
+    if (view === 'rank') fetchRank();
+    window.scrollTo(0, 0);
 }
 
-// විෂයක් විවෘත කරන විට ලිස්ට් එක පුරවන හැටි
+// --- 3. SUBJECT SELECTION LOGIC ---
 function openSubject(subjectName) {
     currentSubject = subjectName;
     document.getElementById('display-subject-title').innerText = subjectName;
@@ -351,51 +324,66 @@ function openSubject(subjectName) {
     unitsList.innerHTML = "";
     papersList.innerHTML = "";
     
-    // Quiz/Units Load කිරීම
     const units = unitQuizData[subjectName] || {};
-    const unitKeys = Object.keys(units);
-    if(unitKeys.length > 0) {
-        unitKeys.forEach(title => {
-            unitsList.innerHTML += `
-                <div onclick="startQuiz('unit', '${title}')" class="glass-card p-5 flex justify-between items-center cursor-pointer border-l-4 border-yellow-500/50 hover:border-yellow-500">
-                    <span class="font-bold text-sm text-slate-200">${title}</span>
-                    <i class="fas fa-play text-[10px] text-yellow-500"></i>
-                </div>`;
-        });
-    } else {
-        unitsList.innerHTML = `<p class="text-xs text-slate-600 p-4 italic">No Units available yet.</p>`;
-    }
+    Object.keys(units).forEach(title => {
+        unitsList.innerHTML += `
+            <div onclick="startQuiz('unit', '${title}')" class="glass-card p-5 flex justify-between items-center cursor-pointer border-l-4 border-yellow-500 hover:bg-white/5 mb-3">
+                <span class="font-bold text-sm text-slate-200">${title}</span>
+                <i class="fas fa-chevron-right text-yellow-500"></i>
+            </div>`;
+    });
 
-    // Past Papers Load කිරීම
     const papers = pastPaperQuizData[subjectName] || {};
-    const paperKeys = Object.keys(papers);
-    if(paperKeys.length > 0) {
-        paperKeys.forEach(title => {
-            papersList.innerHTML += `
-                <div onclick="startQuiz('paper', '${title}')" class="glass-card p-5 flex justify-between items-center cursor-pointer border-l-4 border-cyan-500/50 hover:border-cyan-500">
-                    <span class="font-bold text-sm text-slate-200">${title}</span>
-                    <i class="fas fa-file-alt text-[10px] text-cyan-500"></i>
-                </div>`;
-        });
-    } else {
-        papersList.innerHTML = `<p class="text-xs text-slate-600 p-4 italic">No Papers available yet.</p>`;
-    }
+    Object.keys(papers).forEach(title => {
+        papersList.innerHTML += `
+            <div onclick="startQuiz('paper', '${title}')" class="glass-card p-5 flex justify-between items-center cursor-pointer border-l-4 border-cyan-500 hover:bg-white/5 mb-3">
+                <span class="font-bold text-sm text-slate-200">${title}</span>
+                <i class="fas fa-file-alt text-cyan-500"></i>
+            </div>`;
+    });
 
-    switchTab('quiz'); // Default ලෙස QUIZ පෙන්වන්න
+    switchTab('quiz'); // UI එක හරිගස්සන Function එක (පහළ තියෙනවා)
     changeView('subject');
 }
 
-// --- 5. QUIZ ENGINE ---
+// Tab මාරු කිරීමේදී Quiz එක අයින් කර ලැයිස්තුව පෙන්වීම
+function switchTab(tab) {
+    const quizBtn = document.getElementById('tab-quiz');
+    const paperBtn = document.getElementById('tab-paper');
+    const quizContent = document.getElementById('units-tab-content');
+    const paperContent = document.getElementById('papers-tab-content');
+    const quizArea = document.getElementById('quiz-area');
+
+    quizArea.classList.add('hidden'); // Tab මාරු කරනකොට කලින් කර කර හිටපු Quiz සඟවන්න
+
+    if (tab === 'quiz') {
+        quizBtn.classList.add('bg-yellow-500', 'text-black');
+        quizBtn.classList.remove('text-slate-400');
+        paperBtn.classList.remove('bg-yellow-500', 'text-black');
+        paperBtn.classList.add('text-slate-400');
+        quizContent.classList.remove('hidden');
+        paperContent.classList.add('hidden');
+    } else {
+        paperBtn.classList.add('bg-yellow-500', 'text-black');
+        paperBtn.classList.remove('text-slate-400');
+        quizBtn.classList.remove('bg-yellow-500', 'text-black');
+        quizBtn.classList.add('text-slate-400');
+        paperContent.classList.remove('hidden');
+        quizContent.classList.add('hidden');
+    }
+}
+
+// --- 4. QUIZ ENGINE ---
 function startQuiz(type, title) {
     currentSelectedTitle = title;
     const questions = type === 'unit' ? unitQuizData[currentSubject][title] : pastPaperQuizData[currentSubject][title];
     
     if(!questions || questions.length === 0) {
-        alert("වැඩිදුර ප්‍රශ්න ඇතුළත් කරමින් පවතී.");
+        alert("වැඩිදුර ප්‍රශ්න ඇතුළත් කරමින් පවතී...");
         return;
     }
 
-    // List සඟවා Quiz එක පෙන්වීම
+    // ලැයිස්තු සඟවා Quiz එක පෙන්වීම
     document.getElementById('units-tab-content').classList.add('hidden');
     document.getElementById('papers-tab-content').classList.add('hidden');
     document.getElementById('quiz-area').classList.remove('hidden');
@@ -404,14 +392,14 @@ function startQuiz(type, title) {
     const container = document.getElementById('questions-container');
     container.innerHTML = "";
 
-    questions.forEach((q, qIdx) => {
+    questions.forEach((q, idx) => {
         container.innerHTML += `
-            <div class="glass-card p-6 quiz-card" data-correct="${q.correct}">
-                <p class="text-[10px] font-black text-yellow-500 mb-3 uppercase tracking-widest">Question ${qIdx + 1}</p>
-                <p class="text-sm font-bold mb-5 leading-relaxed text-slate-100">${q.q}</p>
+            <div class="glass-card p-6 quiz-card mb-4" data-correct="${q.correct}">
+                <p class="text-xs font-bold text-yellow-500 mb-2 uppercase">Question ${idx + 1}</p>
+                <p class="text-sm font-bold mb-4 leading-relaxed">${q.q}</p>
                 <div class="space-y-2">
-                    ${q.options.map((opt, optIdx) => `
-                        <button onclick="selectAnswer(this, ${optIdx})" class="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-left text-xs transition-all">
+                    ${q.options.map((opt, i) => `
+                        <button onclick="selectAnswer(this, ${i})" class="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-left text-xs hover:bg-white/10 transition">
                             ${opt}
                         </button>
                     `).join('')}
@@ -420,12 +408,15 @@ function startQuiz(type, title) {
     });
     window.scrollTo(0, 0);
 }
+
 function selectAnswer(btn, idx) {
     const parent = btn.parentElement;
     Array.from(parent.children).forEach(b => b.classList.remove('border-yellow-500', 'bg-yellow-500/20', 'active-choice'));
     btn.classList.add('border-yellow-500', 'bg-yellow-500/20', 'active-choice');
     btn.setAttribute('data-chosen', idx);
 }
+
+// මෙතනින් පස්සේ ඔයාගේ calculateResults, fetchRank සහ අනෙක් functions ටික එහෙම්ම තියන්න...
 
 // --- 6. RESULTS & IMAGE GENERATION ---
 function calculateResults() {
