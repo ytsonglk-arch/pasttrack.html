@@ -198,143 +198,144 @@
     </nav>
 
     <script>
-        // 1. DATA STRUCTURE
-const unitQuizData = {
-    "Media Studies": { 
-        "Unit 01: පදනම": [{ q: "සන්නිවේදනයේ මූලික අංගය?", options: ["මූලාශ්‍රය", "පෑන", "පොත", "කැලෑව"], correct: 0 }] 
-    },
-    "Buddhist Civilization": { "Unit 01: හැඳින්වීම": [] },
-    "Political Science": { "Unit 01": [] },
-    "Logic": { "Unit 01": [] },
-    "Sinhala": { "Unit 01": [] },
-    "Geography": { "Unit 01": [] }
-};
 
-const pastPaperQuizData = {
-    "Media Studies": { 
-        "2023 Media Past Paper": [{ q: "2023 Q1?", options: ["A", "B", "C", "D"], correct: 0 }] 
-    },
-    "Buddhist Civilization": { "2023 BC Paper": [] },
-    "Political Science": {}, "Logic": {}, "Sinhala": {}, "Geography": {}
-};
+        // --- DATA STRUCTURE (ඔයාගේ ප්‍රශ්න 900 මෙතැනට දාන්න) ---
+        const unitQuizData = {
+            "Media Studies": { "Unit 01: පදනම": [{ q: "සන්නිවේදනයේ මූලික අංගය?", options: ["මූලාශ්‍රය", "පෑන", "පොත", "කැලෑව"], correct: 0 }] },
+            "Buddhist Civilization": { "Unit 01: හැඳින්වීම": [] },
+            "Political Science": { "Unit 01": [] },
+            "Logic": { "Unit 01": [] },
+            "History": { "Unit 01": [] },
+            "Geography": { "Unit 01": [] }
+        };
 
-let currentSubject = "";
-let currentQuestions = [];
-let questionIndex = 0;
-let score = 0;
-let timerInterval;
+        const pastPaperQuizData = {
+            "Media Studies": { "2023 Media Past Paper": [{ q: "2023 Q1?", options: ["A", "B", "C", "D"], correct: 0 }] },
+            "Buddhist Civilization": { "2023 Political Paper": [] },
+            "Political Science": {}, "Logic": {}, "History": {}, "Geography": {}
+        };
 
-// 2. NAVIGATION & TABS LOGIC
-function openSubject(subjectName) {
-    currentSubject = subjectName;
-    const container = document.getElementById('subject-list-container');
-    container.innerHTML = `
-        <div class="mb-6 flex items-center gap-4">
-            <button onclick="location.reload()" class="text-yellow-500 font-bold"><i class="fas fa-arrow-left"></i> Back</button>
-            <h2 class="text-xl font-black text-white">${subjectName}</h2>
-        </div>
-        <div class="grid grid-cols-2 gap-4 mb-8">
-            <div id="tab-units" onclick="renderContent('unit')" class="glass-card p-4 text-center cursor-pointer border-b-2 border-yellow-500 text-yellow-500 font-bold">Unit Quiz</div>
-            <div id="tab-past" onclick="renderContent('pastpaper')" class="glass-card p-4 text-center cursor-pointer border-b-2 border-transparent opacity-50 font-bold">Past Papers</div>
-        </div>
-        <div id="quiz-list-display" class="space-y-3"></div>
-    `;
-    renderContent('unit');
-}
+        let currentSubject = "";
 
-function renderContent(type) {
-    const listDisplay = document.getElementById('quiz-list-display');
-    const unitTab = document.getElementById('tab-units');
-    const pastTab = document.getElementById('tab-past');
-    listDisplay.innerHTML = "";
-
-    if (type === 'unit') {
-        unitTab.className = "glass-card p-4 text-center cursor-pointer border-b-2 border-yellow-500 text-yellow-500 font-bold opacity-100";
-        pastTab.className = "glass-card p-4 text-center cursor-pointer border-b-2 border-transparent opacity-50 font-bold";
-        const units = unitQuizData[currentSubject] || {};
-        Object.keys(units).forEach(name => {
-            listDisplay.innerHTML += `<div onclick="prepQuiz('unit', '${name}')" class="glass-card p-5 flex justify-between items-center hover:border-yellow-500 cursor-pointer transition"><span class="text-sm font-bold">${name}</span><i class="fas fa-play-circle text-yellow-500"></i></div>`;
+        // --- AUTH LOGIC ---
+        function toggleAuthMode() {
+            const isReg = document.getElementById('register-fields').classList.toggle('hidden');
+            document.getElementById('auth-btn').innerText = isReg ? "REGISTER" : "LOGIN";
+        }
+        async function handleAuth() {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const name = document.getElementById('reg-name').value;
+            try {
+                if(document.getElementById('auth-btn').innerText === "LOGIN") await auth.signInWithEmailAndPassword(email, password);
+                else {
+                    const res = await auth.createUserWithEmailAndPassword(email, password);
+                    await res.user.updateProfile({displayName: name});
+                    await db.collection("users").doc(res.user.uid).set({name, email, streak: 1, lastLogin: new Date().toDateString()});
+                }
+            } catch(e) { alert(e.message); }
+        }
+        auth.onAuthStateChanged(user => {
+            if(user) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                document.getElementById('bottom-nav').classList.remove('hidden');
+                document.getElementById('user-display-name-header').innerText = user.displayName || "Student";
+                document.getElementById('user-display-name-profile').innerText = user.displayName || "Student";
+                document.getElementById('user-display-email').innerText = user.email;
+                updateStreak(user.uid);
+            }
         });
-    } else {
-        pastTab.className = "glass-card p-4 text-center cursor-pointer border-b-2 border-yellow-500 text-yellow-500 font-bold opacity-100";
-        unitTab.className = "glass-card p-4 text-center cursor-pointer border-b-2 border-transparent opacity-50 font-bold";
-        const papers = pastPaperQuizData[currentSubject] || {};
-        Object.keys(papers).forEach(name => {
-            listDisplay.innerHTML += `<div onclick="prepQuiz('past', '${name}')" class="glass-card p-5 flex justify-between items-center hover:border-red-500 cursor-pointer transition"><span class="text-sm font-bold">${name}</span><i class="fas fa-file-alt text-red-500"></i></div>`;
-        });
-    }
-}
 
-// 3. QUIZ SYSTEM LOGIC
-function prepQuiz(type, key) {
-    const questions = (type === 'unit') ? unitQuizData[currentSubject][key] : pastPaperQuizData[currentSubject][key];
-    if (!questions || questions.length === 0) return alert("ප්‍රශ්න පූරණය වෙමින් පවතී...");
-    startQuiz(key, questions);
-}
+        // --- DASHBOARD LOGIC ---
+        function changeView(view) {
+            ['home', 'ai', 'rank', 'profile'].forEach(v => {
+                document.getElementById(v + '-view').classList.add('hidden');
+                document.getElementById('nav-' + v).classList.replace('nav-active', 'text-slate-500');
+            });
+            document.getElementById(view + '-view').classList.remove('hidden');
+            document.getElementById('nav-' + view).classList.replace('text-slate-500', 'nav-active');
+            if(view === 'rank') fetchRank();
+        }
+        function openSubject(name) {
+            currentSubject = name;
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('subject-screen').classList.remove('hidden');
+            document.getElementById('selected-subject-name').innerText = name;
+            showTab('quiz');
+        }
+        function backToDashboard() {
+            document.getElementById('subject-screen').classList.add('hidden');
+            document.getElementById('uni-screen').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+        }
+        function openUniInfo() {
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('uni-screen').classList.remove('hidden');
+        }
 
-function startQuiz(title, questions) {
-    currentQuestions = questions;
-    questionIndex = 0;
-    score = 0;
-    document.getElementById('quiz-screen').classList.remove('hidden');
-    showQuestion();
-    startTimer(20);
-}
+        // --- QUIZ SYSTEM ---
+        function showTab(tab) {
+            document.getElementById('quiz-tab').classList.toggle('active-tab', tab === 'quiz');
+            document.getElementById('papers-tab').classList.toggle('active-tab', tab === 'papers');
+            document.getElementById('btn-quiz').className = tab === 'quiz' ? "flex-1 py-4 rounded-xl font-black bg-yellow-500 text-black" : "flex-1 py-4 rounded-xl font-black text-slate-500";
+            document.getElementById('btn-papers').className = tab === 'papers' ? "flex-1 py-4 rounded-xl font-black bg-yellow-500 text-black" : "flex-1 py-4 rounded-xl font-black text-slate-500";
+            if(tab === 'quiz') loadList('lesson-list', unitQuizData[currentSubject], 'unit');
+            else loadList('paper-list', pastPaperQuizData[currentSubject], 'paper');
+        }
 
-function showQuestion() {
-    const q = currentQuestions[questionIndex];
-    document.getElementById('current-q-num').innerText = questionIndex + 1;
-    document.getElementById('question-text').innerText = q.q;
-    document.getElementById('progress-bar').style.width = ((questionIndex + 1) / currentQuestions.length * 100) + "%";
-    
-    const container = document.getElementById('options-container');
-    container.innerHTML = "";
-    q.options.forEach((opt, i) => {
-        const btn = document.createElement('button');
-        btn.className = "w-full p-5 glass-card text-left font-bold border-white/5 hover:border-yellow-500 transition-all";
-        btn.innerHTML = `<span class="text-yellow-500 mr-4">${i + 1}.</span> ${opt}`;
-        btn.onclick = () => checkAnswer(i, btn);
-        container.appendChild(btn);
-    });
-    document.getElementById('next-btn').classList.add('hidden');
-}
+        function loadList(id, data, type) {
+            const container = document.getElementById(id);
+            container.innerHTML = "";
+            Object.keys(data).forEach(key => {
+                const div = document.createElement('div');
+                div.className = "glass-card p-6 border-l-4 border-yellow-500 mb-3 flex justify-between cursor-pointer";
+                div.innerHTML = `<span>${key}</span> <i class="fas fa-play"></i>`;
+                div.onclick = () => startQuiz(key, type);
+                container.appendChild(div);
+            });
+            document.getElementById('quiz-area').classList.add('hidden');
+            document.getElementById('paper-quiz-area').classList.add('hidden');
+            container.classList.remove('hidden');
+        }
 
-function checkAnswer(selected, btn) {
-    const correct = currentQuestions[questionIndex].correct;
-    const btns = document.getElementById('options-container').children;
-    for(let b of btns) b.disabled = true;
+        function startQuiz(key, type) {
+            const questions = type === 'unit' ? unitQuizData[currentSubject][key] : pastPaperQuizData[currentSubject][key];
+            const area = type === 'unit' ? document.getElementById('quiz-area') : document.getElementById('paper-quiz-area');
+            const list = type === 'unit' ? document.getElementById('lesson-list') : document.getElementById('paper-list');
+            list.classList.add('hidden');
+            area.classList.remove('hidden');
+            area.innerHTML = `<button onclick="showTab('${type === 'unit' ? 'quiz' : 'papers'}')" class="mb-6 opacity-50"><i class="fas fa-arrow-left"></i> BACK</button>`;
+            
+            let score = 0;
+            questions.forEach((q, idx) => {
+                const card = document.createElement('div'); card.className = "glass-card p-8 mb-6";
+                card.innerHTML = `<p class="mb-6 font-bold text-lg">${idx+1}. ${q.q}</p>`;
+                q.options.forEach((opt, oIdx) => {
+                    const btn = document.createElement('button');
+                    btn.className = "w-full text-left p-5 mb-3 rounded-2xl bg-slate-900 border border-white/5 transition-all";
+                    btn.innerText = opt;
+                    btn.onclick = () => {
+                        const allBtns = card.querySelectorAll('button');
+                        if(oIdx === q.correct) { btn.classList.add('bg-green-600'); score++; }
+                        else { btn.classList.add('wrong-shake'); allBtns[q.correct].classList.add('show-correct'); }
+                        allBtns.forEach(b => b.disabled = true);
+                    };
+                    card.appendChild(btn);
+                });
+                area.appendChild(card);
+            });
+            const fBtn = document.createElement('button');
+            fBtn.className = "w-full p-5 bg-yellow-500 text-black font-black rounded-3xl mt-6";
+            fBtn.innerText = "FINISH & SAVE";
+            fBtn.onclick = async () => {
+                await db.collection("user_results").add({name: auth.currentUser.displayName, score, total: questions.length, subject: currentSubject, timestamp: firebase.firestore.FieldValue.serverTimestamp()});
+                alert(`ලකුණු: ${score}/${questions.length}`);
+                showTab(type === 'unit' ? 'quiz' : 'papers');
+            };
+            area.appendChild(fBtn);
+        }
 
-    if(selected === correct) {
-        btn.classList.add('show-correct');
-        score += 2;
-    } else {
-        btn.classList.add('wrong-shake');
-        btns[correct].classList.add('show-correct');
-    }
-    document.getElementById('next-btn').classList.remove('hidden');
-}
-
-function nextQuestion() {
-    questionIndex++;
-    if(questionIndex < currentQuestions.length) showQuestion();
-    else finishQuiz();
-}
-
-function startTimer(m) {
-    let s = m * 60;
-    timerInterval = setInterval(() => {
-        document.getElementById('quiz-timer').innerText = `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
-        if(s-- <= 0) finishQuiz();
-    }, 1000);
-}
-
-async function finishQuiz() {
-    clearInterval(timerInterval);
-    document.getElementById('quiz-screen').classList.add('hidden');
-    document.getElementById('result-screen').classList.remove('hidden');
-    document.getElementById('final-score').innerText = score;
-    // Firebase update logic...
-}
         const firebaseConfig = {
             apiKey: "AIzaSyB_10UzdkgZPlu-P361PYbEQjTwbKjjWx0",
             authDomain: "al-fast-track.firebaseapp.com",
