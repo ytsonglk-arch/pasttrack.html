@@ -188,28 +188,43 @@
             <button onclick="hidePopup()" class="w-full text-[10px] font-black opacity-50 uppercase text-white">Cancel</button>
         </div>
     </div>
-<!-- Subject/Quiz View -->
+<!-- Subject Detail View -->
 <div id="subject-view" class="hidden p-6 max-w-2xl mx-auto mb-20">
+    <!-- Back Button -->
     <button onclick="changeView('home')" class="mb-6 text-slate-400 text-[10px] font-black uppercase flex items-center">
-        <i class="fas fa-arrow-left mr-2"></i> ආපසු මුල් පිටුවට
+        <i class="fas fa-arrow-left mr-2"></i> Back
     </button>
     
-    <div class="mb-8">
-        <h2 id="display-subject-title" class="text-3xl font-black text-yellow-500 italic uppercase">Subject</h2>
-        <div class="h-1 w-20 bg-yellow-500 mt-2 rounded-full"></div>
+    <h2 id="display-subject-title" class="text-3xl font-black text-yellow-500 italic uppercase mb-6 text-center">Subject</h2>
+
+    <!-- Tab Navigation -->
+    <div class="flex bg-white/5 p-1 rounded-2xl mb-8 border border-white/10">
+        <button id="tab-quiz" onclick="switchTab('quiz')" class="flex-1 py-3 text-xs font-black uppercase rounded-xl transition-all bg-yellow-500 text-black">
+            Units / Quiz
+        </button>
+        <button id="tab-paper" onclick="switchTab('paper')" class="flex-1 py-3 text-xs font-black uppercase rounded-xl transition-all text-slate-400">
+            Past Papers
+        </button>
     </div>
 
-    <!-- Selection Menu -->
-    <div id="selection-menu" class="space-y-6">
-        <div id="units-section">
-            <p class="text-[10px] font-black text-slate-500 uppercase mb-3 tracking-widest">Lessons / ඒකක</p>
-            <div id="units-list" class="space-y-3"></div>
-        </div>
-        <div id="papers-section">
-            <p class="text-[10px] font-black text-slate-500 uppercase mb-3 tracking-widest">Past Papers / පසුගිය ප්‍රශ්න පත්‍ර</p>
-            <div id="papers-list" class="space-y-3"></div>
-        </div>
+    <!-- Units List Container -->
+    <div id="units-tab-content" class="space-y-3">
+        <!-- Units will load here -->
     </div>
+
+    <!-- Past Papers List Container -->
+    <div id="papers-tab-content" class="hidden space-y-3">
+        <!-- Papers will load here -->
+    </div>
+
+    <!-- Quiz Area (Hidden initially) -->
+    <div id="quiz-area" class="hidden mt-6">
+        <div id="questions-container" class="space-y-6"></div>
+        <button onclick="calculateResults()" class="w-full mt-10 p-5 bg-yellow-500 text-black font-black rounded-2xl shadow-xl uppercase">
+            Submit & Download Card
+        </button>
+    </div>
+</div>
 
     <!-- Quiz Area -->
     <div id="quiz-area" class="hidden">
