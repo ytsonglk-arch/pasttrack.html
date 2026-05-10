@@ -10,35 +10,51 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
         :root { --primary: #fbbf24; }
-        body { font-family: 'Plus Jakarta Sans', 'Noto Sans Sinhala', sans-serif; background: #020617; color: white; min-height: 100vh; }
+        body { font-family: 'Plus Jakarta Sans', 'Noto Sans Sinhala', sans-serif; background: #020617; color: white; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 1.5rem; }
         .btn-grad { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); transition: 0.3s; color: black; font-weight: 800; }
-        .active-nav { color: var(--primary); filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6)); }
-        .premium-card { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); border: 1px solid #4338ca; }
-        #chatbot-window { transition: 0.3s ease-in-out; transform: translateY(120%); visibility: hidden; }
-        #chatbot-window.open { transform: translateY(0); visibility: visible; }
+        
+        /* Quiz Animations */
+        @keyframes blink-green {
+            0%, 100% { background-color: rgba(34, 197, 94, 0.2); border-color: #22c55e; }
+            50% { background-color: #22c55e; border-color: #22c55e; color: black; }
+        }
+        .correct-blink { animation: blink-green 0.6s ease-in-out 3; }
+        .wrong-shake { background-color: #ef4444 !important; border-color: #ef4444 !important; animation: shake 0.3s; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+        #toast { transition: 0.5s; transform: translateY(-150%); }
+        #toast.show { transform: translateY(0); }
+        .tab-active { border-bottom: 3px solid var(--primary); color: var(--primary); }
     </style>
 </head>
 <body class="pb-24">
 
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed top-6 left-6 right-6 z-[100] glass p-4 text-center border-amber-500/50 text-sm font-bold"></div>
+
     <!-- AUTH SCREEN -->
     <div id="auth-screen" class="min-h-screen flex items-center justify-center p-6 bg-slate-950">
         <div class="w-full max-w-md glass p-10 text-center">
-            <h1 class="text-3xl font-black italic mb-2">FAST TRACK <span class="text-amber-500">PRO</span></h1>
-            <p id="auth-title" class="text-[10px] tracking-widest text-slate-500 uppercase mb-8">Sign In to Study</p>
+            <div class="mb-6 flex justify-center">
+                <div class="w-20 h-20 bg-amber-500 rounded-3xl flex items-center justify-center rotate-12 shadow-2xl shadow-amber-500/20">
+                    <i class="fas fa-graduation-cap text-4xl text-black -rotate-12"></i>
+                </div>
+            </div>
+            <h1 class="text-3xl font-black italic mb-2 tracking-tighter">FAST TRACK <span class="text-amber-500">PRO</span></h1>
+            <p id="auth-title" class="text-[10px] tracking-widest text-slate-500 uppercase mb-8 font-bold">Sign In to KD Creation</p>
             
             <div id="reg-fields" class="hidden">
-                <input type="text" id="user-name" placeholder="Full Name" class="w-full p-4 mb-4 glass bg-white/5 outline-none focus:border-amber-500">
+                <input type="text" id="user-name" placeholder="Full Name" class="w-full p-4 mb-4 glass bg-white/5 outline-none focus:border-amber-500 transition-all">
             </div>
-            <input type="email" id="email" placeholder="Email" class="w-full p-4 mb-4 glass bg-white/5 outline-none focus:border-amber-500">
-            <input type="password" id="pass" placeholder="Password" class="w-full p-4 mb-6 glass bg-white/5 outline-none focus:border-amber-500">
+            <input type="email" id="email" placeholder="Email Address" class="w-full p-4 mb-4 glass bg-white/5 outline-none focus:border-amber-500 transition-all">
+            <input type="password" id="pass" placeholder="Password" class="w-full p-4 mb-6 glass bg-white/5 outline-none focus:border-amber-500 transition-all">
 
-            <button onclick="handleAuth()" class="w-full p-4 btn-grad rounded-2xl mb-4 uppercase">Continue</button>
-            <button onclick="toggleAuth()" id="toggle-txt" class="text-xs text-slate-400">Need an account? <span class="text-amber-500">Sign Up</span></button>
+            <button onclick="handleAuth()" class="w-full p-4 btn-grad rounded-2xl mb-4 uppercase hover:scale-[1.02] active:scale-95 shadow-lg">Continue</button>
+            <button onclick="toggleAuth()" id="toggle-txt" class="text-xs text-slate-400">නව ගිණුමක් අවශ්‍යද? <span class="text-amber-500 font-bold underline">Sign Up</span></button>
         </div>
     </div>
 
@@ -47,104 +63,133 @@
         
         <!-- HOME VIEW -->
         <div id="home-view">
-            <header class="flex justify-between items-center mb-8">
-                <div class="flex items-center gap-4">
-                    <img id="header-avatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-12 h-12 rounded-xl border border-white/10">
-                    <div>
-                        <h2 id="display-name" class="font-bold text-white">Student</h2>
-                        <div class="flex items-center gap-1">
-                            <p class="text-[9px] text-amber-500 font-bold uppercase">Verified Candidate</p>
-                            <i class="fas fa-check-circle text-green-500 text-[10px]"></i>
-                        </div>
-                    </div>
+            <header class="flex justify-between items-start mb-8">
+                <div>
+                    <h2 class="text-2xl font-black italic">HELLO, <span id="display-name" class="text-amber-500 uppercase">STUDENT</span>!</h2>
+                    <p class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">A/L EXAM COUNTDOWN</p>
                 </div>
-                <div class="glass px-4 py-2 border-amber-500/20">
+                <div class="glass px-4 py-2 border-amber-500/20 flex items-center gap-2">
                     <span id="user-points" class="font-black text-amber-400">0</span> <span class="text-[8px] text-slate-500 font-bold">XP</span>
                 </div>
             </header>
 
+            <!-- COUNTDOWN CARD -->
+            <div class="glass p-6 mb-8 relative overflow-hidden border-amber-500/20">
+                <div class="relative z-10">
+                    <h3 class="text-xs font-bold text-amber-500 mb-2 uppercase">2026 විභාගයට තව</h3>
+                    <div class="flex gap-4 items-center">
+                        <div><span id="days" class="text-4xl font-black italic">00</span><p class="text-[8px] font-bold text-slate-500">DAYS</p></div>
+                        <div class="text-2xl opacity-20">:</div>
+                        <div><span id="hours" class="text-4xl font-black italic">00</span><p class="text-[8px] font-bold text-slate-500">HRS</p></div>
+                    </div>
+                </div>
+                <img src="https://img.freepik.com/free-vector/hand-drawn-science-education-background_23-2148490597.jpg" class="absolute top-0 right-0 w-40 h-full object-cover opacity-10 grayscale">
+            </div>
+
+            <!-- SUBJECTS -->
+            <h3 class="text-xs font-black text-slate-500 mb-4 uppercase tracking-widest">ප්‍රධාන විශයන්</h3>
             <div class="grid grid-cols-1 gap-4" id="subjects-container"></div>
+            
+            <!-- STUDY TIPS -->
+            <h3 class="text-xs font-black text-slate-500 mt-8 mb-4 uppercase tracking-widest">Study Tips</h3>
+            <div class="glass p-4 border-l-4 border-amber-500 text-xs italic text-slate-300">
+                "දිනපතා පැය 2ක් ප්‍රශ්න පත්‍ර සඳහා වෙන් කරන්න. එය ඔබේ මතකය 70% කින් වැඩි කරයි."
+            </div>
         </div>
 
-        <!-- LEADERBOARD VIEW -->
+        <!-- SUBMENU (Past Papers vs Unit Quiz) -->
+        <div id="submenu-view" class="hidden">
+            <button onclick="nav('home')" class="mb-6 text-xs font-bold text-slate-400"><i class="fas fa-arrow-left mr-2"></i> ආපසු</button>
+            <h2 id="selected-sub-name" class="text-2xl font-black mb-6 uppercase">Subject</h2>
+            
+            <div class="flex gap-4 mb-6 border-b border-white/5">
+                <button id="tab-unit" onclick="switchTab('unit')" class="pb-3 text-sm font-bold tab-active flex-1">Unit Quizzes</button>
+                <button id="tab-past" onclick="switchTab('past')" class="pb-3 text-sm font-bold text-slate-500 flex-1">Past Paper Quizzes</button>
+            </div>
+            
+            <div id="quiz-list" class="space-y-3"></div>
+        </div>
+
+        <!-- QUIZ SYSTEM -->
+        <div id="quiz-view" class="hidden">
+            <div class="flex justify-between items-center mb-8">
+                <span id="quiz-title" class="text-[10px] font-bold uppercase text-slate-500">Quiz</span>
+                <span id="q-count" class="text-xs font-black text-amber-500">1 / 50</span>
+            </div>
+            <div class="glass p-8 mb-6">
+                <h2 id="q-text" class="text-lg font-bold leading-relaxed">ප්‍රශ්නය මෙතැන දිස්වේ...</h2>
+            </div>
+            <div id="options-container" class="space-y-3"></div>
+        </div>
+
+        <!-- LEADERBOARD -->
         <div id="rank-view" class="hidden">
             <h2 class="text-2xl font-black italic mb-6">TOP <span class="text-amber-500">STUDENTS</span></h2>
-            <div id="leaderboard-list" class="space-y-3">
-                <!-- Data from Firestore -->
-            </div>
+            <div id="leaderboard-list" class="space-y-3"></div>
         </div>
 
-        <!-- PROFILE VIEW -->
+        <!-- PROFILE & FEEDBACK -->
         <div id="profile-view" class="hidden">
             <div class="text-center mb-8">
-                <img id="profile-img-big" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-24 h-24 mx-auto rounded-[2rem] border-4 border-white/5 mb-4">
+                <img id="profile-img-big" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-24 h-24 mx-auto rounded-3xl border-4 border-white/5 mb-4 shadow-2xl">
                 <h2 id="p-name" class="text-xl font-black">Student Name</h2>
-                <div class="flex items-center justify-center gap-1 mb-6">
-                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Verified Candidate</p>
-                    <i class="fas fa-check-circle text-green-500"></i>
-                </div>
+                <p class="text-[10px] text-green-500 font-black mb-6 uppercase tracking-widest">Verified <i class="fas fa-check-circle"></i></p>
 
-                <!-- Premium Section -->
                 <div class="premium-card p-6 rounded-3xl text-left mb-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h4 class="font-black text-amber-400 tracking-tighter">PREMIUM SUBSCRIPTION</h4>
-                        <i class="fas fa-crown text-amber-500"></i>
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-black text-amber-400 italic">PREMIUM PRO</h4>
+                        <span class="bg-amber-500 text-black text-[9px] px-2 py-0.5 rounded-full font-bold">COMING SOON</span>
                     </div>
-                    <ul class="text-[10px] space-y-2 mb-6 text-slate-300">
-                        <li><i class="fas fa-star mr-2 text-amber-500"></i> සියලුම පසුගිය විභාග ප්‍රශ්න පත්‍ර (PDF)</li>
-                        <li><i class="fas fa-star mr-2 text-amber-500"></i> Unlimited AI Chat Assistant</li>
-                        <li><i class="fas fa-star mr-2 text-amber-500"></i> Ads Free Experience</li>
-                    </ul>
-                    <button onclick="alert('Payment Gateway Loading...')" class="w-full py-3 bg-white text-black rounded-xl font-black text-xs uppercase">Get Premium - Rs.990</button>
+                    <p class="text-[10px] text-slate-300 mb-4 font-bold uppercase">Rs. 100 / Monthly</p>
+                    <button class="w-full py-3 bg-white/10 text-white rounded-xl font-black text-xs uppercase opacity-50 cursor-not-allowed">Subscribe Now</button>
                 </div>
 
-                <!-- Profile Actions -->
-                <div class="space-y-2 mb-8">
-                    <button onclick="changePassword()" class="w-full glass p-4 text-xs font-bold flex justify-between">Change Password <i class="fas fa-key"></i></button>
+                <div class="space-y-2">
+                    <button onclick="changePassword()" class="w-full glass p-4 text-xs font-bold flex justify-between">Change Password <i class="fas fa-key text-amber-500"></i></button>
+                    <button onclick="showFeedback()" class="w-full glass p-4 text-xs font-bold flex justify-between">Send Feedback <i class="fas fa-comment-dots text-amber-500"></i></button>
                     <button onclick="logout()" class="w-full glass p-4 text-xs font-bold text-red-500 flex justify-between">Sign Out <i class="fas fa-sign-out-alt"></i></button>
                 </div>
-
-                <!-- Social & Dev -->
-                <div class="flex justify-center gap-4 mb-6">
-                    <a href="#" class="w-10 h-10 glass flex items-center justify-center text-green-500"><i class="fab fa-whatsapp"></i></a>
-                    <a href="#" class="w-10 h-10 glass flex items-center justify-center text-blue-500"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="w-10 h-10 glass flex items-center justify-center text-red-500"><i class="fab fa-youtube"></i></a>
-                </div>
-                <p class="text-[9px] text-slate-600 font-black uppercase">App Developer: <span class="text-amber-500">KD Creation</span></p>
             </div>
         </div>
-
-        <!-- SUBMENU & QUIZ -->
-        <div id="submenu-view" class="hidden"></div>
-        <div id="quiz-view" class="hidden"></div>
     </div>
 
-    <!-- CHATBOT -->
-    <div id="chatbot-window" class="fixed bottom-24 right-6 left-6 z-[60] glass border-amber-500/30 flex flex-col h-[450px] max-w-md mx-auto overflow-hidden">
-        <div class="p-4 bg-amber-500 text-black flex justify-between items-center">
-            <span class="font-black text-xs uppercase">AI Tutor Assistant</span>
-            <button onclick="toggleChat()"><i class="fas fa-times"></i></button>
-        </div>
-        <div id="chat-msgs" class="flex-1 p-4 overflow-y-auto space-y-3 text-xs"></div>
-        <div class="p-4 border-t border-white/5 flex gap-2">
-            <input type="text" id="chat-input" class="flex-1 bg-white/5 rounded-xl px-4 py-2 outline-none text-xs" placeholder="ප්‍රශ්නය මෙතැන ලියන්න...">
-            <button onclick="askBot()" class="w-10 h-10 btn-grad rounded-xl"><i class="fas fa-paper-plane"></i></button>
+    <!-- FEEDBACK POPUP -->
+    <div id="feedback-pop" class="fixed inset-0 z-[110] bg-black/80 hidden flex items-center justify-center p-6">
+        <div class="w-full max-w-sm glass p-8">
+            <h3 class="font-black mb-4 uppercase">App Feedback</h3>
+            <textarea id="feed-msg" class="w-full h-32 glass bg-white/5 p-4 text-xs outline-none focus:border-amber-500 mb-4" placeholder="ඔබේ අදහස මෙතැන ලියන්න..."></textarea>
+            <div class="flex gap-2">
+                <button onclick="closeFeedback()" class="flex-1 p-3 glass text-xs font-bold">අවලංගු කරන්න</button>
+                <button onclick="submitFeedback()" class="flex-1 p-3 btn-grad rounded-xl text-xs">යොමු කරන්න</button>
+            </div>
         </div>
     </div>
 
-    <button onclick="toggleChat()" class="fixed bottom-28 right-6 w-14 h-14 btn-grad rounded-2xl shadow-2xl z-[55] flex items-center justify-center">
-        <i class="fas fa-robot text-xl"></i>
-    </button>
-
-    <!-- NAV BAR -->
-    <nav id="navbar" class="hidden fixed bottom-6 left-6 right-6 h-20 glass flex justify-around items-center z-50">
-        <button onclick="nav('home')" id="n-home" class="p-4 active-nav"><i class="fas fa-th-large"></i></button>
-        <button onclick="nav('rank')" id="n-rank" class="p-4 text-slate-600"><i class="fas fa-chart-bar"></i></button>
-        <button onclick="nav('profile')" id="n-profile" class="p-4 text-slate-600"><i class="fas fa-user"></i></button>
+    <!-- NAVIGATION -->
+    <nav id="navbar" class="hidden fixed bottom-6 left-6 right-6 h-20 glass flex justify-around items-center z-50 border-amber-500/10">
+        <button onclick="nav('home')" id="n-home" class="p-4 active-nav"><i class="fas fa-home"></i></button>
+        <button onclick="nav('rank')" id="n-rank" class="p-4 text-slate-600"><i class="fas fa-trophy"></i></button>
+        <button onclick="nav('profile')" id="n-profile" class="p-4 text-slate-600"><i class="fas fa-user-gear"></i></button>
     </nav>
 
     <script>
-        // FIREBASE CONFIG
+        // --- DATA ---
+        const unitQuizData = {
+            "Media Studies": { "Unit 01: පදනම": [{ q: "සන්නිවේදනයේ මූලික අංගය?", options: ["මූලාශ්‍රය", "පෑන", "පොත", "කැලෑව"], correct: 0 }] },
+            "Buddhist Civilization": { "Unit 01: හැඳින්වීම": [{ q: "බුදු දහම ඉන්දියාවේ ආරම්භ වූයේ?", options: ["කපිලවස්තුව", "මගධය", "ලුම්බිණිය", "කුසිනාරාව"], correct: 2 }] },
+            "Political Science": { "Unit 01": [] }, "Logic": { "Unit 01": [] }, "History": { "Unit 01": [] }, "Geography": { "Unit 01": [] }
+        };
+
+        const pastPaperQuizData = {
+            "Media Studies": { "2023 Media Past Paper": [{ q: "මාධ්‍ය සදාචාරය පිළිබඳ වැදගත් වන්නේ?", options: ["මුදල්", "නිවැරදි තොරතුරු", "ප්‍රසිද්ධිය", "වේගය"], correct: 1 }] },
+            "Buddhist Civilization": { "2023 BC Paper": [] }
+        };
+
+        let currentSubject = "";
+        let currentQuizList = [];
+        let qIdx = 0;
+
+        // --- FIREBASE SETUP ---
         const firebaseConfig = {
             apiKey: "AIzaSyB_10UzdkgZPlu-P361PYbEQjTwbKjjWx0",
             authDomain: "al-fast-track-2026.firebaseapp.com",
@@ -157,10 +202,10 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // AUTH FUNCTIONS
+        // --- AUTH ---
         function toggleAuth() { 
             const isReg = document.getElementById('reg-fields').classList.toggle('hidden');
-            document.getElementById('auth-title').innerText = isReg ? "Register New Account" : "Sign In to Study";
+            document.getElementById('auth-title').innerText = isReg ? "Create KD Account" : "Sign In to Study";
         }
 
         async function handleAuth() {
@@ -168,13 +213,12 @@
             const pass = document.getElementById('pass').value;
             const name = document.getElementById('user-name').value;
             const isReg = !document.getElementById('reg-fields').classList.contains('hidden');
-
             try {
                 if(isReg) {
                     const res = await auth.createUserWithEmailAndPassword(email, pass);
-                    await db.collection("users").doc(res.user.uid).set({ name, points: 0, photo: "", premium: false });
+                    await db.collection("users").doc(res.user.uid).set({ name, points: 0, premium: false });
                 } else { await auth.signInWithEmailAndPassword(email, pass); }
-            } catch(e) { alert(e.message); }
+            } catch(e) { showToast(e.message); }
         }
 
         auth.onAuthStateChanged(user => {
@@ -182,21 +226,148 @@
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('dashboard').classList.remove('hidden');
                 document.getElementById('navbar').classList.remove('hidden');
-                syncProfile(user.uid);
-                loadLeaderboard();
+                initApp(user.uid);
             }
         });
 
-        function syncProfile(uid) {
+        function initApp(uid) {
             db.collection("users").doc(uid).onSnapshot(doc => {
-                const data = doc.data();
-                document.getElementById('display-name').innerText = data.name;
-                document.getElementById('p-name').innerText = data.name;
-                document.getElementById('user-points').innerText = data.points || 0;
+                const d = doc.data();
+                document.getElementById('display-name').innerText = d.name;
+                document.getElementById('p-name').innerText = d.name;
+                document.getElementById('user-points').innerText = d.points;
+            });
+            renderSubjects();
+            updateCountdown();
+            loadLeaderboard();
+        }
+
+        function renderSubjects() {
+            const container = document.getElementById('subjects-container');
+            container.innerHTML = "";
+            Object.keys(unitQuizData).forEach(sub => {
+                container.innerHTML += `
+                <div onclick="openSubmenu('${sub}')" class="glass p-5 flex justify-between items-center border-white/5 active:scale-95 transition">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-amber-500/10 rounded-full flex items-center justify-center text-amber-500"><i class="fas fa-book-open"></i></div>
+                        <span class="font-bold text-sm uppercase">${sub}</span>
+                    </div>
+                    <i class="fas fa-chevron-right text-slate-600 text-xs"></i>
+                </div>`;
             });
         }
 
-        // LEADERBOARD LOGIC
+        // --- SUBMENU & TABS ---
+        function openSubmenu(sub) {
+            currentSubject = sub;
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('submenu-view').classList.remove('hidden');
+            document.getElementById('selected-sub-name').innerText = sub;
+            switchTab('unit');
+        }
+
+        function switchTab(type) {
+            const list = document.getElementById('quiz-list');
+            list.innerHTML = "";
+            const data = type === 'unit' ? unitQuizData[currentSubject] : pastPaperQuizData[currentSubject];
+            
+            document.getElementById('tab-unit').className = type === 'unit' ? "pb-3 text-sm font-bold tab-active flex-1" : "pb-3 text-sm font-bold text-slate-500 flex-1";
+            document.getElementById('tab-past').className = type === 'past' ? "pb-3 text-sm font-bold tab-active flex-1" : "pb-3 text-sm font-bold text-slate-500 flex-1";
+
+            Object.keys(data || {}).forEach(name => {
+                list.innerHTML += `
+                <div onclick="startQuiz('${type}', '${name}')" class="glass p-4 text-xs font-bold border-white/5 hover:border-amber-500/50 transition">
+                    ${name} <span class="float-right text-amber-500">START <i class="fas fa-play ml-1"></i></span>
+                </div>`;
+            });
+        }
+
+        // --- QUIZ LOGIC ---
+        function startQuiz(type, name) {
+            const data = type === 'unit' ? unitQuizData[currentSubject][name] : pastPaperQuizData[currentSubject][name];
+            if(!data || data.length === 0) return showToast("ප්‍රශ්න පත්‍රය ඉක්මනින් ලබා දෙනු ඇත!");
+            
+            currentQuizList = [...data].sort(() => Math.random() - 0.5); // Shuffle
+            qIdx = 0;
+            document.getElementById('submenu-view').classList.add('hidden');
+            document.getElementById('quiz-view').classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = currentQuizList[qIdx];
+            document.getElementById('q-text').innerText = q.q;
+            document.getElementById('q-count').innerText = `${qIdx + 1} / ${currentQuizList.length}`;
+            const container = document.getElementById('options-container');
+            container.innerHTML = "";
+            
+            q.options.forEach((opt, i) => {
+                container.innerHTML += `<button onclick="checkAnswer(${i}, this)" class="w-full glass p-4 text-left text-sm font-bold border-white/10 transition-all outline-none">${opt}</button>`;
+            });
+        }
+
+        function checkAnswer(idx, btn) {
+            const q = currentQuizList[qIdx];
+            const btns = document.getElementById('options-container').children;
+            
+            for(let b of btns) b.disabled = true;
+
+            if(idx === q.correct) {
+                btn.classList.add('correct-blink');
+                updateXP(10);
+            } else {
+                btn.classList.add('wrong-shake');
+                btns[q.correct].classList.add('correct-blink');
+            }
+
+            setTimeout(() => {
+                qIdx++;
+                if(qIdx < currentQuizList.length) showQuestion();
+                else {
+                    showToast("සියලු ප්‍රශ්න අවසානයි!");
+                    nav('home');
+                }
+            }, 2500);
+        }
+
+        // --- UTILS ---
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        function updateCountdown() {
+            const target = new Date("Nov 25, 2026 08:30:00").getTime();
+            setInterval(() => {
+                const now = new Date().getTime();
+                const diff = target - now;
+                document.getElementById('days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
+                document.getElementById('hours').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            }, 1000);
+        }
+
+        function changePassword() {
+            const user = auth.currentUser;
+            auth.sendPasswordResetEmail(user.email).then(() => showToast("Password link එක Email කරා!"));
+        }
+
+        function showFeedback() { document.getElementById('feedback-pop').classList.remove('hidden'); }
+        function closeFeedback() { document.getElementById('feedback-pop').classList.add('hidden'); }
+        function submitFeedback() {
+            const msg = document.getElementById('feed-msg').value;
+            if(!msg) return;
+            db.collection("feedback").add({ uid: auth.currentUser.uid, msg, time: Date.now() });
+            showToast("ස්තූතියි! ඔබේ අදහස අපට ලැබුණා.");
+            closeFeedback();
+        }
+
+        async function updateXP(pts) {
+            const ref = db.collection("users").doc(auth.currentUser.uid);
+            await ref.update({ points: firebase.firestore.FieldValue.increment(pts) });
+        }
+
         async function loadLeaderboard() {
             const list = document.getElementById('leaderboard-list');
             const snap = await db.collection("users").orderBy("points", "desc").limit(10).get();
@@ -206,50 +377,20 @@
                 const u = doc.data();
                 list.innerHTML += `
                     <div class="glass p-4 flex justify-between items-center border-white/5">
-                        <div class="flex items-center gap-4">
-                            <span class="text-amber-500 font-black w-4">#${i++}</span>
-                            <span class="font-bold text-sm">${u.name}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="text-amber-500 font-black w-4 text-xs">#${i++}</span>
+                            <span class="font-bold text-xs">${u.name}</span>
                         </div>
-                        <span class="text-xs font-black">${u.points} XP</span>
+                        <span class="text-[10px] font-black opacity-60">${u.points} XP</span>
                     </div>`;
             });
         }
 
-        // CHATBOT IMPROVED
-        function toggleChat() { document.getElementById('chatbot-window').classList.toggle('open'); }
-
-        async function askBot() {
-            const input = document.getElementById('chat-input');
-            const chatBox = document.getElementById('chat-msgs');
-            const msg = input.value;
-            if(!msg) return;
-
-            chatBox.innerHTML += `<div class="bg-amber-500/20 p-3 rounded-2xl self-end ml-auto max-w-[80%]">${msg}</div>`;
-            input.value = "";
-
-            // Logic for AI simulation
-            setTimeout(() => {
-                let reply = "මට ඒ ගැන වැඩි විස්තර සොයා දෙන්න පුළුවන්. කරුණාකර ඒ ප්‍රශ්නය තවදුරටත් පැහැදිලි කරන්න.";
-                if(msg.includes("කවුද") || msg.includes("who")) reply = "මම ඔයාගේ A/L Fast Track AI සහායකයා. ඔයාට උදව් කරන්න මම මෙතන ඉන්නවා.";
-                
-                chatBox.innerHTML += `<div class="bg-white/5 p-3 rounded-2xl mr-auto max-w-[80%]">${reply}</div>`;
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }, 800);
-        }
-
-        // OTHER ACTIONS
-        function changePassword() {
-            const user = auth.currentUser;
-            auth.sendPasswordResetEmail(user.email).then(() => alert("Password reset link එක ඔබේ Email එකට එව්වා."));
-        }
-
         function nav(v) {
-            ['home','rank','profile'].forEach(x => {
-                document.getElementById(x+'-view').classList.add('hidden');
-                document.getElementById('n-'+x).className = "p-4 text-slate-600";
-            });
+            ['home','rank','profile','submenu','quiz'].forEach(x => document.getElementById(x+'-view')?.classList.add('hidden'));
             document.getElementById(v+'-view').classList.remove('hidden');
-            document.getElementById('n-'+v).className = "p-4 active-nav";
+            ['home','rank','profile'].forEach(n => document.getElementById('n-'+n).className = "p-4 text-slate-600");
+            if(document.getElementById('n-'+v)) document.getElementById('n-'+v).className = "p-4 active-nav";
         }
 
         function logout() { auth.signOut().then(() => location.reload()); }
