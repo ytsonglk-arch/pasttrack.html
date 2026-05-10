@@ -188,7 +188,53 @@
             <button onclick="hidePopup()" class="w-full text-[10px] font-black opacity-50 uppercase text-white">Cancel</button>
         </div>
     </div>
+<!-- Subject/Quiz View -->
+<div id="subject-view" class="hidden p-6 max-w-2xl mx-auto mb-20">
+    <button onclick="changeView('home')" class="mb-6 text-slate-400 text-[10px] font-black uppercase flex items-center">
+        <i class="fas fa-arrow-left mr-2"></i> ආපසු මුල් පිටුවට
+    </button>
+    
+    <div class="mb-8">
+        <h2 id="display-subject-title" class="text-3xl font-black text-yellow-500 italic uppercase">Subject</h2>
+        <div class="h-1 w-20 bg-yellow-500 mt-2 rounded-full"></div>
+    </div>
 
+    <!-- Selection Menu -->
+    <div id="selection-menu" class="space-y-6">
+        <div id="units-section">
+            <p class="text-[10px] font-black text-slate-500 uppercase mb-3 tracking-widest">Lessons / ඒකක</p>
+            <div id="units-list" class="space-y-3"></div>
+        </div>
+        <div id="papers-section">
+            <p class="text-[10px] font-black text-slate-500 uppercase mb-3 tracking-widest">Past Papers / පසුගිය ප්‍රශ්න පත්‍ර</p>
+            <div id="papers-list" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <!-- Quiz Area -->
+    <div id="quiz-area" class="hidden">
+        <div id="questions-container" class="space-y-6"></div>
+        <button onclick="calculateResults()" class="w-full mt-10 p-5 bg-yellow-500 text-black font-black rounded-2xl shadow-xl uppercase hover:scale-95 transition-transform">
+            Verify Results & Collect Points
+        </button>
+    </div>
+</div>
+
+<!-- Hidden Result Card Template (For Download) -->
+<div id="result-download-wrapper" style="position: absolute; left: -9999px;">
+    <div id="result-card-design" style="width: 450px; background: #020617; border: 10px solid #f59e0b; padding: 40px; border-radius: 40px; text-align: center; color: white;">
+        <h1 style="color: #f59e0b; font-size: 30px; font-weight: 900; letter-spacing: -1px; margin-bottom: 5px;">FAST TRACK PRO</h1>
+        <p style="font-size: 10px; font-weight: bold; letter-spacing: 5px; opacity: 0.6; margin-bottom: 25px;">OFFICIAL SCORE CARD</p>
+        <img id="res-card-img" src="" style="width: 100px; height: 100px; border-radius: 50%; border: 4px solid #f59e0b; margin: 0 auto 20px; object-fit: cover;">
+        <h2 id="res-card-name" style="font-size: 22px; font-weight: 800; margin-bottom: 10px;">STUDENT</h2>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 20px; margin: 20px 0;">
+            <p style="font-size: 9px; opacity: 0.5; margin-bottom: 5px;">VERIFIED SCORE</p>
+            <h3 id="res-card-score" style="font-size: 50px; font-weight: 900; color: #f59e0b;">0%</h3>
+        </div>
+        <p id="res-card-title" style="font-size: 12px; font-weight: bold; color: #94a3b8;"></p>
+        <p style="margin-top: 30px; font-size: 8px; opacity: 0.4;">© 2026 Fast Track - KD Creation</p>
+    </div>
+</div>
     <!-- Navigation -->
     <nav id="bottom-nav" class="hidden fixed bottom-6 left-6 right-6 h-20 glass-card flex justify-around items-center px-4 z-50">
         <button onclick="changeView('home')" id="nav-home" class="p-4 nav-active"><i class="fas fa-house-chimney text-xl"></i></button>
@@ -198,138 +244,190 @@
     </nav>
 
     <script>
-
- // --- DATA STRUCTURE (ඔයාගේ ප්‍රශ්න 900 මෙතැනට දාන්න) ---
+       // --- 1. DATA STRUCTURE (ප්‍රශ්න මෙතැනට ඇතුළත් කරන්න) ---
 const unitQuizData = {
     "Media Studies": { 
-        "Unit 01: පදනම": [{ q: "සන්නිවේදනයේ මූලික අංගය?", options: ["මූලාශ්‍රය", "පෑන", "පොත", "කැලෑව"], correct: 0 }],
-        "Unit 02: මාධ්‍ය ආකෘති": [] 
+        "Unit 01: පදනම": [
+            { q: "සන්නිවේදනයේ මූලික අංගය කුමක්ද?", options: ["මූලාශ්‍රය", "පෑන", "පොත", "කැලෑව"], correct: 0 },
+            { q: "ප්‍රශ්න 50 ක් මෙතැනට ඇතුළත් කළ හැක...", options: ["A", "B", "C", "D"], correct: 1 }
+        ],
+        "Unit 02: සන්නිවේදන ආකෘති": [] 
     },
     "Buddhist Civilization": { "Unit 01: හැඳින්වීම": [] },
     "Political Science": { "Unit 01": [] },
     "Logic": { "Unit 01": [] },
-    "Sinhala": { "Unit 01": [] },
+    "History": { "Unit 01": [] },
     "Geography": { "Unit 01": [] }
 };
 
 const pastPaperQuizData = {
     "Media Studies": { 
-        "2023 Media Past Paper": [{ q: "2023 Q1?", options: ["A", "B", "C", "D"], correct: 0 }],
-        "2022 Media Past Paper": []
+        "2023 Media Past Paper": [
+            { q: "2023 පළමු ප්‍රශ්නය?", options: ["පිළිතුර 1", "පිළිතුර 2", "පිළිතුර 3", "පිළිතුර 4"], correct: 2 }
+        ] 
     },
-    "Buddhist Civilization": { "2023 BC Paper": [] },
-    "Political Science": {}, "Logic": {}, "Sinhala": {}, "Geography": {}
+    "Buddhist Civilization": { "2023 Political Paper": [] },
+    "Political Science": {}, "Logic": {}, "History": {}, "Geography": {}
 };
 
+// --- 2. GLOBAL VARIABLES ---
 let currentSubject = "";
+let currentSelectedTitle = "";
 
-// විෂයයක් තේරූ විට ක්‍රියාත්මක වන ප්‍රධාන Function එක
+// --- 3. VIEW CONTROLLER ---
+function changeView(view) {
+    const views = ['home', 'ai', 'rank', 'profile', 'subject'];
+    views.forEach(v => {
+        const el = document.getElementById(v + '-view');
+        if(el) el.classList.add('hidden');
+        
+        // Navigation Bar icons update
+        const nav = document.getElementById('nav-' + v);
+        if(nav) nav.classList.replace('nav-active', 'text-slate-500');
+    });
+    
+    document.getElementById(view + '-view').classList.remove('hidden');
+    const activeNav = document.getElementById('nav-' + view);
+    if(activeNav) activeNav.classList.replace('text-slate-500', 'nav-active');
+    
+    // Leaderboard එක load කිරීම
+    if(view === 'rank') fetchRank();
+    window.scrollTo(0,0);
+}
+
+// --- 4. SUBJECT & SELECTION LOGIC ---
 function openSubject(subjectName) {
     currentSubject = subjectName;
+    document.getElementById('display-subject-title').innerText = subjectName;
     
-    const container = document.getElementById('subject-list-container');
-    container.innerHTML = `
-        <div class="mb-6 flex items-center gap-4">
-            <button onclick="location.reload()" class="text-yellow-500 font-bold"><i class="fas fa-arrow-left"></i> Back</button>
-            <h2 class="text-xl font-black text-white">${subjectName}</h2>
-        </div>
-        
-        <!-- Tabs -->
-        <div class="grid grid-cols-2 gap-4 mb-8">
-            <div id="tab-units" onclick="renderContent('unit')" class="glass-card p-4 text-center cursor-pointer border-b-2 border-yellow-500 text-yellow-500 font-bold">Unit Quiz</div>
-            <div id="tab-past" onclick="renderContent('pastpaper')" class="glass-card p-4 text-center cursor-pointer border-b-2 border-transparent opacity-50 font-bold">Past Papers</div>
-        </div>
-
-        <div id="quiz-list-display" class="space-y-3">
-            <!-- ලැයිස්තුව මෙතනට වැටේ -->
-        </div>
-    `;
+    const unitsList = document.getElementById('units-list');
+    const papersList = document.getElementById('papers-list');
     
-    renderContent('unit'); // මුලින්ම Units පෙන්වන්න
-}
-
-function renderContent(type) {
-    const listDisplay = document.getElementById('quiz-list-display');
-    const unitTab = document.getElementById('tab-units');
-    const pastTab = document.getElementById('tab-past');
+    unitsList.innerHTML = "";
+    papersList.innerHTML = "";
     
-    listDisplay.innerHTML = "";
-
-    if (type === 'unit') {
-        // Tab Styles මාරු කිරීම
-        unitTab.classList.add('border-yellow-500', 'text-yellow-500', 'opacity-100');
-        pastTab.classList.replace('border-yellow-500', 'border-transparent');
-        pastTab.classList.add('opacity-50');
-
-        const units = unitQuizData[currentSubject] || {};
-        const unitNames = Object.keys(units);
-
-        if (unitNames.length === 0) {
-            listDisplay.innerHTML = `<p class="text-center text-slate-500 py-10">තවමත් දත්ත ඇතුළත් කර නැත.</p>`;
-            return;
-        }
-
-        unitNames.forEach(name => {
-            listDisplay.innerHTML += `
-                <div onclick="prepQuiz('unit', '${name}')" class="glass-card p-5 flex justify-between items-center hover:border-yellow-500 cursor-pointer transition">
-                    <span class="text-sm font-bold">${name}</span>
-                    <i class="fas fa-play-circle text-yellow-500"></i>
+    // Units Load කිරීම
+    const units = unitQuizData[subjectName] || {};
+    const unitKeys = Object.keys(units);
+    if(unitKeys.length > 0) {
+        unitKeys.forEach(title => {
+            unitsList.innerHTML += `
+                <div onclick="startQuiz('unit', '${title}')" class="glass-card p-5 flex justify-between items-center cursor-pointer border-l-4 border-yellow-500/50 hover:border-yellow-500">
+                    <span class="font-bold text-sm text-slate-200">${title}</span>
+                    <i class="fas fa-play text-[10px] text-yellow-500"></i>
                 </div>`;
         });
-
     } else {
-        // Past Paper Tab Styles
-        pastTab.classList.add('border-yellow-500', 'text-yellow-500', 'opacity-100');
-        unitTab.classList.replace('border-yellow-500', 'border-transparent');
-        unitTab.classList.add('opacity-50');
+        unitsList.innerHTML = `<p class="text-xs text-slate-600 ml-2 italic">No units available yet.</p>`;
+    }
 
-        const papers = pastPaperQuizData[currentSubject] || {};
-        const paperNames = Object.keys(papers);
-
-        if (paperNames.length === 0) {
-            listDisplay.innerHTML = `<p class="text-center text-slate-500 py-10">ප්‍රශ්න පත්‍ර තවමත් ඇතුළත් කර නැත.</p>`;
-            return;
-        }
-
-        paperNames.forEach(name => {
-            listDisplay.innerHTML += `
-                <div onclick="prepQuiz('past', '${name}')" class="glass-card p-5 flex justify-between items-center hover:border-red-500 cursor-pointer transition">
-                    <span class="text-sm font-bold">${name}</span>
-                    <i class="fas fa-file-alt text-red-500"></i>
+    // Past Papers Load කිරීම
+    const papers = pastPaperQuizData[subjectName] || {};
+    const paperKeys = Object.keys(papers);
+    if(paperKeys.length > 0) {
+        paperKeys.forEach(title => {
+            papersList.innerHTML += `
+                <div onclick="startQuiz('paper', '${title}')" class="glass-card p-5 flex justify-between items-center cursor-pointer border-l-4 border-cyan-500/50 hover:border-cyan-500">
+                    <span class="font-bold text-sm text-slate-200">${title}</span>
+                    <i class="fas fa-file-alt text-[10px] text-cyan-500"></i>
                 </div>`;
         });
+    } else {
+        papersList.innerHTML = `<p class="text-xs text-slate-600 ml-2 italic">No papers available yet.</p>`;
     }
+
+    document.getElementById('selection-menu').classList.remove('hidden');
+    document.getElementById('quiz-area').classList.add('hidden');
+    changeView('subject');
 }
 
-// Quiz එකට අවශ්‍ය දත්ත සූදානම් කිරීම
-function prepQuiz(type, key) {
-    let questions = [];
-    if (type === 'unit') {
-        questions = unitQuizData[currentSubject][key];
-    } else {
-        questions = pastPaperQuizData[currentSubject][key];
-    }
-
-    if (!questions || questions.length === 0) {
-        alert("මෙම කොටසේ ප්‍රශ්න තවමත් ඇතුළත් කර නැත.");
+// --- 5. QUIZ ENGINE ---
+function startQuiz(type, title) {
+    currentSelectedTitle = title;
+    const questions = type === 'unit' ? unitQuizData[currentSubject][title] : pastPaperQuizData[currentSubject][title];
+    
+    if(!questions || questions.length === 0) {
+        alert("වැඩිදුර ප්‍රශ්න ඇතුළත් කරමින් පවතී. කරුණාකර පසුව උත්සාහ කරන්න.");
         return;
     }
 
-    // කලින් දුන් startQuiz function එක මෙතනින් call කරන්න පුළුවන්
-    // currentQuestions = questions;
-    startQuiz(key, questions); 
-}
-            const fBtn = document.createElement('button');
-            fBtn.className = "w-full p-5 bg-yellow-500 text-black font-black rounded-3xl mt-6";
-            fBtn.innerText = "FINISH & SAVE";
-            fBtn.onclick = async () => {
-                await db.collection("user_results").add({name: auth.currentUser.displayName, score, total: questions.length, subject: currentSubject, timestamp: firebase.firestore.FieldValue.serverTimestamp()});
-                alert(`ලකුණු: ${score}/${questions.length}`);
-                showTab(type === 'unit' ? 'quiz' : 'papers');
-            };
-            area.appendChild(fBtn);
-        }
+    document.getElementById('selection-menu').classList.add('hidden');
+    document.getElementById('quiz-area').classList.remove('hidden');
+    document.getElementById('display-subject-title').innerText = title;
 
+    const container = document.getElementById('questions-container');
+    container.innerHTML = "";
+
+    questions.forEach((q, qIdx) => {
+        container.innerHTML += `
+            <div class="glass-card p-6 quiz-card" data-correct="${q.correct}">
+                <p class="text-[10px] font-black text-yellow-500 mb-3 uppercase tracking-widest">Question ${qIdx + 1}</p>
+                <p class="text-sm font-bold mb-5 leading-relaxed text-slate-100">${q.q}</p>
+                <div class="space-y-2">
+                    ${q.options.map((opt, optIdx) => `
+                        <button onclick="selectAnswer(this, ${optIdx})" class="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-left text-xs transition-all hover:bg-white/10">
+                            ${opt}
+                        </button>
+                    `).join('')}
+                </div>
+            </div>`;
+    });
+    window.scrollTo(0, 0);
+}
+
+function selectAnswer(btn, idx) {
+    const parent = btn.parentElement;
+    Array.from(parent.children).forEach(b => b.classList.remove('border-yellow-500', 'bg-yellow-500/20', 'active-choice'));
+    btn.classList.add('border-yellow-500', 'bg-yellow-500/20', 'active-choice');
+    btn.setAttribute('data-chosen', idx);
+}
+
+// --- 6. RESULTS & IMAGE GENERATION ---
+function calculateResults() {
+    const cards = document.querySelectorAll('.quiz-card');
+    let correctCount = 0;
+    let answeredAll = true;
+
+    cards.forEach(card => {
+        const selected = card.querySelector('.active-choice');
+        if(!selected) answeredAll = false;
+        if(selected && selected.getAttribute('data-chosen') == card.getAttribute('data-correct')) {
+            correctCount++;
+        }
+    });
+
+    if(!answeredAll) {
+        if(!confirm("ඔබ සියලුම ප්‍රශ්න වලට පිළිතුරු දී නැත. ප්‍රතිඵල ලබා ගැනීමට අවශ්‍යද?")) return;
+    }
+
+    const percent = Math.round((correctCount / cards.length) * 100);
+    const user = auth.currentUser;
+
+    // Firebase Update
+    db.collection("users").doc(user.uid).update({
+        points: firebase.firestore.FieldValue.increment(percent)
+    });
+
+    // Result Card Data Mapping
+    document.getElementById('res-card-img').src = user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName}`;
+    document.getElementById('res-card-name').innerText = user.displayName.toUpperCase();
+    document.getElementById('res-card-score').innerText = percent + "%";
+    document.getElementById('res-card-title').innerText = currentSelectedTitle;
+
+    alert("ප්‍රතිඵල සකස් කරමින් පවතී. මදක් රැඳී සිටින්න...");
+
+    // PNG Download (html2canvas)
+    const cardDesign = document.getElementById('result-card-design');
+    html2canvas(cardDesign, { useCORS: true, backgroundColor: "#020617", scale: 2 }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `FastTrack_Result_${user.displayName}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        
+        alert(`සුභ පැතුම්! ඔබ ලබාගත් ලකුණු ප්‍රමාණය: ${percent}%\nඔබේ Profile එකට Points එකතු විය.`);
+        changeView('home');
+    });
+}
         const firebaseConfig = {
             apiKey: "AIzaSyB_10UzdkgZPlu-P361PYbEQjTwbKjjWx0",
             authDomain: "al-fast-track.firebaseapp.com",
@@ -453,23 +551,12 @@ function prepQuiz(type, key) {
             } catch(e) { console.log(e); }
         }
 
+        // Auth Logic
         function toggleAuthMode() {
-    const regFields = document.getElementById('register-fields');
-    const authBtn = document.getElementById('auth-btn');
-    const toggleBtn = document.getElementById('toggle-btn');
-    
-    const isRegistering = regFields.classList.toggle('hidden');
-
-    if (!isRegistering) {
-        // Register mode එකේදී (fields පේනවා නම්)
-        authBtn.innerText = "REGISTER";
-        toggleBtn.innerText = "Back to Login";
-    } else {
-        // Login mode එකේදී (fields සැඟවී ඇති විට)
-        authBtn.innerText = "LOGIN";
-        toggleBtn.innerText = "Register";
-    }
-}
+            const isReg = document.getElementById('register-fields').classList.toggle('hidden');
+            document.getElementById('auth-btn').innerText = isReg ? "REGISTER" : "LOGIN";
+            document.getElementById('toggle-btn').innerText = isReg ? "Back to Login" : "Register";
+        }
 
         async function handleAuth() {
             const email = document.getElementById('auth-email').value;
