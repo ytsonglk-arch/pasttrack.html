@@ -429,9 +429,28 @@ function startQuiz(type, title) {
 }
 
 function selectAnswer(btn, idx) {
-    const parent = btn.parentElement;
-    Array.from(parent.children).forEach(b => b.classList.remove('border-yellow-500', 'bg-yellow-500/20', 'active-choice'));
-    btn.classList.add('border-yellow-500', 'bg-yellow-500/20', 'active-choice');
+    const card = btn.closest('.quiz-card'); // ප්‍රශ්නය තියෙන Card එක ගන්නවා
+    const correctIdx = parseInt(card.getAttribute('data-correct')); // නිවැරදි පිළිතුරේ අංකය
+    const buttons = card.querySelectorAll('button'); // ඒ Card එකේ තියෙන ඔක්කොම buttons
+
+    // එක පාරක් පිළිතුරක් එබුවාම ආයෙ වෙනස් කරන්න බැරි වෙන්න buttons disable කරනවා
+    buttons.forEach(b => b.disabled = true);
+
+    if (idx === correctIdx) {
+        // නිවැරදි පිළිතුර එබුවා නම්: කොළ පාට වෙනවා
+        btn.classList.add('bg-green-600', 'border-green-500', 'text-white', 'active-choice');
+    } else {
+        // වැරදි පිළිතුරක් එබුවා නම්:
+        btn.classList.add('wrong-selected', 'wrong-shake'); // එබූ එක රතු වෙනවා
+        
+        // නිවැරදි පිළිතුර සොයාගෙන ඒක නිවි නිවි පත්තු වෙන්න හදනවා
+        buttons[correctIdx].classList.add('correct-blink');
+        
+        // ලකුණු ගණනය කරන්න පසුවට ඕන නිසා වැරදි එකත් active-choice විදියට මාක් කරනවා
+        btn.classList.add('active-choice');
+    }
+    
+    // දත්ත ගබඩා කිරීමට (Result එකට)
     btn.setAttribute('data-chosen', idx);
 }
 
