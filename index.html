@@ -2137,18 +2137,20 @@ function downloadResultImage() {
 
       auth.onAuthStateChanged(user => {
     if(user) {
-        // Dashboard එක පෙන්වීම
-        document.getElementById('auth-screen').classList.add('hidden');
-        document.getElementById('dashboard').classList.remove('hidden');
-        document.getElementById('bottom-nav').classList.remove('hidden');
+        // ... (අනිත් Screen මාරු කරන කෑලි ටික)
         
-        // නම් පෙන්වීම
         document.getElementById('user-display-name-header').innerText = user.displayName;
         document.getElementById('user-display-name-profile').innerText = user.displayName;
 
-        // පින්තූරය සෙට් කිරීම
-        const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName)}&background=d4af37&color=fff`;
-        const userImg = user.photoURL || defaultAvatar;
+        // 🟢 මෙන්න මේ කොටස විතරක් අලුතින් දාන්න
+        let userImg;
+        if (user.photoURL) {
+            // Google පින්තූරේ Security Block එක නැති කරන්න මේ "Images.weserv.nl" කියන සර්විස් එක පාවිච්චි කරමු
+            userImg = `https://images.weserv.nl/?url=${encodeURIComponent(user.photoURL)}&w=200&h=200&fit=cover&circle=1`;
+        } else {
+            // පින්තූරයක් නැත්නම් අකුරු සහිත Avatar එකක්
+            userImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName)}&background=d4af37&color=fff`;
+        }
 
         const avatarHeader = document.getElementById('user-avatar');
         const avatarProfile = document.getElementById('profile-pic-large');
@@ -2157,7 +2159,7 @@ function downloadResultImage() {
         if(avatarProfile) avatarProfile.src = userImg;
 
     } else {
-        // User ලොග් වෙලා නැත්නම් හෝ Logout වුණොත්
+        // Logout logic...
         document.getElementById('auth-screen').classList.remove('hidden');
         document.getElementById('dashboard').classList.add('hidden');
         document.getElementById('bottom-nav').classList.add('hidden');
