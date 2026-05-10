@@ -207,9 +207,9 @@
 <!-- Subject Detail View -->
 <div id="subject-view" class="hidden p-6 max-w-2xl mx-auto mb-20">
     <!-- Back Button -->
-    <button onclick="changeView('home')" class="mb-6 text-slate-400 text-[10px] font-black uppercase flex items-center">
-        <i class="fas fa-arrow-left mr-2"></i> Back
-    </button>
+   <button onclick="goBackToHome()" class="mb-6 text-slate-400 text-[10px] font-black uppercase flex items-center">
+    <i class="fas fa-arrow-left mr-2"></i> Back
+</button>
     
     <h2 id="display-subject-title" class="text-3xl font-black text-yellow-500 italic uppercase mb-6 text-center">Subject</h2>
 
@@ -220,7 +220,7 @@
         </button>
         <button id="tab-paper" onclick="switchTab('paper')" class="flex-1 py-3 text-xs font-black uppercase rounded-xl transition-all text-slate-400">
             Past Papers
-        </button>
+       </button>
     </div>
 
     <!-- Units List Container -->
@@ -328,7 +328,19 @@ function changeView(view) {
     
     window.scrollTo(0, 0);
 }
+// මේ කෑල්ල Script එකේ ඕනෑම තැනක පේළියක් විදියට දාන්න පුළුවන් (හැබැයි තවත් function එකක් ඇතුළට දාන්න එපා)
+function goBackToHome() {
+    // 1. Subject View එක වහන්න
+    const subjectView = document.getElementById('subject-view');
+    if (subjectView) subjectView.classList.add('hidden');
 
+    // 2. Dashboard එක පෙන්වන්න
+    const dashboard = document.getElementById('dashboard');
+    if (dashboard) dashboard.classList.remove('hidden');
+
+    // 3. මුල් පිටුවට (Home) යන්න
+    changeView('home');
+}
 // --- 3. SUBJECT SELECTION LOGIC ---
 function openSubject(subjectName) {
     // Dashboard එක වහන්න (එතකොට Leaderboard එක පේන්නේ නැහැ)
