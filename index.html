@@ -296,7 +296,6 @@ function changeView(view) {
         const el = document.getElementById(v + '-view');
         if(el) el.classList.add('hidden');
         
-        // Navigation Bar icons update
         const nav = document.getElementById('nav-' + v);
         if(nav) nav.classList.replace('nav-active', 'text-slate-500');
     });
@@ -305,23 +304,54 @@ function changeView(view) {
     const activeNav = document.getElementById('nav-' + view);
     if(activeNav) activeNav.classList.replace('text-slate-500', 'nav-active');
     
-    // Leaderboard එක load කිරීම
     if(view === 'rank') fetchRank();
     window.scrollTo(0,0);
 }
 
-// --- 4. SUBJECT & SELECTION LOGIC ---
+// --- 4. NEW TAB SYSTEM LOGIC ---
+
+// Tab දෙක මාරු කරන Function එක
+function switchTab(tab) {
+    const quizBtn = document.getElementById('tab-quiz');
+    const paperBtn = document.getElementById('tab-paper');
+    const quizContent = document.getElementById('units-tab-content');
+    const paperContent = document.getElementById('papers-tab-content');
+    const quizArea = document.getElementById('quiz-area');
+
+    // Quiz එකක් කරමින් සිටියදී Tab එකක් එබුවොත් Quiz එක සඟවනවා
+    quizArea.classList.add('hidden');
+    
+    if (tab === 'quiz') {
+        quizBtn.classList.add('bg-yellow-500', 'text-black');
+        quizBtn.classList.remove('text-slate-400');
+        paperBtn.classList.remove('bg-yellow-500', 'text-black');
+        paperBtn.classList.add('text-slate-400');
+        
+        quizContent.classList.remove('hidden');
+        paperContent.classList.add('hidden');
+    } else {
+        paperBtn.classList.add('bg-yellow-500', 'text-black');
+        paperBtn.classList.remove('text-slate-400');
+        quizBtn.classList.remove('bg-yellow-500', 'text-black');
+        quizBtn.classList.add('text-slate-400');
+        
+        paperContent.classList.remove('hidden');
+        quizContent.classList.add('hidden');
+    }
+}
+
+// විෂයක් විවෘත කරන විට ලිස්ට් එක පුරවන හැටි
 function openSubject(subjectName) {
     currentSubject = subjectName;
     document.getElementById('display-subject-title').innerText = subjectName;
     
-    const unitsList = document.getElementById('units-list');
-    const papersList = document.getElementById('papers-list');
+    const unitsList = document.getElementById('units-tab-content');
+    const papersList = document.getElementById('papers-tab-content');
     
     unitsList.innerHTML = "";
     papersList.innerHTML = "";
     
-    // Units Load කිරීම
+    // Quiz/Units Load කිරීම
     const units = unitQuizData[subjectName] || {};
     const unitKeys = Object.keys(units);
     if(unitKeys.length > 0) {
@@ -333,7 +363,7 @@ function openSubject(subjectName) {
                 </div>`;
         });
     } else {
-        unitsList.innerHTML = `<p class="text-xs text-slate-600 ml-2 italic">No units available yet.</p>`;
+        unitsList.innerHTML = `<p class="text-xs text-slate-600 p-4 italic">No Units available yet.</p>`;
     }
 
     // Past Papers Load කිරීම
@@ -348,11 +378,10 @@ function openSubject(subjectName) {
                 </div>`;
         });
     } else {
-        papersList.innerHTML = `<p class="text-xs text-slate-600 ml-2 italic">No papers available yet.</p>`;
+        papersList.innerHTML = `<p class="text-xs text-slate-600 p-4 italic">No Papers available yet.</p>`;
     }
 
-    document.getElementById('selection-menu').classList.remove('hidden');
-    document.getElementById('quiz-area').classList.add('hidden');
+    switchTab('quiz'); // Default ලෙස QUIZ පෙන්වන්න
     changeView('subject');
 }
 
@@ -362,11 +391,13 @@ function startQuiz(type, title) {
     const questions = type === 'unit' ? unitQuizData[currentSubject][title] : pastPaperQuizData[currentSubject][title];
     
     if(!questions || questions.length === 0) {
-        alert("වැඩිදුර ප්‍රශ්න ඇතුළත් කරමින් පවතී. කරුණාකර පසුව උත්සාහ කරන්න.");
+        alert("වැඩිදුර ප්‍රශ්න ඇතුළත් කරමින් පවතී.");
         return;
     }
 
-    document.getElementById('selection-menu').classList.add('hidden');
+    // List සඟවා Quiz එක පෙන්වීම
+    document.getElementById('units-tab-content').classList.add('hidden');
+    document.getElementById('papers-tab-content').classList.add('hidden');
     document.getElementById('quiz-area').classList.remove('hidden');
     document.getElementById('display-subject-title').innerText = title;
 
@@ -380,7 +411,7 @@ function startQuiz(type, title) {
                 <p class="text-sm font-bold mb-5 leading-relaxed text-slate-100">${q.q}</p>
                 <div class="space-y-2">
                     ${q.options.map((opt, optIdx) => `
-                        <button onclick="selectAnswer(this, ${optIdx})" class="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-left text-xs transition-all hover:bg-white/10">
+                        <button onclick="selectAnswer(this, ${optIdx})" class="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-left text-xs transition-all">
                             ${opt}
                         </button>
                     `).join('')}
@@ -389,7 +420,6 @@ function startQuiz(type, title) {
     });
     window.scrollTo(0, 0);
 }
-
 function selectAnswer(btn, idx) {
     const parent = btn.parentElement;
     Array.from(parent.children).forEach(b => b.classList.remove('border-yellow-500', 'bg-yellow-500/20', 'active-choice'));
