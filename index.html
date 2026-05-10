@@ -1,64 +1,395 @@
-<!-- කලින් code එකේ <style> කොටසට මේක දාන්න (නැත්නම් මුළු code එකම පහළ තියෙනවා) -->
-<style>
-    /* එකක් යට එකක් පිළිවෙලට තියෙන්න style එක */
-    .subjects-list {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem; /* Cards අතර පරතරය */
-    }
-    
-    .sub-card {
-        width: 100%; /* Card එක සම්පූර්ණ පළල ගන්න */
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 1.25rem;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 1.25rem;
-        transition: 0.3s all ease;
-    }
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A/L Fast Track Pro | KD Creation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Noto+Sans+Sinhala:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-    .sub-card:hover {
-        background: rgba(251, 191, 36, 0.05);
-        border-color: rgba(251, 191, 36, 0.3);
-        transform: translateX(5px); /* Hover කළාම පොඩ්ඩක් දකුණට යනවා */
-    }
-</style>
+    <style>
+        :root { --primary: #fbbf24; }
+        body { font-family: 'Plus Jakarta Sans', 'Noto Sans Sinhala', sans-serif; background: #020617; color: white; overflow-x: hidden; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 1.5rem; }
+        .btn-grad { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); transition: 0.3s; color: black; font-weight: 800; }
+        
+        .sub-card { border: 2px solid transparent; background-clip: padding-box; position: relative; transition: 0.4s; cursor: pointer; }
+        .sub-card::after { content: ''; position: absolute; inset: -2px; background: linear-gradient(45deg, #fbbf24, transparent, #fbbf24); border-radius: 1.5rem; z-index: -1; opacity: 0.1; }
+        .sub-card:hover::after { opacity: 0.8; }
+        .sub-card:hover { transform: translateY(-3px); }
 
-<!-- Main App ඇතුළේ "ALL SUBJECTS LIST" කොටස මේ විදියට update කරන්න -->
-<div id="home-view">
-    <!-- ... කලින් header සහ countdown කොටස් ... -->
+        @keyframes blink-green { 0%, 100% { background-color: rgba(34, 197, 94, 0.2); border-color: #22c55e; } 50% { background-color: #22c55e; border-color: #22c55e; color: black; } }
+        .correct-blink { animation: blink-green 0.6s ease-in-out 3; }
+        .wrong-shake { background-color: #ef4444 !important; border-color: #ef4444 !important; animation: shake 0.3s; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
-    <h3 class="text-[10px] font-black text-slate-500 mb-5 uppercase tracking-widest flex items-center gap-2">
-        <span class="w-8 h-[1px] bg-slate-800"></span> තෝරාගත් විශයන් <span class="w-8 h-[1px] bg-slate-800"></span>
-    </h3>
-    
-    <!-- මෙන්න මෙතන තමයි වෙනස් කළේ: grid-cols-1 දාලා flex-col කළා -->
-    <div class="subjects-list" id="subjects-container">
-        <!-- විශයන් auto-render වෙන්නේ මෙතනට -->
-    </div>
-</div>
+        #toast { transition: 0.5s; transform: translateY(-150%); }
+        #toast.show { transform: translateY(0); }
+        .tab-active { border-bottom: 3px solid var(--primary); color: var(--primary); }
+    </style>
+</head>
+<body class="pb-24">
 
-<script>
-    // JS එකේ renderSubjects function එක මේ විදියට වෙනස් කරන්න
-    function renderSubjects() {
-        const container = document.getElementById('subjects-container');
-        container.innerHTML = ALL_SUBJECTS.map(sub => `
-            <div onclick="openSubmenu('${sub.id}', '${sub.name}')" class="sub-card glass">
-                <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-500 border border-amber-500/20">
-                        <i class="fas ${sub.icon} text-lg"></i>
-                    </div>
-                    <div>
-                        <p class="font-black text-[11px] uppercase tracking-wider">${sub.name}</p>
-                        <p class="text-[8px] text-slate-500 font-bold uppercase">Tap to start learning</p>
-                    </div>
-                </div>
-                <div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
-                    <i class="fas fa-chevron-right text-[10px] text-slate-600"></i>
+    <div id="toast" class="fixed top-6 left-6 right-6 z-[100] glass p-4 text-center border-amber-500/50 text-sm font-bold text-amber-500 uppercase"></div>
+
+    <!-- AUTH SCREEN -->
+    <div id="auth-screen" class="min-h-screen flex items-center justify-center p-6 bg-slate-950">
+        <div class="w-full max-w-md glass p-10 text-center">
+            <div class="mb-6 flex justify-center">
+                <div class="w-20 h-20 bg-amber-500 rounded-3xl flex items-center justify-center rotate-12 shadow-2xl shadow-amber-500/20">
+                    <i class="fas fa-graduation-cap text-4xl text-black -rotate-12"></i>
                 </div>
             </div>
-        `).join('');
-    }
-</script>
+            <h1 class="text-3xl font-black italic mb-2 tracking-tighter">FAST TRACK <span class="text-amber-500">PRO</span></h1>
+            <p id="auth-title" class="text-[10px] tracking-widest text-slate-500 uppercase mb-8 font-bold">Sign In to KD Creation</p>
+            <div id="reg-fields" class="hidden">
+                <input type="text" id="user-name" placeholder="Full Name" class="w-full p-4 mb-4 glass bg-white/5 outline-none focus:border-amber-500 transition-all">
+            </div>
+            <input type="email" id="email" placeholder="Email Address" class="w-full p-4 mb-4 glass bg-white/5 outline-none focus:border-amber-500 transition-all">
+            <input type="password" id="pass" placeholder="Password" class="w-full p-4 mb-6 glass bg-white/5 outline-none focus:border-amber-500 transition-all">
+            <button onclick="handleAuth()" class="w-full p-4 btn-grad rounded-2xl mb-4 uppercase hover:scale-[1.02] shadow-lg">Continue</button>
+            <button onclick="toggleAuth()" id="toggle-txt" class="text-xs text-slate-400">නව ගිණුමක් අවශ්‍යද? <span class="text-amber-500 font-bold underline">Sign Up</span></button>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="dashboard" class="hidden p-6 max-w-2xl mx-auto">
+        
+        <!-- HOME VIEW -->
+        <div id="home-view">
+            <header class="flex justify-between items-start mb-8">
+                <div>
+                    <h2 class="text-2xl font-black italic uppercase">HELLO, <span id="display-name" class="text-amber-500">STUDENT</span>!</h2>
+                    <p class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">A/L EXAM COUNTDOWN</p>
+                </div>
+                <div class="glass px-4 py-2 border-amber-500/20 flex items-center gap-2">
+                    <span id="user-points" class="font-black text-amber-400">0</span> <span class="text-[8px] text-slate-500 font-bold uppercase">XP</span>
+                </div>
+            </header>
+
+            <!-- COUNTDOWN CARD -->
+            <div class="glass p-6 mb-8 relative overflow-hidden border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-transparent">
+                <div class="relative z-10">
+                    <h3 class="text-[10px] font-black text-amber-500 mb-4 uppercase tracking-[0.2em]">2026 EXAM COUNTDOWN</h3>
+                    <div class="flex gap-4 items-center">
+                        <div class="text-center"><span id="days" class="text-4xl font-black italic">00</span><p class="text-[7px] font-black text-slate-500 mt-1">DAYS</p></div>
+                        <div class="text-xl opacity-20">:</div>
+                        <div class="text-center"><span id="hours" class="text-4xl font-black italic">00</span><p class="text-[7px] font-black text-slate-500 mt-1">HOURS</p></div>
+                        <div class="text-xl opacity-20">:</div>
+                        <div class="text-center"><span id="mins" class="text-4xl font-black italic">00</span><p class="text-[7px] font-black text-slate-500 mt-1">MINUTES</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ALL SUBJECTS LIST -->
+            <h3 class="text-[10px] font-black text-slate-500 mb-5 uppercase tracking-widest flex items-center gap-2">
+                <span class="w-8 h-[1px] bg-slate-800"></span> තෝරාගත් විශයන් <span class="w-8 h-[1px] bg-slate-800"></span>
+            </h3>
+            <div class="grid grid-cols-1 gap-4" id="subjects-container"></div>
+        </div>
+
+        <!-- SUBMENU -->
+        <div id="submenu-view" class="hidden">
+            <button onclick="nav('home')" class="mb-6 text-[10px] font-black text-slate-400 uppercase tracking-widest"><i class="fas fa-chevron-left mr-2"></i> Back to Home</button>
+            <h2 id="selected-sub-name" class="text-2xl font-black mb-6 uppercase italic text-amber-500">Subject</h2>
+            <div class="flex gap-4 mb-6 border-b border-white/5">
+                <button id="tab-unit" onclick="switchTab('unit')" class="pb-3 text-xs font-black uppercase tab-active flex-1">Unit Quizzes</button>
+                <button id="tab-past" onclick="switchTab('past')" class="pb-3 text-xs font-black uppercase text-slate-500 flex-1">Past Papers</button>
+            </div>
+            <div id="quiz-list" class="space-y-4"></div>
+        </div>
+
+        <!-- QUIZ VIEW -->
+        <div id="quiz-view" class="hidden">
+            <div class="flex justify-between items-center mb-8">
+                <span id="quiz-title" class="text-[10px] font-black uppercase text-slate-500">KD QUIZ ENGINE</span>
+                <span id="q-count" class="px-3 py-1 glass text-[10px] font-black text-amber-500 uppercase">1 / 50</span>
+            </div>
+            <div class="glass p-10 mb-8 border-white/10">
+                <h2 id="q-text" class="text-lg font-bold leading-relaxed text-slate-200">Loading...</h2>
+            </div>
+            <div id="options-container" class="space-y-4"></div>
+        </div>
+
+        <!-- SCORECARD -->
+        <div id="scorecard-view" class="hidden">
+            <div id="capture-area" class="glass p-8 border-amber-500/20 text-center bg-slate-950">
+                <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-2xl shadow-green-500/20">
+                    <i class="fas fa-check text-4xl text-black"></i>
+                </div>
+                <h1 class="text-xl font-black italic mb-1">A/L FAST TRACK <span class="text-amber-500">PRO</span></h1>
+                <p class="text-[8px] text-slate-500 font-bold mb-8 uppercase">Verified by KD Creation</p>
+                <div class="py-6 border-y border-white/5 mb-8">
+                    <p class="text-[10px] text-slate-400 uppercase mb-1">Student Name</p>
+                    <h2 id="score-user-name" class="text-2xl font-black text-amber-500 uppercase">NAME</h2>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="glass p-4 border-white/5">
+                        <p class="text-[8px] text-slate-500 uppercase">Score</p>
+                        <span id="score-val" class="text-3xl font-black italic">0%</span>
+                    </div>
+                    <div class="glass p-4 border-white/5">
+                        <p class="text-[8px] text-slate-500 uppercase">Correct</p>
+                        <span id="score-correct" class="text-3xl font-black italic">0/0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mt-6">
+                <button onclick="nav('home')" class="p-4 glass text-xs font-black uppercase">Home</button>
+                <button onclick="downloadScorecard()" class="p-4 btn-grad rounded-2xl text-xs uppercase">Download <i class="fas fa-download ml-2"></i></button>
+            </div>
+        </div>
+
+        <!-- RANK VIEW -->
+        <div id="rank-view" class="hidden">
+            <h2 class="text-2xl font-black italic mb-8 flex items-center gap-3">
+                <i class="fas fa-trophy text-amber-500"></i> TOP <span class="text-amber-500">STUDENTS</span>
+            </h2>
+            <div id="leaderboard-list" class="space-y-3"></div>
+        </div>
+
+        <!-- PROFILE VIEW -->
+        <div id="profile-view" class="hidden text-center">
+            <img id="p-img" src="" class="w-24 h-24 rounded-[2rem] mx-auto mb-4 border-4 border-amber-500/20">
+            <h2 id="p-name" class="text-2xl font-black uppercase">Name</h2>
+            <p class="text-[10px] text-slate-500 font-black uppercase mb-8">Verified Student</p>
+            <button onclick="logout()" class="w-full glass p-5 text-red-500 font-black uppercase">End Session</button>
+        </div>
+    </div>
+
+    <!-- NAVBAR -->
+    <nav id="navbar" class="hidden fixed bottom-6 left-6 right-6 h-20 glass flex justify-around items-center z-50">
+        <button onclick="nav('home')" id="n-home" class="p-4"><i class="fas fa-th-large"></i></button>
+        <button onclick="nav('rank')" id="n-rank" class="p-4 opacity-30"><i class="fas fa-chart-line"></i></button>
+        <button onclick="nav('profile')" id="n-profile" class="p-4 opacity-30"><i class="fas fa-user-circle"></i></button>
+    </nav>
+
+    <script>
+        // --- ALL SUBJECTS DATA ---
+        const ALL_SUBJECTS = [
+            { id: "media", name: "Media Studies", icon: "fa-tv" },
+            { id: "buddhist", name: "Buddhist Civilization", icon: "fa-dharmachakra" },
+            { id: "logic", name: "Logic & Scientific Method", icon: "fa-brain" },
+            { id: "pol", name: "Political Science", icon: "fa-landmark" },
+            { id: "geo", name: "Geography", icon: "fa-globe-asia" },
+            { id: "hist", name: "History", icon: "fa-monument" },
+            { id: "sinhala", name: "Sinhala Language", icon: "fa-pen-nib" },
+            { id: "ict", name: "Information Tech (ICT)", icon: "fa-laptop-code" }
+        ];
+
+        // Sample Quizzes (ඔයාට මේවට ප්‍රශ්න 50 බැගින් පසුව ඇඩ් කරන්න පුළුවන්)
+        const quizDatabase = {
+            "media": { 
+                unit: { "Unit 01: සන්නිවේදන හැඳින්වීම": [{q: "සන්නිවේදනයේ පියා කවුද?", options: ["අරිස්ටෝටල්", "විල්බර් ශ්‍රාම්", "හැරල්ඩ් ලැස්වෙල්", "ඩේවිඩ් බර්ලෝ"], correct: 1}] },
+                past: { "2023 Past Paper": [] }
+            },
+            "buddhist": {
+                unit: { "Unit 01: බුදු දහමේ උල්පත": [{q: "ප්‍රථම ධර්ම දේශනාව කුමක්ද?", options: ["ධම්මචක්කප්පවත්තන", "ආදිත්තපරියාය", "අනත්තලක්ඛණ", "මංගල සූත්‍රය"], correct: 0}] },
+                past: { "2023 Past Paper": [] }
+            }
+            // අනෙක් විශයන් වලටත් මේ වගේම දත්ත ඇතුළත් කරන්න.
+        };
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB_10UzdkgZPlu-P361PYbEQjTwbKjjWx0",
+            authDomain: "al-fast-track-2026.firebaseapp.com",
+            projectId: "al-fast-track-2026",
+            storageBucket: "al-fast-track-2026.appspot.com",
+            messagingSenderId: "272353911468",
+            appId: "1:272353911468:web:07c22eb0c9f167fce37509"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let currentSubId = "";
+        let qIdx = 0, scoreCount = 0, currentQuiz = [];
+
+        // --- CORE FUNCTIONS ---
+        function renderSubjects() {
+            const container = document.getElementById('subjects-container');
+            container.innerHTML = ALL_SUBJECTS.map(sub => `
+                <div onclick="openSubmenu('${sub.id}', '${sub.name}')" class="sub-card glass p-6 flex justify-between items-center">
+                    <div class="flex items-center gap-5">
+                        <div class="w-12 h-12 bg-amber-500 rounded-2xl flex items-center justify-center text-black shadow-lg shadow-amber-500/20">
+                            <i class="fas ${sub.icon}"></i>
+                        </div>
+                        <span class="font-black text-xs uppercase tracking-widest">${sub.name}</span>
+                    </div>
+                    <i class="fas fa-chevron-right text-slate-700"></i>
+                </div>
+            `).join('');
+        }
+
+        function openSubmenu(id, name) {
+            currentSubId = id;
+            document.getElementById('selected-sub-name').innerText = name;
+            nav('submenu');
+            switchTab('unit');
+        }
+
+        function switchTab(type) {
+            const list = document.getElementById('quiz-list');
+            list.innerHTML = "";
+            document.getElementById('tab-unit').className = type === 'unit' ? "pb-3 text-xs font-black uppercase tab-active flex-1" : "pb-3 text-xs font-black uppercase text-slate-500 flex-1";
+            document.getElementById('tab-past').className = type === 'past' ? "pb-3 text-xs font-black uppercase tab-active flex-1" : "pb-3 text-xs font-black uppercase text-slate-500 flex-1";
+            
+            const subData = quizDatabase[currentSubId] ? quizDatabase[currentSubId][type] : {};
+            const keys = Object.keys(subData);
+            
+            if(keys.length === 0) {
+                list.innerHTML = `<div class="text-center p-10 text-slate-600 text-[10px] font-black uppercase">Coming Soon...</div>`;
+                return;
+            }
+
+            keys.forEach(name => {
+                list.innerHTML += `<div onclick="startQuiz('${type}', '${name}')" class="glass p-5 text-[10px] font-black uppercase border-white/5 flex justify-between cursor-pointer hover:border-amber-500/40">
+                    <span>${name}</span> <span class="text-amber-500">START <i class="fas fa-play ml-1"></i></span>
+                </div>`;
+            });
+        }
+
+        function startQuiz(type, name) {
+            const questions = quizDatabase[currentSubId][type][name];
+            if(!questions || questions.length === 0) return alert("ප්‍රශ්න පත්‍රය සූදානම් වෙමින් පවතී!");
+            currentQuiz = [...questions];
+            qIdx = 0; scoreCount = 0;
+            nav('quiz');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = currentQuiz[qIdx];
+            document.getElementById('q-text').innerText = q.q;
+            document.getElementById('q-count').innerText = `${qIdx + 1} / ${currentQuiz.length}`;
+            const container = document.getElementById('options-container');
+            container.innerHTML = q.options.map((opt, i) => `
+                <button onclick="checkAnswer(${i}, this)" class="w-full glass p-5 text-left text-xs font-black uppercase border-white/5 hover:bg-white/5 transition-all outline-none">
+                    ${opt}
+                </button>
+            `).join('');
+        }
+
+        function checkAnswer(idx, btn) {
+            const q = currentQuiz[qIdx];
+            const btns = document.getElementById('options-container').children;
+            for(let b of btns) b.disabled = true;
+
+            if(idx === q.correct) {
+                btn.classList.add('correct-blink');
+                scoreCount++;
+                updateXP(10);
+            } else {
+                btn.classList.add('wrong-shake');
+                btns[q.correct].classList.add('correct-blink');
+            }
+
+            setTimeout(() => {
+                qIdx++;
+                if(qIdx < currentQuiz.length) showQuestion();
+                else showScore();
+            }, 2000);
+        }
+
+        function showScore() {
+            const perc = Math.round((scoreCount / currentQuiz.length) * 100);
+            document.getElementById('score-val').innerText = perc + "%";
+            document.getElementById('score-correct').innerText = `${scoreCount}/${currentQuiz.length}`;
+            nav('scorecard');
+        }
+
+        async function downloadScorecard() {
+            const canvas = await html2canvas(document.getElementById('capture-area'));
+            const link = document.createElement('a');
+            link.download = `Result-${Date.now()}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        // --- SYSTEM ---
+        function toggleAuth() { document.getElementById('reg-fields').classList.toggle('hidden'); }
+        async function handleAuth() {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('pass').value;
+            const name = document.getElementById('user-name').value;
+            const isReg = !document.getElementById('reg-fields').classList.contains('hidden');
+            try {
+                if(isReg) {
+                    const res = await auth.createUserWithEmailAndPassword(email, pass);
+                    await db.collection("users").doc(res.user.uid).set({ name, points: 0, photo: "https://cdn-icons-png.flaticon.com/512/149/149071.png" });
+                } else { await auth.signInWithEmailAndPassword(email, pass); }
+            } catch(e) { alert(e.message); }
+        }
+
+        auth.onAuthStateChanged(user => {
+            if(user) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                document.getElementById('navbar').classList.remove('hidden');
+                initApp(user.uid);
+            }
+        });
+
+        function initApp(uid) {
+            db.collection("users").doc(uid).onSnapshot(doc => {
+                const d = doc.data();
+                document.getElementById('display-name').innerText = d.name;
+                document.getElementById('p-name').innerText = d.name;
+                document.getElementById('score-user-name').innerText = d.name;
+                document.getElementById('user-points').innerText = d.points;
+                document.getElementById('p-img').src = d.photo;
+            });
+            renderSubjects();
+            updateCountdown();
+            loadLeaderboard();
+        }
+
+        function nav(v) {
+            ['home','rank','profile','submenu','quiz','scorecard'].forEach(x => document.getElementById(x+'-view')?.classList.add('hidden'));
+            document.getElementById(v+'-view').classList.remove('hidden');
+            ['home','rank','profile'].forEach(n => document.getElementById('n-'+n).classList.add('opacity-30'));
+            if(document.getElementById('n-'+v)) document.getElementById('n-'+v).classList.remove('opacity-30');
+        }
+
+        async function loadLeaderboard() {
+            const list = document.getElementById('leaderboard-list');
+            const snap = await db.collection("users").orderBy("points", "desc").limit(10).get();
+            list.innerHTML = "";
+            let i = 1;
+            snap.forEach(doc => {
+                const u = doc.data();
+                list.innerHTML += `<div class="glass p-4 flex justify-between items-center border-white/5">
+                    <div class="flex items-center gap-4">
+                        <span class="text-xs font-black text-amber-500">#${i}</span>
+                        <span class="text-[10px] font-black uppercase">${u.name}</span>
+                    </div>
+                    <span class="text-[9px] font-black">${u.points} XP</span>
+                </div>`;
+                i++;
+            });
+        }
+
+        function updateCountdown() {
+            const target = new Date("Nov 25, 2026 08:30:00").getTime();
+            setInterval(() => {
+                const now = new Date().getTime();
+                const diff = target - now;
+                document.getElementById('days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
+                document.getElementById('hours').innerText = String(Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2,'0');
+                document.getElementById('mins').innerText = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2,'0');
+            }, 1000);
+        }
+
+        async function updateXP(pts) {
+            await db.collection("users").doc(auth.currentUser.uid).update({ points: firebase.firestore.FieldValue.increment(pts) });
+        }
+
+        function logout() { auth.signOut().then(() => location.reload()); }
+    </script>
+</body>
+</html>
