@@ -1895,16 +1895,11 @@ function selectAnswer(btn, idx) {
 
 // 4. Final Result & Image
 async function calculateResults() {
-    // 1. ප්‍රශ්න කාඩ්පත් සොයා ගැනීම
     const cards = document.querySelectorAll('.quiz-card');
     let score = 0;
     
-    if (cards.length === 0) {
-        console.error("Quiz cards not found!");
-        return;
-    }
+    if (cards.length === 0) return;
 
-    // 2. ලකුණු ගණනය කිරීම
     cards.forEach(card => {
         const selected = card.querySelector('.active-choice');
         if(selected && selected.getAttribute('data-chosen') == card.getAttribute('data-correct')) {
@@ -1915,25 +1910,31 @@ async function calculateResults() {
     const percent = Math.round((score / cards.length) * 100);
     const user = auth.currentUser;
 
-    // 3. Firebase එකට ලකුණු යැවීම
+    // --- වැදගත්ම වෙනස මෙතනයි ---
     if (user) {
-        await db.collection("users").doc(user.uid).update({
-            points: firebase.firestore.FieldValue.increment(percent)
-        });
+        // .update වෙනුවට .set පාවිච්චි කරනවා {merge: true} එක්ක. 
+        // එතකොට Document එක නැතත් අලුතින් හැදිලා Points ඇඩ් වෙනවා.
+        try {
+            await db.collection("users").doc(user.uid).set({
+                points: firebase.firestore.FieldValue.increment(percent)
+            }, { merge: true });
+        } catch (e) {
+            console.error("Points Update Error: ", e);
+        }
     }
 
-    // 4. Modal එකට දත්ත දැමීම
+    // Modal එකට දත්ත දැමීම
     document.getElementById('res-card-img').src = user?.photoURL || `https://ui-avatars.com/api/?name=${user?.displayName}`;
     document.getElementById('res-card-name').innerText = user?.displayName || "Student";
     document.getElementById('res-card-score').innerText = percent + "%";
     document.getElementById('res-card-title').innerText = currentSelectedTitle;
 
-    // 5. Popup එක පෙන්වීම
+    // දැන් අනිවාර්යයෙන්ම Popup එක පේන්න ඕනේ
     const modal = document.getElementById('result-modal');
     if (modal) {
         modal.classList.remove('hidden');
     } else {
-        alert("ඔබේ ප්‍රතිඵලය: " + percent + "%"); // Modal එක නැතිනම් alert එකක් පෙන්වන්න
+        alert("ඔබේ ප්‍රතිඵලය: " + percent + "%");
     }
 }
 
