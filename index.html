@@ -1779,38 +1779,72 @@ function goBackToHome() {
     changeView('home');
 }
 // --- 3. SUBJECT SELECTION LOGIC ---
-function openSubject(subjectName) {
-    // Dashboard එක වහන්න (එතකොට Leaderboard එක පේන්නේ නැහැ)
-    document.getElementById('dashboard').classList.add('hidden');
+function openSubject(name) {
+    currentSubject = name;
     
-    // ඉතිරි කෝඩ් එක (subject-view පෙන්වන එක) පහළින් තියෙන්න ඕනේ...
-    document.getElementById('subject-view').classList.remove('hidden');
+    // 1. මුලින්ම Dashboard එක වහලා Subject View එක පෙන්වනවා
+    const dashboard = document.getElementById('dashboard');
+    const subjectView = document.getElementById('subject-view');
     
-    // ... (ඔයාගේ ඉතිරි ලිස්ට් පෙන්වන කෝඩ් එක)
+    if (dashboard) dashboard.classList.add('hidden');
+    if (subjectView) subjectView.classList.remove('hidden');
+    
+    // 2. විෂය නම Update කරනවා
+    const titleEl = document.getElementById('display-subject-title');
+    if (titleEl) titleEl.innerText = name;
 
+    // 3. වැදගත්ම කොටස: ඔයාගේ HTML එකේ තියෙන ID එකට ගැළපෙන්න මෙතන නම් වෙනස් කළා
+    const uList = document.getElementById('units-list'); // මම Screenshot එකේ දැක්කේ මේ ID එක
+    const pList = document.getElementById('papers-list'); // ඒ වගේම මේකත්
     
-    unitsList.innerHTML = "";
-    papersList.innerHTML = "";
+    // වැරදීමකින්වත් ඒ ID එක නැතිනම් පරණ නම චෙක් කරනවා
+    const finalUList = uList || document.getElementById('units-tab-content');
+    const finalPList = pList || document.getElementById('papers-tab-content');
+
+    if (!finalUList) {
+        console.error("Units list container එක සොයාගත නොහැක! කරුණාකර HTML එකේ ID එක පරීක්ෂා කරන්න.");
+        return;
+    }
+
+    finalUList.innerHTML = ""; 
+    if (finalPList) finalPList.innerHTML = "";
+
+    // 4. Units (පාඩම්) ටික පුරවනවා
+    const units = unitQuizData[name] || {};
+    const unitKeys = Object.keys(units);
     
-    const units = unitQuizData[subjectName] || {};
-    Object.keys(units).forEach(title => {
-        unitsList.innerHTML += `
-            <div onclick="startQuiz('unit', '${title}')" class="glass-card p-5 flex justify-between items-center cursor-pointer border-l-4 border-yellow-500 hover:bg-white/5 mb-3">
-                <span class="font-bold text-sm text-slate-200">${title}</span>
-                <i class="fas fa-chevron-right text-yellow-500"></i>
-            </div>`;
-    });
+    if (unitKeys.length === 0) {
+        finalUList.innerHTML = `<p class="text-xs text-slate-500 p-4">මෙම විෂයට අදාළ පාඩම් තවමත් ඇතුළත් කර නැත.</p>`;
+    } else {
+        unitKeys.forEach(title => {
+            finalUList.innerHTML += `
+                <div onclick="startQuiz('unit', '${title}')" class="glass-card p-5 flex justify-between items-center cursor-pointer border-l-4 border-yellow-500 mb-3 transition hover:bg-white/5">
+                    <span class="font-bold text-sm text-slate-200">${title}</span>
+                    <i class="fas fa-play text-yellow-500"></i>
+                </div>`;
+        });
+    }
 
-    const papers = pastPaperQuizData[subjectName] || {};
-    Object.keys(papers).forEach(title => {
-        papersList.innerHTML += `
-            <div onclick="startQuiz('paper', '${title}')" class="glass-card p-5 flex justify-between items-center cursor-pointer border-l-4 border-cyan-500 hover:bg-white/5 mb-3">
-                <span class="font-bold text-sm text-slate-200">${title}</span>
-                <i class="fas fa-file-alt text-cyan-500"></i>
-            </div>`;
-    });
+    // 5. Past Papers ටික පුරවනවා
+    const papers = pastPaperQuizData[name] || {};
+    const paperKeys = Object.keys(papers);
+    
+    if (finalPList) {
+        if (paperKeys.length === 0) {
+            finalPList.innerHTML = `<p class="text-xs text-slate-500 p-4">පසුගිය ප්‍රශ්න පත්‍ර නොමැත.</p>`;
+        } else {
+            paperKeys.forEach(title => {
+                finalPList.innerHTML += `
+                    <div onclick="startQuiz('paper', '${title}')" class="glass-card p-5 flex justify-between items-center cursor-pointer border-l-4 border-cyan-500 mb-3 transition hover:bg-white/5">
+                        <span class="font-bold text-sm text-slate-200">${title}</span>
+                        <i class="fas fa-file-alt text-cyan-500"></i>
+                    </div>`;
+            });
+        }
+    }
 
-    switchTab('quiz'); // UI එක හරිගස්සන Function එක (පහළ තියෙනවා)
+    // Tab එක Reset කරනවා
+    switchTab('quiz');
     changeView('subject');
 }
 
