@@ -198,148 +198,143 @@
     </nav>
 
     <script>
-        // විෂයයන්ට අදාළ දත්ත (මෙතැනට ප්‍රශ්න 900 ම ඇතුළත් කළ හැක)
-const allQuizData = {
-    "Media Studies": {
-        units: ["Unit 01: මාධ්‍ය හැඳින්වීම", "Unit 02: සන්නිවේදන ආකෘති", "Unit 03: අතිරේක අභ්‍යාස - සන්නිවේදනය හා මාධ්‍ය අධ්‍යයනය I": [
-    { q: "1. සන්නිවේදකයා විසින් පණිවිඩය සකස් කිරීමේ ක්‍රියාවලිය හඳුන්වන්නේ,", options: ["විකේතකරණයයි.", "සංජානනයයි.", "ආකේතකරණයයි.", "ප්‍රතිපෝෂණයයි.", "නාලිකාකරණයයි."], correct: 2 },
-    { q: "2. ශ්‍රී ලංකාවේ ප්‍රථම ගුවන් විදුලි විකාශනය ආරම්භ වූ වර්ෂය වන්නේ,", options: ["1921", "1923", "1925", "1949", "1967"], correct: 1 },
-    { q: "3. 'මාධ්‍යය පණිවිඩයයි' (The Medium is the Message) යන ප්‍රකාශය සිදු කළේ කවුද?", options: ["හැරල්ඩ් ලැස්වෙල්", "විල්බර් ශ්‍රාම්", "මාෂල් මැක්ලුහන්", "ඩේවිඩ් බර්ලෝ", "ක්ලෝඩ් ෂැනන්"], correct: 2 },
-    { q: "4. දොරටුපාල (Gatekeeping) සංකල්පය මුලින්ම හඳුන්වා දුන් විද්වතා වන්නේ,", options: ["කර්ට් ලෙවින්", "විල්බර් ශ්‍රාම්", "ඩේවිඩ් වයිට්", "බර්ලෝ", "ලැස්වෙල්"], correct: 0 },
-    { q: "5. ප්‍රවෘත්තියක වැදගත්ම තොරතුරු මුලින්ම ඉදිරිපත් කරන ක්‍රමය වන්නේ,", options: ["සිරස්තල ක්‍රමයයි.", "යටිකුරු පිරමීඩ ක්‍රමයයි.", "සෘජු පිරමීඩ ක්‍රමයයි.", "කාලානුක්‍රමික ක්‍රමයයි.", "විස්තරාත්මක ක්‍රමයයි."], correct: 1 },
-    { q: "6. පුද්ගලයෙකු තමා සමඟම කරගනු ලබන සන්නිවේදනය හඳුන්වන්නේ,", options: ["අන්තර් පුද්ගල සන්නිවේදනයයි.", "සමූහ සන්නිවේදනයයි.", "ආත්මීය සන්නිවේදනයයි.", "ජන සන්නිවේදනයයි.", "මහජන සන්නිවේදනයයි."], correct: 2 },
-    { q: "7. ලෝකයේ ප්‍රථම රූපවාහිනී විකාශනය ආරම්භ කළ ආයතනය වන්නේ,", options: ["CNN", "NBC", "BBC", "NHK", "ABC"], correct: 2 },
-    { q: "8. සන්නිවේදනයේදී 'ඝෝෂාව' (Noise) යන්නෙන් අදහස් කරන්නේ,", options: ["වැඩි ශබ්දයයි.", "සන්නිවේදනයට බාධා පමුණුවන ඕනෑම දෙයකි.", "ගුවන්විදුලි තරංගයි.", "ප්‍රතිපෝෂණයයි.", "මාධ්‍ය බලපෑමයි."], correct: 1 },
-    { q: "9. ලෝකයේ ප්‍රථම මුද්‍රිත පුවත්පත ලෙස සැලකෙන්නේ,", options: ["Oxford Gazette", "Relation", "Daily Courant", "The Times", "Acta Diurna"], correct: 1 },
-    { q: "10. සිනමාව කිනම් වර්ගයේ මාධ්‍යයක් ලෙස හඳුනාගත හැකිද?", options: ["ශ්‍රව්‍ය මාධ්‍යයකි.", "දෘශ්‍ය මාධ්‍යයකි.", "ශ්‍රව්‍ය - දෘශ්‍ය මාධ්‍යයකි.", "මුද්‍රිත මාධ්‍යයකි.", "අවාචික මාධ්‍යයකි."], correct: 2 },
-    { q: "11. 'කවුද, කුමක්ද, කාටද, කිනම් නාලිකාවකින්ද, කිනම් බලපෑමකින්ද' යනුවෙන් සන්නිවේදන ආකෘතියක් ඉදිරිපත් කළේ,", options: ["ඇරිස්ටෝටල්", "හැරල්ඩ් ලැස්වෙල්", "ෂැනන් සහ වීවර්", "විල්බර් ශ්‍රාම්", "ඩේවිඩ් බර්ලෝ"], correct: 1 },
-    { q: "12. මහජන සම්බන්ධතා (PR) ක්‍රියාවලියේ මූලික අරමුණ කුමක්ද?", options: ["ලාභය උපරිම කිරීම", "භාණ්ඩ ප්‍රවර්ධනය", "ආයතනය සහ මහජනයා අතර අන්‍යෝන්‍ය අවබෝධය ගොඩනැගීම", "ප්‍රචාරණය", "තරඟකරුවන් පරාජය කිරීම"], correct: 2 },
-    { q: "13. සන්නිවේදන ක්‍රියාවලිය සාර්ථක වූවාදැයි දැනගත හැක්කේ කුමකින්ද?", options: ["සංදේශයෙනි.", "නාලිකාවෙනි.", "ප්‍රතිපෝෂණයෙනි.", "සන්දර්භයෙනි.", "සන්නිවේදකයාගෙනි."], correct: 2 },
-    { q: "14. ජනකලා හා ජන සන්නිවේදන ක්‍රම අයත් වන්නේ කිනම් සන්නිවේදන ගණයටද?", options: ["නූතන සන්නිවේදනය", "සාම්ප්‍රදායික සන්නිවේදනය", "විද්‍යුත් සන්නිවේදනය", "අන්තර්ජාල සන්නිවේදනය", "නව මාධ්‍ය"], correct: 1 },
-    { q: "15. ප්‍රවෘත්ති වාර්තාකරණයේදී '5W සහ 1H' සංකල්පයට අයත් නොවන සාධකය කුමක්ද?", options: ["Who (කවුද)", "Why (ඇයි)", "Where (කොහේද)", "Wealth (ධනය)", "How (කොහොමද)"], correct: 3 },
-    { q: "16. රූපවාහිනියේ 'පියා' ලෙස සැලකෙන්නේ කවුද?", options: ["ජෝන් ලොගී බෙයාර්ඩ්", "ගුග්ලියෙල්මෝ මාර්කෝනි", "ඇලෙක්සැන්ඩර් ග්‍රැහැම් බෙල්", "තෝමස් අල්වා එඩිසන්", "සැමුවෙල් මෝර්ස්"], correct: 0 },
-    { q: "17. සන්නිවේදනයේදී 'සන්දර්භය' (Context) යනු,", options: ["භාවිතා කරන භාෂාවයි.", "සන්නිවේදනය සිදුවන පරිසරය හෝ පසුබිමයි.", "සංදේශයේ දිගයි.", "නාලිකාවේ ගුණාත්මක බවයි.", "ග්‍රාහකයාගේ උනන්දුවයි."], correct: 1 },
-    { q: "18. පුවත්පතක 'සංස්කාරක වාක්‍යය' මගින් ප්‍රකාශ වන්නේ,", options: ["ප්‍රධාන පුවතයි.", "ලේඛකයාගේ පෞද්ගලික මතයයි.", "පුවත්පත් ආයතනයේ නිල මතයයි.", "මහජනතාවගේ අදහස්ය.", "දැන්වීම්කරුවන්ගේ අදහස්ය."], correct: 2 },
-    { q: "19. අන්තර්ජාලය පදනම් කරගත් සන්නිවේදනය හඳුන්වන පොදු නාමය කුමක්ද?", options: ["පැරණි මාධ්‍ය", "ජන මාධ්‍ය", "නව මාධ්‍ය", "මුද්‍රිත මාධ්‍ය", "සාම්ප්‍රදායික මාධ්‍ය"], correct: 2 },
-    { q: "20. ශ්‍රී ලංකාවේ ප්‍රථම පුවත්පත වන්නේ,", options: ["ලක්මිණි පහන", "ලංකාලෝකය", "The Government Gazette", "සරසවි සඳරැස", "දිනමිණ"], correct: 2 },
-    { q: "21. අභිචාර විධි (Rituals) සන්නිවේදන මෙවලමක් ලෙස භාවිතා වන්නේ කුමන සංස්කෘතිය තුළද?", options: ["නූතන සංස්කෘතිය", "ජන සංස්කෘතිය", "ජනප්‍රිය සංස්කෘතිය", "පාරිභෝගික සංස්කෘතිය", "විද්‍යුත් සංස්කෘතිය"], correct: 1 },
-    { q: "22. සන්නිවේදනයේදී 'අවාචික' (Non-verbal) සන්නිවේදනයට නිදසුනක් වන්නේ,", options: ["කතාව", "ලිපිය", "සින්දුව", "මුහුණේ ඉරියව්", "දුරකථන ඇමතුම"], correct: 3 },
-    { q: "23. පුවත්පතක ප්‍රමාණය අනුව 'ටැබ්ලොයිඩ්' (Tabloid) යනු,", options: ["විශාල ප්‍රමාණයයි.", "මධ්‍යම ප්‍රමාණයයි.", "කුඩා ප්‍රමාණයයි.", "සඟරා ප්‍රමාණයයි.", "ඩිජිටල් ප්‍රමාණයයි."], correct: 2 },
-    { q: "24. ගුවන්විදුලි මාධ්‍යයට පමණක් ආවේණික ලක්ෂණය කුමක්ද?", options: ["රූපමය ස්වභාවය", "ශ්‍රව්‍යමය ස්වභාවය", "කාලීන බව", "ප්‍රතිපෝෂණය ප්‍රමාද වීම", "අන්ධ මාධ්‍යයක් වීම"], correct: 4 },
-    { q: "25. විකාශන මාධ්‍ය (Broadcasting) යන ගණයට අයත් වන්නේ,", options: ["පුවත්පත් හා සඟරා", "ගුවන්විදුලිය හා රූපවාහිනිය", "සිනමාව හා නාට්‍ය", "පොත් හා පත්‍රිකා", "අන්තර්ජාල ලිපි"], correct: 1 },
-    { q: "26. සන්නිවේදන ක්‍රියාවලියේදී 'නාලිකාව' (Channel) යනු,", options: ["පණිවිඩය ගමන් කරන මාවතයි.", "පණිවිඩය ලබන්නායි.", "බාධකයයි.", "පණිවිඩයේ අර්ථයයි.", "ප්‍රතිචාරයයි."], correct: 0 },
-    { q: "27. ප්‍රචාරණය (Propaganda) යන්නෙහි මූලික ලක්ෂණය වන්නේ,", options: ["තොරතුරු දැනුවත් කිරීමයි.", "විනෝදාස්වාදය සැපයීමයි.", "යම් මතයක් සමාජගත කිරීමට බලපෑම් කිරීමයි.", "සත්‍යය පමණක් හෙළි කිරීමයි.", "අධ්‍යාපනය ලබා දීමයි."], correct: 2 },
-    { q: "28. ජනමාධ්‍ය ආචාරධර්ම (Media Ethics) වැදගත් වන්නේ ඇයි?", options: ["ආයතනයේ ලාභය වැඩි කිරීමට", "මාධ්‍යයේ නිදහස සීමා කිරීමට", "සදාචාරාත්මක හා වගකීම් සහගත මාධ්‍ය භාවිතයක් සඳහා", "ප්‍රචාරණය වැඩි කිරීමට", "නාලිකාවේ ජනප්‍රියත්වය සඳහා"], correct: 2 },
-    { q: "29. ලෝක සන්නිවේදන දිනය ලෙස සමරනු ලබන්නේ,", options: ["මැයි 17", "ජුනි 05", "දෙසැම්බර් 10", "මාර්තු 08", "ඔක්තෝබර් 16"], correct: 0 },
-    { q: "30. ශ්‍රී ලංකාවේ ප්‍රථම රූපවාහිනී නාලිකාව වන්නේ,", options: ["ජාතික රූපවාහිනිය", "ස්වාධීන රූපවාහිනිය (ITN)", "සිරස ටීවී", "ස්වර්ණවාහිනී", "ටීඑන්එල්"], correct: 1 },
-    { q: "31. සන්නිවේදනයේ 'අත්දැකීම් පසුතලය' (Field of Experience) යන්නෙන් අදහස් වන්නේ,", options: ["වයස", "අධ්‍යාපනය, සංස්කෘතිය හා දැනුම", "පදිංචි ස්ථානය", "භාවිතා කරන දුරකථනය", "රැකියාව"], correct: 1 },
-    { q: "32. ගෝලීය ගම්මානය (Global Village) යන සංකල්පය ගොඩනැගීමට මූලික වූයේ,", options: ["පුවත්පත් දියුණුවයි.", "ප්‍රවාහන දියුණුවයි.", "සන්නිවේදන තාක්ෂණයේ දියුණුවයි.", "කෘෂිකර්ම දියුණුවයි.", "කර්මාන්ත දියුණුවයි."], correct: 2 },
-    { q: "33. පුවත්පතක 'සිරස්තලය' (Headline) මගින් ඉටු නොකරන කාර්යය කුමක්ද?", options: ["ග්‍රාහකයා ආකර්ෂණය කර ගැනීම", "පණිවිඩය සංක්ෂිප්තව ඉදිරිපත් කිරීම", "සම්පූර්ණ ප්‍රවෘත්තියම විස්තර කිරීම", "පිටුවේ අලංකාරය වැඩිකිරීම", "පුවත වර්ගීකරණය කිරීම"], correct: 2 },
-    { q: "34. සන්නිවේදනයේදී 'විකේතනය' (Decoding) සිදු කරනු ලබන්නේ,", options: ["සන්නිවේදකයා විසිනි.", "නාලිකාව විසිනි.", "ග්‍රාහකයා විසිනි.", "සංදේශය විසිනි.", "බාධකය විසිනි."], correct: 2 },
-    { q: "35. ශ්‍රී ලංකාවේ ප්‍රථම සිංහල පුවත්පත ලෙස සැලකෙන්නේ,", options: ["ලක්මිණි පහන", "ලංකාලෝකය", "දිනමිණ", "සිංහල බෞද්ධයා", "සරසවි සඳරැස"], correct: 1 },
-    { q: "36. සන්නිවේදනයේ මූලික කාර්යයක් වන 'සමාජානුයෝජනය' යනු,", options: ["විනෝද වීමයි.", "සමාජයේ පවතින සිරිත් විරිත් හා අගයන් උගන්වා සමාජයට හුරු කිරීමයි.", "පුවත්පත් මුද්‍රණයයි.", "පණිවිඩ යැවීමයි.", "සංඛ්‍යාලේඛන එකතු කිරීමයි."], correct: 1 },
-    { q: "37. ගුවන්විදුලි වැඩසටහන් වර්ගීකරණයේදී 'සඟරා වැඩසටහන' (Magazine Program) යනු,", options: ["පුවත්පත් කියවන වැඩසටහනකි.", "එකම තේමාවක් යටතේ විවිධ අංග ඇතුළත් වැඩසටහනකි.", "සින්දු පමණක් ඇති වැඩසටහනකි.", "පැය 24 පුරා විකාශනය වන වැඩසටහනකි.", "නාට්‍යයකි."], correct: 1 },
-    { q: "38. ජනමාධ්‍ය මගින් සිදුකරන 'දොරටු පාලක' කාර්යය වඩාත් බලපාන්නේ,", options: ["දැන්වීම් වලටය.", "ප්‍රවෘත්ති තේරීමට හා සංස්කරණයටය.", "නාට්‍ය වලටය.", "ගීත වලටය.", "චිත්‍රපට වලටය."], correct: 1 },
-    { q: "39. ඩිජිටල් බෙදීම (Digital Divide) යනු,", options: ["පරිගණක කැඩීමයි.", "තාක්ෂණය ඇති සහ නැති පිරිස අතර පවතින පරතරයයි.", "අන්තර්ජාලය වේගවත් වීමයි.", "දුරකථන වර්ගීකරණයයි.", "මෘදුකාංග බෙදා දීමයි."], correct: 1 },
-    { q: "40. සන්නිවේදනයේදී 'ප්‍රායෝගික ඝෝෂාව' (Physical Noise) සඳහා නිදසුනක් වන්නේ,", options: ["භාෂාව නොදැනීම", "වෙනස් සංස්කෘතියක වීම", "මයික්‍රොෆෝනයක ඇතිවන යම් ශබ්ද බාධාවක්", "වැරදි අර්ථකථනය", "නොසැලකිලිමත්කම"], correct: 2 },
-    { q: "41. 'අර්ථකථනය' (Interpretation) යන ජනමාධ්‍ය කාර්යය තුළින් සිදු වන්නේ,", options: ["තොරතුරු හුදෙක් වාර්තා කිරීමයි.", "සිදුවීම් වල පසුබිම හා අනාගත බලපෑම පැහැදිලි කිරීමයි.", "විනෝදාස්වාදය දීමයි.", "භාණ්ඩ විකිණීමයි.", "නාලිකා ප්‍රවර්ධනයයි."], correct: 1 },
-    { q: "42. සන්නිවේදන ආකෘති (Models) භාවිතා කිරීමේ ප්‍රධාන අරමුණ වන්නේ,", options: ["සන්නිවේදන ක්‍රියාවලිය සරලව තේරුම් ගැනීමයි.", "චිත්‍ර ඇඳීමයි.", "තාක්ෂණය දියුණු කිරීමයි.", "ග්‍රාහකයන් ගණනය කිරීමයි.", "පණිවිඩ වේගවත් කිරීමයි."], correct: 0 },
-    { q: "43. මහජන සම්බන්ධතාවයේදී 'ගැටලු කළමනාකරණය' (Issue Management) යනු,", options: ["පොලිසියට පැමිණිලි කිරීමයි.", "ආයතනයට එල්ල විය හැකි අහිතකර බලපෑම් කල්තබා හඳුනාගෙන පියවර ගැනීමයි.", "සේවකයින්ට දඬුවම් කිරීමයි.", "දැන්වීම් පළ කිරීමයි.", "ලාභය ගණනය කිරීමයි."], correct: 1 },
-    { q: "44. ප්‍රජා ගුවන්විදුලිය (Community Radio) යනු,", options: ["රටකටම ඇසෙන ගුවන්විදුලියකි.", "නිශ්චිත කුඩා ප්‍රජාවකගේ ගැටළු හා අවශ්‍යතා සඳහා වෙන්වූ ගුවන්විදුලියකි.", "සින්දු පමණක් ප්‍රචාරය කරන ගුවන්විදුලියකි.", "දැන්වීම් පමණක් ප්‍රචාරය කරන ගුවන්විදුලියකි.", "ජාත්‍යන්තර ගුවන්විදුලියකි."], correct: 1 },
-    { q: "45. සංවර්ධන සන්නිවේදනයේදී (Development Communication) වඩාත් වැදගත් වන්නේ,", options: ["ඉහළ සිට පහළට ගලා යන සන්නිවේදනයයි.", "ජනතාවගේ සහභාගීත්වය සහිත සන්නිවේදනයයි.", "සිනමාව පමණක් භාවිතා කිරීමයි.", "දැන්වීම් පළ කිරීමයි.", "ගුවන්විදුලිය පමණක් භාවිතා කිරීමයි."], correct: 1 },
-    { q: "46. සන්නිවේදනයේ 'අවකාශය' (Proxemics) පිළිබඳ අධ්‍යයනය අයත් වන්නේ,", options: ["වාචික සන්නිවේදනයටයි.", "අවාචික සන්නිවේදනයටයි.", "ජන සන්නිවේදනයටයි.", "ලිඛිත සන්නිවේදනයටයි.", "සංවිධාන සන්නිවේදනයටයි."], correct: 1 },
-    { q: "47. ප්‍රවෘත්තිමය වටිනාකම තීරණය කරන සාධකයක් නොවන්නේ,", options: ["කාලීනත්වය", "සමීපත්වය", "අසාමාන්‍ය බව", "ප්‍රමුඛත්වය", "කඩදාසි වල මිල"], correct: 4 },
-    { q: "48. 'නැරඹූ සැණින් ගෙවීම' (Pay-per-view) යනු කුමන මාධ්‍ය ප්‍රවණතාවයේ ලක්ෂණයක්ද?", options: ["පුවත්පත්", "ගුවන්විදුලිය", "නව මාධ්‍ය", "ජනකලා", "සිනමාව"], correct: 2 },
-    { q: "49. සන්නිවේදන ක්‍රියාවලියක 'මූලාශ්‍රය' (Source) ලෙස හඳුන්වන්නේ,", options: ["පණිවිඩයයි.", "නාලිකාවයි.", "සන්නිවේදකයායි.", "ග්‍රාහකයායි.", "ප්‍රතිපෝෂණයයි."], correct: 2 },
-    { q: "50. ලෝක ප්‍රවෘත්ති වාර්තාකරණයේදී රොයිටර් (Reuters) යනු,", options: ["පුවත්පතකි.", "ප්‍රවෘත්ති ඒජන්සියකි.", "රූපවාහිනී නාලිකාවකි.", "ගුවන්විදුලි මධ්‍යස්ථානයකි.", "සඟරාවකි."], correct: 1 } ]
-],
-        pastPapers: ["2023 Past Paper", "2022 Past Paper", "2021 Past Paper"]
+        // 1. DATA STRUCTURE
+const unitQuizData = {
+    "Media Studies": { 
+        "Unit 01: පදනම": [{ q: "සන්නිවේදනයේ මූලික අංගය?", options: ["මූලාශ්‍රය", "පෑන", "පොත", "කැලෑව"], correct: 0 }] 
     },
-    "Political Science": {
-        units: ["Unit 01: දේශපාලන විද්‍යාවේ ස්වභාවය", "Unit 02: රාජ්‍යය", "Unit 03: ආණ්ඩුව"],
-        pastPapers: ["2023 Past Paper", "2022 Past Paper"]
+    "Buddhist Civilization": { "Unit 01: හැඳින්වීම": [] },
+    "Political Science": { "Unit 01": [] },
+    "Logic": { "Unit 01": [] },
+    "Sinhala": { "Unit 01": [] },
+    "Geography": { "Unit 01": [] }
+};
+
+const pastPaperQuizData = {
+    "Media Studies": { 
+        "2023 Media Past Paper": [{ q: "2023 Q1?", options: ["A", "B", "C", "D"], correct: 0 }] 
     },
-    // අනෙක් විෂයන් සඳහාද මේ ආකාරයටම දත්ත එක් කරන්න...
+    "Buddhist Civilization": { "2023 BC Paper": [] },
+    "Political Science": {}, "Logic": {}, "Sinhala": {}, "Geography": {}
 };
 
 let currentSubject = "";
-let currentQuizType = ""; // 'unit' or 'pastpaper'
+let currentQuestions = [];
+let questionIndex = 0;
+let score = 0;
+let timerInterval;
 
-// විෂයයක් ක්ලික් කළ විට ක්‍රියාත්මක වන function එක
+// 2. NAVIGATION & TABS LOGIC
 function openSubject(subjectName) {
     currentSubject = subjectName;
-    const data = allQuizData[subjectName];
-    
-    if (!data) {
-        alert("මෙම විෂයට අදාළ දත්ත තවමත් ඇතුළත් කර නැත.");
-        return;
-    }
-
-    // Dashboard එකේ Subject List එක ඉවත් කර අලුත් View එක පෙන්වීම
     const container = document.getElementById('subject-list-container');
     container.innerHTML = `
         <div class="mb-6 flex items-center gap-4">
-            <button onclick="reloadHome()" class="text-yellow-500 font-bold"><i class="fas fa-arrow-left"></i> Back</button>
+            <button onclick="location.reload()" class="text-yellow-500 font-bold"><i class="fas fa-arrow-left"></i> Back</button>
             <h2 class="text-xl font-black text-white">${subjectName}</h2>
         </div>
-        
         <div class="grid grid-cols-2 gap-4 mb-8">
-            <div id="tab-units" onclick="toggleQuizTab('unit')" class="glass-card p-4 text-center cursor-pointer border-b-2 border-yellow-500 text-yellow-500 font-bold">Unit Quiz</div>
-            <div id="tab-past" onclick="toggleQuizTab('pastpaper')" class="glass-card p-4 text-center cursor-pointer border-b-2 border-transparent opacity-50 font-bold">Past Papers</div>
+            <div id="tab-units" onclick="renderContent('unit')" class="glass-card p-4 text-center cursor-pointer border-b-2 border-yellow-500 text-yellow-500 font-bold">Unit Quiz</div>
+            <div id="tab-past" onclick="renderContent('pastpaper')" class="glass-card p-4 text-center cursor-pointer border-b-2 border-transparent opacity-50 font-bold">Past Papers</div>
         </div>
-
-        <div id="quiz-list-display" class="space-y-3">
-            <!-- මෙතැනට Units හෝ Past Papers පෙන්වයි -->
-        </div>
+        <div id="quiz-list-display" class="space-y-3"></div>
     `;
-    
-    toggleQuizTab('unit'); // මුලින්ම Unit ටැබ් එක පෙන්වන්න
+    renderContent('unit');
 }
 
-function toggleQuizTab(type) {
-    currentQuizType = type;
+function renderContent(type) {
     const listDisplay = document.getElementById('quiz-list-display');
-    const data = allQuizData[currentSubject];
-    
-    // Tab active style මාරු කිරීම
-    if(type === 'unit') {
-        document.getElementById('tab-units').classList.add('border-yellow-500', 'text-yellow-500', 'opacity-100');
-        document.getElementById('tab-past').classList.replace('border-yellow-500', 'border-transparent');
-        document.getElementById('tab-past').classList.add('opacity-50');
-        
-        // Units පෙන්වීම
-        listDisplay.innerHTML = data.units.map((unit, i) => `
-            <div onclick="startQuiz('${unit}')" class="glass-card p-5 flex justify-between items-center bg-white/5 border border-white/10 hover:border-yellow-500 transition cursor-pointer">
-                <span class="text-sm font-bold">${unit}</span>
-                <i class="fas fa-play-circle text-yellow-500"></i>
-            </div>
-        `).join('');
-    } else {
-        document.getElementById('tab-past').classList.add('border-yellow-500', 'text-yellow-500', 'opacity-100');
-        document.getElementById('tab-units').classList.replace('border-yellow-500', 'border-transparent');
-        document.getElementById('tab-units').classList.add('opacity-50');
+    const unitTab = document.getElementById('tab-units');
+    const pastTab = document.getElementById('tab-past');
+    listDisplay.innerHTML = "";
 
-        // Past Papers පෙන්වීම
-        listDisplay.innerHTML = data.pastPapers.map((paper, i) => `
-            <div onclick="startQuiz('${paper}')" class="glass-card p-5 flex justify-between items-center bg-white/5 border border-white/10 hover:border-red-500 transition cursor-pointer">
-                <span class="text-sm font-bold text-red-200">${paper}</span>
-                <i class="fas fa-file-invoice text-red-500"></i>
-            </div>
-        `).join('');
+    if (type === 'unit') {
+        unitTab.className = "glass-card p-4 text-center cursor-pointer border-b-2 border-yellow-500 text-yellow-500 font-bold opacity-100";
+        pastTab.className = "glass-card p-4 text-center cursor-pointer border-b-2 border-transparent opacity-50 font-bold";
+        const units = unitQuizData[currentSubject] || {};
+        Object.keys(units).forEach(name => {
+            listDisplay.innerHTML += `<div onclick="prepQuiz('unit', '${name}')" class="glass-card p-5 flex justify-between items-center hover:border-yellow-500 cursor-pointer transition"><span class="text-sm font-bold">${name}</span><i class="fas fa-play-circle text-yellow-500"></i></div>`;
+        });
+    } else {
+        pastTab.className = "glass-card p-4 text-center cursor-pointer border-b-2 border-yellow-500 text-yellow-500 font-bold opacity-100";
+        unitTab.className = "glass-card p-4 text-center cursor-pointer border-b-2 border-transparent opacity-50 font-bold";
+        const papers = pastPaperQuizData[currentSubject] || {};
+        Object.keys(papers).forEach(name => {
+            listDisplay.innerHTML += `<div onclick="prepQuiz('past', '${name}')" class="glass-card p-5 flex justify-between items-center hover:border-red-500 cursor-pointer transition"><span class="text-sm font-bold">${name}</span><i class="fas fa-file-alt text-red-500"></i></div>`;
+        });
     }
 }
 
-// Home එකට ආපසු යාම සඳහා
-function reloadHome() {
-    location.reload(); // හෝ subject-list-container එකේ තිබූ පරණ HTML එක නැවත ජනනය කරන්න
+// 3. QUIZ SYSTEM LOGIC
+function prepQuiz(type, key) {
+    const questions = (type === 'unit') ? unitQuizData[currentSubject][key] : pastPaperQuizData[currentSubject][key];
+    if (!questions || questions.length === 0) return alert("ප්‍රශ්න පූරණය වෙමින් පවතී...");
+    startQuiz(key, questions);
 }
 
-// ප්‍රශ්න පත්‍රය ආරම්භ කිරීම (Quiz Logic මෙතැනින් පටන් ගනී)
-function startQuiz(title) {
-    alert(title + " ප්‍රශ්න පත්‍රය දැන් ආරම්භ වේ!");
-    // මෙතැනදී ප්‍රශ්න 50 පෙන්වන Screen එකට යාමට අවශ්‍ය logic එක ලියන්න
+function startQuiz(title, questions) {
+    currentQuestions = questions;
+    questionIndex = 0;
+    score = 0;
+    document.getElementById('quiz-screen').classList.remove('hidden');
+    showQuestion();
+    startTimer(20);
 }
 
+function showQuestion() {
+    const q = currentQuestions[questionIndex];
+    document.getElementById('current-q-num').innerText = questionIndex + 1;
+    document.getElementById('question-text').innerText = q.q;
+    document.getElementById('progress-bar').style.width = ((questionIndex + 1) / currentQuestions.length * 100) + "%";
+    
+    const container = document.getElementById('options-container');
+    container.innerHTML = "";
+    q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full p-5 glass-card text-left font-bold border-white/5 hover:border-yellow-500 transition-all";
+        btn.innerHTML = `<span class="text-yellow-500 mr-4">${i + 1}.</span> ${opt}`;
+        btn.onclick = () => checkAnswer(i, btn);
+        container.appendChild(btn);
+    });
+    document.getElementById('next-btn').classList.add('hidden');
+}
+
+function checkAnswer(selected, btn) {
+    const correct = currentQuestions[questionIndex].correct;
+    const btns = document.getElementById('options-container').children;
+    for(let b of btns) b.disabled = true;
+
+    if(selected === correct) {
+        btn.classList.add('show-correct');
+        score += 2;
+    } else {
+        btn.classList.add('wrong-shake');
+        btns[correct].classList.add('show-correct');
+    }
+    document.getElementById('next-btn').classList.remove('hidden');
+}
+
+function nextQuestion() {
+    questionIndex++;
+    if(questionIndex < currentQuestions.length) showQuestion();
+    else finishQuiz();
+}
+
+function startTimer(m) {
+    let s = m * 60;
+    timerInterval = setInterval(() => {
+        document.getElementById('quiz-timer').innerText = `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+        if(s-- <= 0) finishQuiz();
+    }, 1000);
+}
+
+async function finishQuiz() {
+    clearInterval(timerInterval);
+    document.getElementById('quiz-screen').classList.add('hidden');
+    document.getElementById('result-screen').classList.remove('hidden');
+    document.getElementById('final-score').innerText = score;
+    // Firebase update logic...
+}
         const firebaseConfig = {
             apiKey: "AIzaSyB_10UzdkgZPlu-P361PYbEQjTwbKjjWx0",
             authDomain: "al-fast-track.firebaseapp.com",
