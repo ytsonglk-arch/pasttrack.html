@@ -2114,12 +2114,26 @@ function downloadResultImage() {
         }
 
         // Auth Logic
-        function toggleAuthMode() {
-            const isReg = document.getElementById('register-fields').classList.toggle('hidden');
-            document.getElementById('auth-btn').innerText = isReg ? "REGISTER" : "LOGIN";
-            document.getElementById('toggle-btn').innerText = isReg ? "Back to Login" : "Register";
-        }
+        let isLoginMode = true; // මේක function එකෙන් පිට උඩින් තියෙන්න ඕනේ
 
+function toggleAuthMode() {
+    isLoginMode = !isLoginMode;
+    const authBtn = document.getElementById('auth-btn');
+    const toggleBtn = document.getElementById('toggle-btn');
+    const regFields = document.getElementById('register-fields');
+
+    if (isLoginMode) {
+        // Login Mode එකට මාරු කිරීම
+        authBtn.innerText = "LOGIN";
+        toggleBtn.innerText = "Register";
+        regFields.classList.add('hidden');
+    } else {
+        // Register Mode එකට මාරු කිරීම
+        authBtn.innerText = "REGISTER";
+        toggleBtn.innerText = "Login";
+        regFields.classList.remove('hidden');
+    }
+}
         async function handleAuth() {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
