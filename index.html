@@ -2113,8 +2113,8 @@ function downloadResultImage() {
             } catch(e) { console.log(e); }
         }
 
-        // Auth Logic
-        let isLoginMode = true; // මේක function එකෙන් පිට උඩින් තියෙන්න ඕනේ
+     // ⚠️ මේක JavaScript එකේ උඩින්ම (Functions වලට පිටින්) තියෙන්න ඕනේ
+let isLoginMode = true; 
 
 function toggleAuthMode() {
     isLoginMode = !isLoginMode;
@@ -2123,47 +2123,82 @@ function toggleAuthMode() {
     const regFields = document.getElementById('register-fields');
 
     if (isLoginMode) {
-        // Login Mode එකට මාරු කිරීම
         authBtn.innerText = "LOGIN";
         toggleBtn.innerText = "Register";
         regFields.classList.add('hidden');
     } else {
-        // Register Mode එකට මාරු කිරීම
         authBtn.innerText = "REGISTER";
         toggleBtn.innerText = "Login";
         regFields.classList.remove('hidden');
     }
 }
-        async function handleAuth() {
-            const email = document.getElementById('auth-email').value;
-            const password = document.getElementById('auth-password').value;
-            const name = document.getElementById('reg-name').value;
-            const mode = document.getElementById('auth-btn').innerText;
-            try {
-                if(mode === "LOGIN") await auth.signInWithEmailAndPassword(email, password);
-                else {
-                    const res = await auth.createUserWithEmailAndPassword(email, password);
-                    await res.user.updateProfile({displayName: name});
-                    await db.collection("users").doc(res.user.uid).set({ name, email, points: 0, streak: 1, lastLogin: new Date().toDateString() });
-                }
-            } catch(e) { alert(e.message); }
-        }
 
+async function handleAuth() {
+    const email = document.getElementById('auth-email').value.trim();
+    const password = document.getElementById('auth-password').value;
+    const authBtn = document.getElementById('auth-btn');
+
+    // හිස්ව තිබේ නම් නතර කිරීම
+    if (!email || !password) {
+        alert("කරුණාකර Email සහ Password ඇතුළත් කරන්න.");
+        return;
+    }
+
+    // බටන් එක Disable කිරීම (වැඩේ වෙනකම්)
+    authBtn.disabled = true;
+    authBtn.innerText = "Processing...";
+
+    try {
+        if (isLoginMode) {
+            // LOGIN ක්‍රියාවලිය
+            await auth.signInWithEmailAndPassword(email, password);
+        } else {
+            // REGISTER ක්‍රියාවලිය
+            const name = document.getElementById('reg-name').value.trim();
+            if (!name) {
+                alert("කරුණාකර ඔබේ නම ඇතුළත් කරන්න.");
+                authBtn.disabled = false;
+                authBtn.innerText = "REGISTER";
+                return;
+            }
+            const cred = await auth.createUserWithEmailAndPassword(email, password);
+            await cred.user.updateProfile({ displayName: name });
+            
+            // Register වුණාට පස්සේ Dashboard එකට යන්න
+            location.reload(); 
+        }
+    } catch (error) {
+        alert("Error: " + error.message);
+        authBtn.disabled = false;
+        authBtn.innerText = isLoginMode ? "LOGIN" : "REGISTER";
+    }
+}
      auth.onAuthStateChanged(user => {
     if(user) {
-        // Dashboard එකේ උඩ පොඩි පින්තූරය
-        const headerImg = document.getElementById('user-avatar');
-        if(headerImg) headerImg.src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName)}&background=d4af37&color=fff`;
-
-        // Profile පේජ් එකේ ලොකු පින්තූරය
-        const profileImg = document.getElementById('profile-pic-large');
-        if(profileImg) {
-            profileImg.src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName)}&background=d4af37&color=fff`;
-        }
+        // Dashboard පෙන්වීම
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+        document.getElementById('bottom-nav').classList.remove('hidden');
         
-        // අනෙක් විස්තර (නම වගේ දේවල්)
-        document.getElementById('user-display-name-header').innerText = user.displayName;
-        document.getElementById('user-display-name-profile').innerText = user.displayName;
+        // නම් පෙන්වීම
+        const displayName = user.displayName || "Student";
+        document.getElementById('user-display-name-header').innerText = displayName;
+        document.getElementById('user-display-name-profile').innerText = displayName;
+
+        // 🟢 ඊමේල් ලොගින් නිසා අපි නමෙන් Avatar එකක් හදමු
+        // මෙහි background=d4af37 (රන්වන් පාට) සහ color=fff (සුදු පාට) දීලා තියෙනවා
+        const userImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=d4af37&color=fff&bold=true&size=128`;
+
+        const avatarHeader = document.getElementById('user-avatar');
+        const avatarProfile = document.getElementById('profile-pic-large');
+
+        if(avatarHeader) avatarHeader.src = userImg;
+        if(avatarProfile) avatarProfile.src = userImg;
+
+    } else {
+        document.getElementById('auth-screen').classList.remove('hidden');
+        document.getElementById('dashboard').classList.add('hidden');
+        document.getElementById('bottom-nav').classList.add('hidden');
     }
 });
         function handleLogout() { auth.signOut().then(() => location.reload()); }
