@@ -1835,8 +1835,12 @@ function switchTab(tab) {
 // 3. Quiz Engine
 function startQuiz(type, title) {
     currentSelectedTitle = title;
-    const questions = type === 'unit' ? unitQuizData[currentSubject][title] : pastPaperQuizData[currentSubject][title];
-    if(!questions || questions.length === 0) return alert("ප්‍රශ්න සකස් කරමින් පවතී...");
+    let questionsRaw = type === 'unit' ? unitQuizData[currentSubject][title] : pastPaperQuizData[currentSubject][title];
+    
+    if(!questionsRaw || questionsRaw.length === 0) return alert("ප්‍රශ්න සකස් කරමින් පවතී...");
+
+    // ප්‍රශ්න වල පිළිවෙළ වෙනස් නොවී තිබීමට copy එකක් ගනිමු
+    const questions = JSON.parse(JSON.stringify(questionsRaw));
 
     document.getElementById('units-list').classList.add('hidden');
     document.getElementById('papers-list').classList.add('hidden');
@@ -1845,13 +1849,28 @@ function startQuiz(type, title) {
 
     const container = document.getElementById('questions-container');
     container.innerHTML = "";
+
     questions.forEach((q, idx) => {
+        // --- මෙන්න මෙතනින් පිළිතුරු මාරු කරනවා (Shuffle) ---
+        const originalOptions = [...q.options];
+        const correctAnswerText = originalOptions[q.correct]; // නිවැරදි පිළිතුරේ අකුරු ටික අරගන්නවා
+        
+        // පිළිතුරු ලිස්ට් එක shuffle කරනවා
+        q.options.sort(() => Math.random() - 0.5);
+        
+        // shuffle වුණාට පස්සේ අලුත් නිවැරදි index එක හොයාගන්නවා
+        const newCorrectIdx = q.options.indexOf(correctAnswerText);
+
         container.innerHTML += `
-            <div class="glass-card p-6 quiz-card" data-correct="${q.correct}">
-                <p class="text-[10px] font-black text-yellow-500 mb-3 uppercase">Question ${idx + 1}</p>
+            <div class="glass-card p-6 quiz-card mb-4" data-correct="${newCorrectIdx}">
+                <p class="text-[10px] font-black text-yellow-500 mb-3 uppercase tracking-widest">Question ${idx + 1}</p>
                 <p class="text-sm font-bold mb-5 leading-relaxed text-slate-100">${q.q}</p>
                 <div class="space-y-2">
-                    ${q.options.map((opt, i) => `<button onclick="selectAnswer(this, ${i})" class="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-left text-xs transition-all">${opt}</button>`).join('')}
+                    ${q.options.map((opt, i) => `
+                        <button onclick="selectAnswer(this, ${i})" class="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-left text-xs transition-all hover:bg-white/10">
+                            ${opt}
+                        </button>
+                    `).join('')}
                 </div>
             </div>`;
     });
@@ -1876,23 +1895,46 @@ function selectAnswer(btn, idx) {
 
 // 4. Final Result & Image
 async function calculateResults() {
+    // 1. ප්‍රශ්න කාඩ්පත් සොයා ගැනීම
     const cards = document.querySelectorAll('.quiz-card');
     let score = 0;
-    cards.forEach(c => {
-        const sel = c.querySelector('.active-choice');
-        if(sel && sel.getAttribute('data-chosen') == c.getAttribute('data-correct')) score++;
+    
+    if (cards.length === 0) {
+        console.error("Quiz cards not found!");
+        return;
+    }
+
+    // 2. ලකුණු ගණනය කිරීම
+    cards.forEach(card => {
+        const selected = card.querySelector('.active-choice');
+        if(selected && selected.getAttribute('data-chosen') == card.getAttribute('data-correct')) {
+            score++;
+        }
     });
 
     const percent = Math.round((score / cards.length) * 100);
     const user = auth.currentUser;
-    await db.collection("users").doc(user.uid).update({ points: firebase.firestore.FieldValue.increment(percent) });
 
-    document.getElementById('res-card-img').src = user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName}`;
-    document.getElementById('res-card-name').innerText = user.displayName;
+    // 3. Firebase එකට ලකුණු යැවීම
+    if (user) {
+        await db.collection("users").doc(user.uid).update({
+            points: firebase.firestore.FieldValue.increment(percent)
+        });
+    }
+
+    // 4. Modal එකට දත්ත දැමීම
+    document.getElementById('res-card-img').src = user?.photoURL || `https://ui-avatars.com/api/?name=${user?.displayName}`;
+    document.getElementById('res-card-name').innerText = user?.displayName || "Student";
     document.getElementById('res-card-score').innerText = percent + "%";
     document.getElementById('res-card-title').innerText = currentSelectedTitle;
 
-    document.getElementById('result-modal').classList.remove('hidden');
+    // 5. Popup එක පෙන්වීම
+    const modal = document.getElementById('result-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+    } else {
+        alert("ඔබේ ප්‍රතිඵලය: " + percent + "%"); // Modal එක නැතිනම් alert එකක් පෙන්වන්න
+    }
 }
 
 function downloadResultImage() {
