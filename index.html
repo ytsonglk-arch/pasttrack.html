@@ -11,39 +11,38 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
         :root { --primary: #f59e0b; --bg-dark: #020617; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.1); }
         body { font-family: 'Plus Jakarta Sans', 'Noto Sans Sinhala', sans-serif; background: radial-gradient(circle at top right, #1e1b4b, #020617); color: white; min-height: 100vh; overflow-x: hidden; }
-        .glass-card { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 2rem; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .glass-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 30px -10px rgba(245, 158, 11, 0.3); }
+        .glass-card { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 2rem; transition: all 0.4s ease; }
         .timer-container { background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80'); background-size: cover; background-position: center; }
         .nav-active { color: var(--primary); filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.8)); }
         .tab-content { display: none; }
         .active-tab { display: block; animation: fadeIn 0.5s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .show-correct { background-color: rgba(34, 197, 94, 0.3) !important; border-color: #22c55e !important; color: white !important; font-weight: bold; }
+        .show-correct { background-color: rgba(34, 197, 94, 0.3) !important; border-color: #22c55e !important; color: white !important; }
         .wrong-shake { animation: shake 0.4s; background-color: #ef4444 !important; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
         .profile-img { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
-        .leader-gold { border: 2px solid #ffd700; background: rgba(255, 215, 0, 0.1); }
+        #result-download-card { background: linear-gradient(135deg, #1e1b4b 0%, #020617 100%); border: 4px solid #f59e0b; padding: 40px; border-radius: 20px; width: 400px; text-align: center; }
     </style>
 </head>
 <body class="pb-28">
 
-    <!-- Auth Screen -->
+    <!-- Auth -->
     <div id="auth-screen" class="min-h-screen flex items-center justify-center p-6 text-center">
-        <div class="w-full max-w-sm glass-card p-10 relative overflow-hidden">
-            <div class="absolute -top-10 -right-10 w-32 h-32 bg-yellow-500/20 blur-3xl rounded-full"></div>
+        <div class="w-full max-w-sm glass-card p-10">
             <h1 class="text-4xl font-black text-yellow-500 mb-2 tracking-tighter">FAST TRACK</h1>
             <p class="text-[10px] text-slate-400 uppercase tracking-[0.4em] mb-10 font-bold">KD Creation Pro</p>
-            <div id="register-fields" class="hidden"><input type="text" id="reg-name" placeholder="ඔබේ නම" class="w-full p-4 mb-4 rounded-2xl bg-slate-900/50 border border-slate-700 outline-none focus:border-yellow-500"></div>
-            <input type="email" id="auth-email" placeholder="Email" class="w-full p-4 mb-4 rounded-2xl bg-slate-900/50 border border-slate-700 outline-none focus:border-yellow-500">
-            <input type="password" id="auth-password" placeholder="Password" class="w-full p-4 mb-6 rounded-2xl bg-slate-900/50 border border-slate-700 outline-none focus:border-yellow-500">
-            <button onclick="handleAuth()" id="auth-btn" class="w-full p-4 bg-yellow-500 text-black font-black rounded-2xl shadow-lg active:scale-95 transition-transform">LOGIN</button>
-            <div class="flex justify-between mt-8 text-[10px] font-bold text-slate-500 uppercase">
+            <div id="register-fields" class="hidden"><input type="text" id="reg-name" placeholder="ඔබේ නම" class="w-full p-4 mb-4 rounded-2xl bg-slate-900 border border-slate-700 outline-none"></div>
+            <input type="email" id="auth-email" placeholder="Email" class="w-full p-4 mb-4 rounded-2xl bg-slate-900 border border-slate-700 outline-none">
+            <input type="password" id="auth-password" placeholder="Password" class="w-full p-4 mb-6 rounded-2xl bg-slate-900 border border-slate-700 outline-none">
+            <button onclick="handleAuth()" id="auth-btn" class="w-full p-4 bg-yellow-500 text-black font-black rounded-2xl shadow-lg">LOGIN</button>
+            <div class="flex justify-between mt-8 text-[10px] font-bold text-slate-500">
                 <button onclick="toggleAuthMode()" id="toggle-btn" class="text-yellow-500">Register</button>
-                <button onclick="resetPasswordPopup()">Forgot Password?</button>
+                <button onclick="showResetModal()">Forgot Password?</button>
             </div>
         </div>
     </div>
@@ -52,56 +51,66 @@
     <div id="dashboard" class="hidden p-6 max-w-2xl mx-auto">
         <header class="flex justify-between items-center mb-10">
             <div class="flex items-center gap-4">
-                <img id="user-avatar" src="https://ui-avatars.com/api/?name=User&background=random" class="profile-img">
-                <div><p class="text-[10px] text-yellow-500 font-black uppercase tracking-widest mb-1">Hello,</p><h1 id="user-display-name-header" class="text-xl font-black">Student</h1></div>
+                <img id="user-avatar" src="https://ui-avatars.com/api/?name=User" class="profile-img">
+                <div><p class="text-[10px] text-yellow-500 font-black uppercase mb-1">Hello,</p><h1 id="user-display-name-header" class="text-xl font-black">Student</h1></div>
             </div>
             <div class="flex gap-2">
-                <div class="glass-card px-4 py-2 flex items-center gap-2 border-orange-500/30"><i class="fas fa-star text-yellow-500"></i><span id="user-total-points" class="font-black text-sm">0</span></div>
+                <div class="glass-card px-4 py-2 flex items-center gap-2"><i class="fas fa-star text-yellow-500"></i><span id="user-total-points" class="font-black">0</span></div>
                 <div class="glass-card px-4 py-2 flex items-center gap-2"><i class="fas fa-fire text-orange-500"></i><span id="streak-count" class="font-black">0</span></div>
             </div>
         </header>
 
         <!-- Home View -->
         <div id="home-view">
-            <div class="timer-container p-8 rounded-[3rem] mb-10 text-white relative overflow-hidden border border-white/10 shadow-2xl">
-                <p class="text-center text-[10px] font-black uppercase mb-6 tracking-[0.3em]">2026 A/L Countdown</p>
-                <div class="flex justify-around items-center relative z-10">
-                    <div class="text-center"><span id="cd-days" class="text-5xl font-black block">00</span><span class="text-[9px] font-bold opacity-70">DAYS</span></div>
-                    <div class="text-center font-light text-4xl opacity-30">:</div>
-                    <div class="text-center"><span id="cd-hours" class="text-5xl font-black block">00</span><span class="text-[9px] font-bold opacity-70">HRS</span></div>
-                    <div class="text-center font-light text-4xl opacity-30">:</div>
-                    <div class="text-center"><span id="cd-mins" class="text-5xl font-black block">00</span><span class="text-[9px] font-bold opacity-70">MINS</span></div>
+            <div class="timer-container p-8 rounded-[3rem] mb-10 text-white relative border border-white/10 shadow-2xl">
+                <p class="text-center text-[10px] font-black uppercase mb-6 tracking-widest">2026 A/L Countdown</p>
+                <div class="flex justify-around items-center">
+                    <div class="text-center"><span id="cd-days" class="text-5xl font-black block">00</span><span class="text-[9px] font-bold opacity-70 uppercase">Days</span></div>
+                    <div class="text-center"><span id="cd-hours" class="text-5xl font-black block">00</span><span class="text-[9px] font-bold opacity-70 uppercase">Hrs</span></div>
+                    <div class="text-center"><span id="cd-mins" class="text-5xl font-black block">00</span><span class="text-[9px] font-bold opacity-70 uppercase">Mins</span></div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4 mb-8">
-                <div onclick="openSubject('Media Studies')" class="glass-card p-5 text-center cursor-pointer border-b-4 border-purple-500">
-                    <div class="w-12 h-12 bg-purple-500/20 rounded-2xl flex items-center justify-center text-purple-400 mx-auto mb-3"><i class="fas fa-clapperboard"></i></div>
-                    <h4 class="font-bold text-sm">Media</h4>
+            <!-- Subject List (Vertical style restored) -->
+            <div class="space-y-4 mb-8">
+                <div onclick="openSubject('Media Studies')" class="glass-card p-6 flex items-center cursor-pointer border-l-4 border-purple-500">
+                    <div class="w-12 h-12 bg-purple-500/20 rounded-2xl flex items-center justify-center text-purple-400 mr-4"><i class="fas fa-clapperboard"></i></div>
+                    <div><h4 class="font-extrabold">Media Studies</h4><p class="text-[10px] text-slate-500 uppercase font-bold">මාධ්‍ය අධ්‍යයනය</p></div>
                 </div>
-                <div onclick="openSubject('Political Science')" class="glass-card p-5 text-center cursor-pointer border-b-4 border-blue-500">
-                    <div class="w-12 h-12 bg-blue-500/20 rounded-2xl flex items-center justify-center text-blue-400 mx-auto mb-3"><i class="fas fa-landmark-flag"></i></div>
-                    <h4 class="font-bold text-sm">Pol Sci</h4>
+                <div onclick="openSubject('Political Science')" class="glass-card p-6 flex items-center cursor-pointer border-l-4 border-blue-500">
+                    <div class="w-12 h-12 bg-blue-500/20 rounded-2xl flex items-center justify-center text-blue-400 mr-4"><i class="fas fa-landmark-flag"></i></div>
+                    <div><h4 class="font-extrabold">Political Science</h4><p class="text-[10px] text-slate-500 uppercase font-bold">දේශපාලන විද්‍යාව</p></div>
                 </div>
-                <div onclick="openSubject('Buddhist Civilization')" class="glass-card p-5 text-center cursor-pointer border-b-4 border-orange-500">
-                    <div class="w-12 h-12 bg-orange-500/20 rounded-2xl flex items-center justify-center text-orange-400 mx-auto mb-3"><i class="fas fa-dharmachakra"></i></div>
-                    <h4 class="font-bold text-sm">Buddhist Civ</h4>
+                <div onclick="openSubject('Buddhist Civilization')" class="glass-card p-6 flex items-center cursor-pointer border-l-4 border-orange-500">
+                    <div class="w-12 h-12 bg-orange-500/20 rounded-2xl flex items-center justify-center text-orange-400 mr-4"><i class="fas fa-dharmachakra"></i></div>
+                    <div><h4 class="font-extrabold">Buddhist Civilization</h4><p class="text-[10px] text-slate-500 uppercase font-bold">බෞද්ධ ශිෂ්ටාචාරය</p></div>
                 </div>
-                <div onclick="openSubject('Logic')" class="glass-card p-5 text-center cursor-pointer border-b-4 border-emerald-500">
-                    <div class="w-12 h-12 bg-emerald-500/20 rounded-2xl flex items-center justify-center text-emerald-400 mx-auto mb-3"><i class="fas fa-brain"></i></div>
-                    <h4 class="font-bold text-sm">Logic</h4>
+                <div onclick="openSubject('Sinhala')" class="glass-card p-6 flex items-center cursor-pointer border-l-4 border-pink-500">
+                    <div class="w-12 h-12 bg-pink-500/20 rounded-2xl flex items-center justify-center text-pink-400 mr-4"><i class="fas fa-language"></i></div>
+                    <div><h4 class="font-extrabold">Sinhala</h4><p class="text-[10px] text-slate-500 uppercase font-bold">සිංහල</p></div>
                 </div>
-            </div>
-
-            <div onclick="openUniInfo()" class="glass-card p-6 border-2 border-dashed border-yellow-500/20 flex items-center cursor-pointer bg-yellow-500/[0.02]">
-                <div class="w-12 h-12 bg-yellow-500/20 rounded-2xl flex items-center justify-center text-yellow-500 mr-4"><i class="fas fa-graduation-cap"></i></div>
-                <div><h4 class="font-black text-lg text-yellow-500 leading-tight">University Info</h4><p class="text-[9px] text-slate-500 uppercase font-bold">Check Z-Scores & Campuses</p></div>
+                <div onclick="openSubject('Economics')" class="glass-card p-6 flex items-center cursor-pointer border-l-4 border-emerald-500">
+                    <div class="w-12 h-12 bg-emerald-500/20 rounded-2xl flex items-center justify-center text-emerald-400 mr-4"><i class="fas fa-chart-line"></i></div>
+                    <div><h4 class="font-extrabold">Economics</h4><p class="text-[10px] text-slate-500 uppercase font-bold">ආර්ථික විද්‍යාව</p></div>
+                </div>
+                <div onclick="openSubject('Logic')" class="glass-card p-6 flex items-center cursor-pointer border-l-4 border-cyan-500">
+                    <div class="w-12 h-12 bg-cyan-500/20 rounded-2xl flex items-center justify-center text-cyan-400 mr-4"><i class="fas fa-brain"></i></div>
+                    <div><h4 class="font-extrabold">Logic</h4><p class="text-[10px] text-slate-500 uppercase font-bold">තර්ක ශාස්ත්‍රය</p></div>
+                </div>
+                <div onclick="openSubject('History')" class="glass-card p-6 flex items-center cursor-pointer border-l-4 border-red-500">
+                    <div class="w-12 h-12 bg-red-500/20 rounded-2xl flex items-center justify-center text-red-400 mr-4"><i class="fas fa-history"></i></div>
+                    <div><h4 class="font-extrabold">History</h4><p class="text-[10px] text-slate-500 uppercase font-bold">ඉතිහාසය</p></div>
+                </div>
+                <div onclick="openSubject('Geography')" class="glass-card p-6 flex items-center cursor-pointer border-l-4 border-blue-400">
+                    <div class="w-12 h-12 bg-blue-400/20 rounded-2xl flex items-center justify-center text-blue-400 mr-4"><i class="fas fa-globe"></i></div>
+                    <div><h4 class="font-extrabold">Geography</h4><p class="text-[10px] text-slate-500 uppercase font-bold">භූගෝල විද්‍යාව</p></div>
+                </div>
             </div>
         </div>
 
-        <!-- Leaderboard View -->
+        <!-- Rank View -->
         <div id="rank-view" class="hidden">
-            <h2 class="text-2xl font-black mb-6 text-center italic text-yellow-500">Weekly Top Scorers</h2>
+            <h2 class="text-2xl font-black mb-6 text-center text-yellow-500 uppercase">Leaderboard</h2>
             <div id="rank-list" class="space-y-4"></div>
         </div>
 
@@ -109,81 +118,85 @@
         <div id="profile-view" class="hidden">
             <div class="text-center mb-8">
                 <div class="relative inline-block">
-                    <img id="profile-pic-large" src="https://ui-avatars.com/api/?name=User&background=random" class="w-24 h-24 rounded-full border-4 border-yellow-500 object-cover mb-4 mx-auto">
-                    <label class="absolute bottom-2 right-0 bg-yellow-500 p-2 rounded-full cursor-pointer shadow-lg">
-                        <i class="fas fa-camera text-black text-xs"></i>
-                        <input type="file" id="upload-pic" class="hidden" accept="image/*" onchange="uploadProfilePic(this)">
-                    </label>
+                    <img id="profile-pic-large" src="https://ui-avatars.com/api/?name=User" class="w-24 h-24 rounded-full border-4 border-yellow-500 object-cover mx-auto mb-4">
+                    <label class="absolute bottom-1 right-0 bg-yellow-500 p-2 rounded-full cursor-pointer"><i class="fas fa-camera text-black text-xs"></i><input type="file" class="hidden" onchange="uploadProfilePic(this)"></label>
                 </div>
                 <h2 id="user-display-name-profile" class="text-2xl font-black">Student</h2>
-                <p id="user-display-email" class="text-xs text-slate-500"></p>
             </div>
             <div class="space-y-3">
-                <button onclick="resetPasswordPopup()" class="w-full glass-card p-5 flex justify-between items-center">Reset Password <i class="fas fa-shield-halved"></i></button>
-                <button onclick="showFeedback()" class="w-full glass-card p-5 flex justify-between items-center">Send Feedback <i class="fas fa-paper-plane"></i></button>
-                <div class="p-8 glass-card bg-yellow-500/5 text-center mt-6">
-                    <p class="text-[10px] text-slate-500 uppercase font-black mb-2">Developed By</p>
-                    <h3 class="text-2xl font-black italic tracking-tighter">KD CREATION <span class="text-yellow-500 text-sm">PRO</span></h3>
+                <button onclick="showResetModal()" class="w-full glass-card p-5 flex justify-between">Reset Password <i class="fas fa-key"></i></button>
+                <div class="grid grid-cols-3 gap-2 mt-4">
+                    <a href="#" class="glass-card p-4 text-center text-red-500"><i class="fab fa-youtube text-2xl"></i></a>
+                    <a href="#" class="glass-card p-4 text-center text-blue-500"><i class="fab fa-facebook text-2xl"></i></a>
+                    <a href="#" class="glass-card p-4 text-center text-green-500"><i class="fab fa-whatsapp text-2xl"></i></a>
                 </div>
-                <button onclick="handleLogout()" class="w-full p-5 bg-red-500/10 text-red-500 rounded-3xl font-black border border-red-500/20 mt-4">LOGOUT</button>
+                <button onclick="handleLogout()" class="w-full p-5 bg-red-500/10 text-red-500 rounded-3xl font-black mt-6 border border-red-500/20">LOGOUT</button>
             </div>
         </div>
 
-        <!-- AI View -->
+        <!-- AI Chat -->
         <div id="ai-view" class="hidden">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 bg-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/20"><i class="fas fa-robot text-black"></i></div>
-                <div><h2 class="font-black text-lg">Fast Track AI</h2><p class="text-[9px] text-emerald-500 font-bold uppercase">Online & Ready to Help</p></div>
-            </div>
-            <div id="ai-chat-output" class="h-[400px] overflow-y-auto space-y-4 mb-6 p-4 rounded-3xl bg-slate-900/30 border border-white/5">
-                <div class="text-left"><div class="glass-card p-4 text-sm inline-block max-w-[80%]">ආයුබෝවන්! මම Fast Track AI. ඔබට අද කුමන විෂයකින්ද සහාය අවශ්‍ය?</div></div>
-            </div>
-            <div class="flex gap-2 p-2 bg-slate-900 rounded-2xl border border-slate-700">
-                <input type="text" id="ai-input" placeholder="ප්‍රශ්නය මෙතැන ලියන්න..." class="flex-1 bg-transparent p-3 outline-none text-sm">
-                <button onclick="askGemini()" class="w-12 h-12 bg-cyan-600 rounded-xl hover:bg-cyan-500 transition-colors shadow-lg"><i class="fas fa-paper-plane text-white"></i></button>
+            <div id="ai-chat-output" class="h-[400px] overflow-y-auto space-y-4 mb-4 p-4"></div>
+            <div class="flex gap-2 bg-slate-900 p-2 rounded-2xl border border-slate-700">
+                <input type="text" id="ai-input" placeholder="Ask anything..." class="flex-1 bg-transparent p-3 outline-none">
+                <button onclick="askGemini()" class="w-12 h-12 bg-cyan-600 rounded-xl"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
     </div>
 
     <!-- Subject Screen -->
     <div id="subject-screen" class="hidden min-h-screen p-6 pb-32">
-        <button onclick="backToDashboard()" class="mb-8 text-slate-500 font-black text-xs tracking-widest"><i class="fas fa-chevron-left mr-2"></i> BACK TO DASHBOARD</button>
+        <button onclick="backToDashboard()" class="mb-8 font-black text-slate-500 uppercase text-xs"><i class="fas fa-chevron-left mr-2"></i> Back</button>
         <h1 id="selected-subject-name" class="text-3xl font-black text-yellow-500 mb-8 uppercase tracking-tighter">Subject</h1>
-        <div class="flex space-x-2 mb-8 bg-slate-900 p-1 rounded-2xl border border-white/5">
-            <button onclick="showTab('quiz')" id="btn-quiz" class="flex-1 py-4 rounded-xl font-black text-xs">UNIT QUIZ</button>
-            <button onclick="showTab('papers')" id="btn-papers" class="flex-1 py-4 rounded-xl font-black text-xs">PAST PAPERS</button>
+        <div class="flex space-x-2 mb-8 bg-slate-900 p-1 rounded-2xl">
+            <button onclick="showTab('quiz')" id="btn-quiz" class="flex-1 py-4 rounded-xl font-black text-xs uppercase">Units</button>
+            <button onclick="showTab('papers')" id="btn-papers" class="flex-1 py-4 rounded-xl font-black text-xs uppercase">Papers</button>
         </div>
         <div id="quiz-tab" class="tab-content active-tab"><div id="lesson-list" class="space-y-4"></div><div id="quiz-area" class="hidden"></div></div>
         <div id="papers-tab" class="tab-content"><div id="paper-list" class="space-y-4"></div><div id="paper-quiz-area" class="hidden"></div></div>
     </div>
 
-    <!-- Modals -->
-    <div id="uni-screen" class="hidden min-h-screen p-6 pb-32">
-        <button onclick="backToDashboard()" class="mb-8 font-black opacity-50"><i class="fas fa-arrow-left"></i> BACK</button>
-        <h1 class="text-4xl font-black text-yellow-500 mb-8 italic uppercase">University Info</h1>
-        <div class="glass-card p-10 text-center border-yellow-500/20"><i class="fas fa-clock text-4xl mb-4 text-yellow-500 opacity-20"></i><p class="text-slate-400">Z-Score සහ Campus තොරතුරු යාවත්කාලීන වෙමින් පවතී...</p></div>
+    <!-- Result Modal (For Image Generation) -->
+    <div id="result-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl">
+        <div id="certificate-container" class="text-center">
+            <div id="result-download-card">
+                <h1 class="text-yellow-500 font-black text-3xl mb-2">FAST TRACK PRO</h1>
+                <p class="text-slate-400 uppercase tracking-widest text-[10px] mb-8">Performance Certificate</p>
+                <div class="w-20 h-20 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-6"><i class="fas fa-trophy text-3xl text-yellow-500"></i></div>
+                <h2 id="res-name" class="text-2xl font-bold mb-1">Student Name</h2>
+                <p id="res-subject" class="text-yellow-500 font-bold mb-6 italic">Subject Name</p>
+                <div class="bg-white/5 p-6 rounded-2xl mb-8">
+                    <p class="text-slate-500 text-xs uppercase font-bold">Your Score</p>
+                    <h3 id="res-score" class="text-5xl font-black">00/00</h3>
+                </div>
+                <p class="text-[10px] text-slate-500 uppercase font-bold tracking-tighter">Congratulations on completing the quiz!</p>
+            </div>
+            <div class="flex gap-4 mt-8">
+                <button onclick="downloadResult()" class="flex-1 bg-yellow-500 text-black p-4 rounded-2xl font-black uppercase text-xs">Download Image</button>
+                <button onclick="closeResult()" class="flex-1 bg-white/10 text-white p-4 rounded-2xl font-black uppercase text-xs">Close</button>
+            </div>
+        </div>
     </div>
 
-    <!-- Bottom Nav -->
-    <nav id="bottom-nav" class="hidden fixed bottom-6 left-6 right-6 h-20 glass-card flex justify-around items-center px-4 z-50 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-white/10">
+    <!-- Custom Password Reset Modal -->
+    <div id="reset-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/80">
+        <div class="w-full max-w-xs glass-card p-8 text-center border-yellow-500/30">
+            <h3 class="text-xl font-black mb-4">Reset Password?</h3>
+            <p class="text-xs text-slate-400 mb-6 leading-relaxed">අපි ඔබගේ Email ලිපිනයට මුරපදය අලුත් කිරීමට (Reset) ලින්ක් එකක් එවීමට අවශ්‍යද?</p>
+            <button onclick="confirmReset()" class="w-full bg-yellow-500 text-black p-4 rounded-2xl font-black mb-3">ඔව්, එවන්න</button>
+            <button onclick="hideResetModal()" class="w-full p-4 text-[10px] font-black uppercase opacity-50">දැන් අවශ්‍ය නැත</button>
+        </div>
+    </div>
+
+    <!-- Nav -->
+    <nav id="bottom-nav" class="hidden fixed bottom-6 left-6 right-6 h-20 glass-card flex justify-around items-center px-4 z-50">
         <button onclick="changeView('home')" id="nav-home" class="p-4 nav-active"><i class="fas fa-house-chimney text-xl"></i></button>
         <button onclick="changeView('ai')" id="nav-ai" class="p-4 text-slate-500"><i class="fas fa-robot text-xl"></i></button>
         <button onclick="changeView('rank')" id="nav-rank" class="p-4 text-slate-500"><i class="fas fa-trophy text-xl"></i></button>
         <button onclick="changeView('profile')" id="nav-profile" class="p-4 text-slate-500"><i class="fas fa-user-gear text-xl"></i></button>
     </nav>
 
-    <!-- Feedback Modal -->
-    <div id="feedback-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-8 bg-black/95 backdrop-blur-xl">
-        <div class="w-full max-w-sm glass-card p-10 border-yellow-500/30">
-            <h3 class="text-xl font-black mb-4">Send Feedback</h3>
-            <textarea id="feedback-text" rows="5" class="w-full bg-slate-900 p-5 rounded-2xl border border-slate-700 outline-none text-white mb-6 text-sm" placeholder="ඔබේ අදහස් මෙතැන ලියන්න..."></textarea>
-            <button onclick="submitFeedback()" class="w-full bg-yellow-500 text-black font-black p-5 rounded-2xl shadow-xl">SEND NOW</button>
-            <button onclick="closeFeedback()" class="w-full mt-4 text-[10px] font-black opacity-30 uppercase tracking-widest">CLOSE</button>
-        </div>
-    </div>
-
     <script>
-        // --- FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyB_10UzdkgZPlu-P361PYbEQjTwbKjjWx0",
             authDomain: "al-fast-track.firebaseapp.com",
@@ -197,151 +210,16 @@
         const db = firebase.firestore();
         const storage = firebase.storage();
 
-        // --- AUTH LOGIC ---
-        function toggleAuthMode() {
-            const isReg = document.getElementById('register-fields').classList.toggle('hidden');
-            document.getElementById('auth-btn').innerText = isReg ? "REGISTER" : "LOGIN";
-            document.getElementById('toggle-btn').innerText = isReg ? "Already have an account?" : "Register";
-        }
-
-        async function handleAuth() {
-            const email = document.getElementById('auth-email').value;
-            const password = document.getElementById('auth-password').value;
-            const name = document.getElementById('reg-name').value;
-            try {
-                if(document.getElementById('auth-btn').innerText === "LOGIN") await auth.signInWithEmailAndPassword(email, password);
-                else {
-                    const res = await auth.createUserWithEmailAndPassword(email, password);
-                    await res.user.updateProfile({displayName: name});
-                    await db.collection("users").doc(res.user.uid).set({
-                        name, email, streak: 1, points: 0, photoURL: "", lastLogin: new Date().toDateString(), weekStart: new Date().toISOString()
-                    });
-                }
-            } catch(e) { alert(e.message); }
-        }
-
-        auth.onAuthStateChanged(user => {
-            if(user) {
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('dashboard').classList.remove('hidden');
-                document.getElementById('bottom-nav').classList.remove('hidden');
-                document.getElementById('user-display-name-header').innerText = user.displayName || "Student";
-                document.getElementById('user-display-name-profile').innerText = user.displayName || "Student";
-                document.getElementById('user-display-email').innerText = user.email;
-                if(user.photoURL) {
-                    document.getElementById('user-avatar').src = user.photoURL;
-                    document.getElementById('profile-pic-large').src = user.photoURL;
-                }
-                updateStreakAndPoints(user.uid);
-            }
-        });
-
-        // --- PASSWORD RESET ---
-        async function resetPasswordPopup() {
-            const email = auth.currentUser ? auth.currentUser.email : document.getElementById('auth-email').value;
-            if(!email) return alert("කරුණාකර Email ලිපිනය ඇතුළත් කරන්න.");
-            
-            if(confirm("ඔබට මුරපදය වෙනස් කිරීමට (Password Reset) ඊමේල් පණිවිඩයක් අවශ්‍යද?")) {
-                try {
-                    await auth.sendPasswordResetEmail(email);
-                    alert("Reset Link එක සාර්ථකව යොමු කළා! කරුණාකර ඔබේ Inbox එක හෝ Spam Folder එක පරීක්ෂා කරන්න.");
-                } catch(e) { alert("Error: " + e.message); }
-            }
-        }
-
-        // --- PROFILE IMAGE UPLOAD ---
-        async function uploadProfilePic(input) {
-            const file = input.files[0];
-            if(!file) return;
-            const ref = storage.ref(`profiles/${auth.currentUser.uid}`);
-            await ref.put(file);
-            const url = await ref.getDownloadURL();
-            await auth.currentUser.updateProfile({photoURL: url});
-            await db.collection("users").doc(auth.currentUser.uid).update({photoURL: url});
-            location.reload();
-        }
-
-        // --- POINTS & LEADERBOARD LOGIC ---
-        async function updateStreakAndPoints(uid) {
-            const ref = db.collection("users").doc(uid);
-            const doc = await ref.get();
-            if(doc.exists) {
-                const d = doc.data();
-                document.getElementById('streak-count').innerText = d.streak || 0;
-                document.getElementById('user-total-points').innerText = d.points || 0;
-            }
-        }
-
-        async function fetchRank() {
-            const list = document.getElementById('rank-list');
-            list.innerHTML = "<div class='text-center py-10 opacity-50'>Ranking loading...</div>";
-            
-            // සතියක කාලය පරීක්ෂා කිරීම (Simplified: Reset logic based on score filtering)
-            const snap = await db.collection("users").orderBy("points", "desc").limit(10).get();
-            list.innerHTML = "";
-            
-            snap.forEach((doc, i) => {
-                const d = doc.data();
-                const isTop3 = i < 3;
-                const cardClass = isTop3 ? 'leader-gold' : '';
-                const icon = i === 0 ? '👑' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
-                const photo = d.photoURL || `https://ui-avatars.com/api/?name=${d.name}`;
-
-                list.innerHTML += `
-                    <div class="glass-card p-4 flex justify-between items-center ${cardClass}">
-                        <div class="flex items-center gap-4">
-                            <span class="font-black text-yellow-500 w-8">${icon}</span>
-                            <img src="${photo}" class="w-10 h-10 rounded-full object-cover">
-                            <span class="font-bold text-sm">${d.name}</span>
-                        </div>
-                        <span class="bg-yellow-500 text-black px-3 py-1 rounded-full text-[10px] font-black">${d.points} PTS</span>
-                    </div>`;
-            });
-        }
-
-        // --- ADVANCED AI CHAT ---
-        async function askGemini() {
-            const input = document.getElementById('ai-input');
-            const output = document.getElementById('ai-chat-output');
-            const msg = input.value.trim();
-            if(!msg) return;
-
-            output.innerHTML += `<div class='text-right'><span class='bg-yellow-500 text-black p-3 rounded-2xl text-sm inline-block max-w-[80%]'>${msg}</span></div>`;
-            input.value = "";
-            output.scrollTop = output.scrollHeight;
-
-            try {
-                // සටහන: ඔබේ සැබෑ API Key එක මෙතැනට ඇතුළත් කරන්න
-                const key = "AIzaSyDXXXXXXXXXXXX_YOUR_REAL_API_KEY"; 
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
-                    method:'POST',
-                    headers:{'Content-Type':'application/json'},
-                    body:JSON.stringify({
-                        "contents": [{
-                            "parts":[{ "text": `You are a helpful Sri Lankan A/L teacher. Explain this in simple Sinhala: ${msg}` }]
-                        }]
-                    })
-                });
-                const data = await response.json();
-                const aiMsg = data.candidates[0].content.parts[0].text;
-                output.innerHTML += `<div class='text-left'><div class='glass-card p-4 text-sm inline-block max-w-[80%]'>${aiMsg}</div></div>`;
-                output.scrollTop = output.scrollHeight;
-            } catch(e) {
-                output.innerHTML += `<div class='text-left'><div class='glass-card p-4 text-red-400 text-sm'>AI සම්බන්ධ වීමට නොහැක. කරුණාකර පසුව උත්සාහ කරන්න.</div></div>`;
-            }
-        }
-
-        // --- CORE SYSTEM DATA ---
+        // Subjects & Quiz Logic
         const unitQuizData = {
             "Media Studies": { "Unit 01: පදනම": [{ q: "සන්නිවේදනයේ මූලික අංගය?", options: ["මූලාශ්‍රය", "පෑන", "පොත", "කැලෑව"], correct: 0 }] },
-            "Political Science": { "Unit 01: හැඳින්වීම": [{ q: "දේශපාලන විද්‍යාවේ පියා?", options: ["සොක්‍රටීස්", "ඇරිස්ටෝටල්", "ප්ලේටෝ", "මාක්ස්"], correct: 1 }] },
-            "Buddhist Civilization": { "Unit 01": [] }, "Logic": { "Unit 01": [] }, "History": { "Unit 01": [] }, "Geography": { "Unit 01": [] }
+            "Political Science": { "Unit 01": [{ q: "දේශපාලනයේ පියා?", options: ["සොක්‍රටීස්", "ඇරිස්ටෝටල්", "ප්ලේටෝ"], correct: 1 }] },
+            "Buddhist Civilization": { "Unit 01": [] }, "Sinhala": { "Unit 01": [] }, "Economics": { "Unit 01": [] }, "Logic": { "Unit 01": [] }, "History": { "Unit 01": [] }, "Geography": { "Unit 01": [] }
         };
-
-        const pastPaperQuizData = { "Media Studies": {}, "Political Science": {}, "Buddhist Civilization": {}, "Logic": {}, "History": {}, "Geography": {} };
+        const pastPaperQuizData = { "Media Studies": {}, "Political Science": {}, "Buddhist Civilization": {}, "Sinhala": {}, "Economics": {}, "Logic": {}, "History": {}, "Geography": {} };
         let currentSubject = "";
 
-        // --- UI FLOW LOGIC ---
+        // UI Helpers
         function changeView(view) {
             ['home', 'ai', 'rank', 'profile'].forEach(v => {
                 document.getElementById(v + '-view').classList.add('hidden');
@@ -361,20 +239,15 @@
         }
 
         function backToDashboard() {
-            document.querySelectorAll('#subject-screen, #uni-screen').forEach(s => s.classList.add('hidden'));
+            document.getElementById('subject-screen').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
-        }
-
-        function openUniInfo() {
-            document.getElementById('dashboard').classList.add('hidden');
-            document.getElementById('uni-screen').classList.remove('hidden');
         }
 
         function showTab(tab) {
             document.getElementById('quiz-tab').classList.toggle('active-tab', tab === 'quiz');
             document.getElementById('papers-tab').classList.toggle('active-tab', tab === 'papers');
-            document.getElementById('btn-quiz').className = tab === 'quiz' ? "flex-1 py-4 rounded-xl font-black bg-yellow-500 text-black shadow-lg" : "flex-1 py-4 rounded-xl font-black text-slate-500";
-            document.getElementById('btn-papers').className = tab === 'papers' ? "flex-1 py-4 rounded-xl font-black bg-yellow-500 text-black shadow-lg" : "flex-1 py-4 rounded-xl font-black text-slate-500";
+            document.getElementById('btn-quiz').className = tab === 'quiz' ? "flex-1 py-4 rounded-xl font-black bg-yellow-500 text-black" : "flex-1 py-4 rounded-xl font-black text-slate-500";
+            document.getElementById('btn-papers').className = tab === 'papers' ? "flex-1 py-4 rounded-xl font-black bg-yellow-500 text-black" : "flex-1 py-4 rounded-xl font-black text-slate-500";
             if(tab === 'quiz') loadList('lesson-list', unitQuizData[currentSubject], 'unit');
             else loadList('paper-list', pastPaperQuizData[currentSubject], 'paper');
         }
@@ -382,14 +255,11 @@
         function loadList(id, data, type) {
             const container = document.getElementById(id);
             container.innerHTML = "";
-            if(!data || Object.keys(data).length === 0) {
-                container.innerHTML = "<p class='text-center opacity-30 py-10'>මෙහි ප්‍රශ්න ඇතුළත් කර නොමැත.</p>";
-                return;
-            }
+            if(!data || Object.keys(data).length === 0) { container.innerHTML = "<p class='text-center opacity-20 py-10'>ප්‍රශ්න පත්‍ර නොමැත.</p>"; return; }
             Object.keys(data).forEach(key => {
                 const div = document.createElement('div');
-                div.className = "glass-card p-6 border-l-4 border-yellow-500 flex justify-between items-center cursor-pointer active:scale-95 transition-all";
-                div.innerHTML = `<span class="font-bold">${key}</span> <i class="fas fa-play-circle text-yellow-500 text-xl"></i>`;
+                div.className = "glass-card p-6 flex justify-between cursor-pointer border-l-4 border-yellow-500";
+                div.innerHTML = `<span>${key}</span> <i class="fas fa-play"></i>`;
                 div.onclick = () => startQuiz(key, type);
                 container.appendChild(div);
             });
@@ -404,19 +274,19 @@
             const list = type === 'unit' ? document.getElementById('lesson-list') : document.getElementById('paper-list');
             list.classList.add('hidden');
             area.classList.remove('hidden');
-            area.innerHTML = `<button onclick="showTab('${type === 'unit' ? 'quiz' : 'papers'}')" class="mb-6 opacity-50 text-xs font-bold"><i class="fas fa-arrow-left"></i> BACK</button>`;
+            area.innerHTML = `<button onclick="showTab('${type === 'unit' ? 'quiz' : 'papers'}')" class="mb-4 opacity-50"><i class="fas fa-arrow-left"></i> BACK</button>`;
             
             let score = 0;
             questions.forEach((q, idx) => {
-                const card = document.createElement('div'); card.className = "glass-card p-8 mb-6";
-                card.innerHTML = `<p class="mb-6 font-bold text-lg leading-snug">${idx+1}. ${q.q}</p>`;
+                const card = document.createElement('div'); card.className = "glass-card p-8 mb-4";
+                card.innerHTML = `<p class="mb-4 font-bold">${idx+1}. ${q.q}</p>`;
                 q.options.forEach((opt, oIdx) => {
                     const btn = document.createElement('button');
-                    btn.className = "w-full text-left p-5 mb-3 rounded-2xl bg-slate-900/50 border border-white/5 transition-all hover:border-yellow-500/50";
+                    btn.className = "w-full text-left p-4 mb-2 rounded-xl bg-slate-900 border border-white/5";
                     btn.innerText = opt;
                     btn.onclick = () => {
                         const allBtns = card.querySelectorAll('button');
-                        if(oIdx === q.correct) { btn.classList.add('bg-green-600/40', 'border-green-500'); score++; }
+                        if(oIdx === q.correct) { btn.classList.add('bg-green-600'); score++; }
                         else { btn.classList.add('wrong-shake'); allBtns[q.correct].classList.add('show-correct'); }
                         allBtns.forEach(b => b.disabled = true);
                     };
@@ -426,39 +296,113 @@
             });
 
             const fBtn = document.createElement('button');
-            fBtn.className = "w-full p-5 bg-yellow-500 text-black font-black rounded-3xl mt-6 shadow-xl";
+            fBtn.className = "w-full p-5 bg-yellow-500 text-black font-black rounded-3xl mt-4";
             fBtn.innerText = "FINISH & COLLECT POINTS";
             fBtn.onclick = async () => {
-                const pointsEarned = score * 10; // එක් ප්‍රශ්නයකට ලකුණු 10 බැගින්
-                await db.collection("users").doc(auth.currentUser.uid).update({
-                    points: firebase.firestore.FieldValue.increment(pointsEarned)
-                });
-                alert(`සම්පූර්ණයි! ඔබ ලකුණු ${pointsEarned} ක් ලබාගත්තා.`);
-                showTab(type === 'unit' ? 'quiz' : 'papers');
+                await db.collection("users").doc(auth.currentUser.uid).update({ points: firebase.firestore.FieldValue.increment(score * 10) });
+                showResult(score, questions.length);
             };
             area.appendChild(fBtn);
         }
 
-        // --- UTILS ---
+        // Custom Result & Download
+        function showResult(score, total) {
+            document.getElementById('res-name').innerText = auth.currentUser.displayName;
+            document.getElementById('res-subject').innerText = currentSubject;
+            document.getElementById('res-score').innerText = `${score}/${total}`;
+            document.getElementById('result-modal').classList.remove('hidden');
+        }
+
+        function downloadResult() {
+            const card = document.getElementById('result-download-card');
+            html2canvas(card).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `FastTrack_Result_${currentSubject}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+
+        function closeResult() {
+            document.getElementById('result-modal').classList.add('hidden');
+            backToDashboard();
+        }
+
+        // Custom Reset Logic
+        function showResetModal() { document.getElementById('reset-modal').classList.remove('hidden'); }
+        function hideResetModal() { document.getElementById('reset-modal').classList.add('hidden'); }
+        async function confirmReset() {
+            const email = auth.currentUser ? auth.currentUser.email : document.getElementById('auth-email').value;
+            if(!email) return alert("Email required!");
+            try {
+                await auth.sendPasswordResetEmail(email);
+                alert("Reset Email එක සාර්ථකව යොමු කළා! කරුණාකර ඔබේ Gmail එකෙහි Inbox එක හෝ Spam folder එක පරීක්ෂා කරන්න.");
+                hideResetModal();
+            } catch(e) { alert(e.message); }
+        }
+
+        // Auth & Other
+        async function handleAuth() {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const name = document.getElementById('reg-name').value;
+            try {
+                if(document.getElementById('auth-btn').innerText === "LOGIN") await auth.signInWithEmailAndPassword(email, password);
+                else {
+                    const res = await auth.createUserWithEmailAndPassword(email, password);
+                    await res.user.updateProfile({displayName: name});
+                    await db.collection("users").doc(res.user.uid).set({ name, email, points: 0, streak: 1, lastLogin: new Date().toDateString() });
+                }
+            } catch(e) { alert(e.message); }
+        }
+
+        auth.onAuthStateChanged(user => {
+            if(user) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                document.getElementById('bottom-nav').classList.remove('hidden');
+                document.getElementById('user-display-name-header').innerText = user.displayName;
+                document.getElementById('user-display-name-profile').innerText = user.displayName;
+                if(user.photoURL) {
+                    document.getElementById('user-avatar').src = user.photoURL;
+                    document.getElementById('profile-pic-large').src = user.photoURL;
+                }
+                updateDashboard(user.uid);
+            }
+        });
+
+        async function updateDashboard(uid) {
+            const doc = await db.collection("users").doc(uid).get();
+            if(doc.exists) {
+                document.getElementById('user-total-points').innerText = doc.data().points || 0;
+                document.getElementById('streak-count').innerText = doc.data().streak || 1;
+            }
+        }
+
+        async function uploadProfilePic(input) {
+            const file = input.files[0];
+            if(!file) return;
+            const ref = storage.ref(`profiles/${auth.currentUser.uid}`);
+            await ref.put(file);
+            const url = await ref.getDownloadURL();
+            await auth.currentUser.updateProfile({photoURL: url});
+            await db.collection("users").doc(auth.currentUser.uid).update({photoURL: url});
+            location.reload();
+        }
+
+        function toggleAuthMode() {
+            const isReg = document.getElementById('register-fields').classList.toggle('hidden');
+            document.getElementById('auth-btn').innerText = isReg ? "REGISTER" : "LOGIN";
+        }
+
         function updateTimer() {
             const gap = new Date("Aug 10, 2026").getTime() - new Date().getTime();
-            document.getElementById('cd-days').innerText = String(Math.max(0, Math.floor(gap / (1000*60*60*24)))).padStart(2, '0');
-            document.getElementById('cd-hours').innerText = String(Math.max(0, Math.floor((gap % (1000*60*60*24)) / (1000*60*60)))).padStart(2, '0');
-            document.getElementById('cd-mins').innerText = String(Math.max(0, Math.floor((gap % (1000*60*60)) / (1000*60)))).padStart(2, '0');
+            document.getElementById('cd-days').innerText = String(Math.floor(gap / (1000*60*60*24))).padStart(2, '0');
+            document.getElementById('cd-hours').innerText = String(Math.floor((gap % (1000*60*60*24)) / (1000*60*60))).padStart(2, '0');
+            document.getElementById('cd-mins').innerText = String(Math.floor((gap % (1000*60*60)) / (1000*60))).padStart(2, '0');
         }
-        setInterval(updateTimer, 60000); updateTimer();
-
+        setInterval(updateTimer, 1000); updateTimer();
         function handleLogout() { auth.signOut().then(() => location.reload()); }
-        function showFeedback() { document.getElementById('feedback-modal').classList.remove('hidden'); }
-        function closeFeedback() { document.getElementById('feedback-modal').classList.add('hidden'); }
-        async function submitFeedback() {
-            const msg = document.getElementById('feedback-text').value;
-            if(!msg) return;
-            await db.collection("feedbacks").add({
-                uid: auth.currentUser.uid, name: auth.currentUser.displayName, message: msg, timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            alert("අදහස් ලබාදීම ගැන ස්තුතියි!"); closeFeedback();
-        }
     </script>
 </body>
 </html>
