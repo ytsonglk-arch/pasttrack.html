@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A/L Fast Track Pro | Elite Edition</title>
+    <title>A/L Fast Track Pro | KD Creation</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Noto+Sans+Sinhala:wght@400;700&display=swap" rel="stylesheet">
@@ -19,130 +19,148 @@
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 1.5rem; }
         .active-nav { color: var(--primary); filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4)); transform: translateY(-2px); }
         .countdown-box { background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80'); background-size: cover; background-position: center; border: 1px solid rgba(251, 191, 36, 0.2); }
-        .custom-modal { background: rgba(2, 6, 23, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .custom-modal { background: rgba(2, 6, 23, 0.98); backdrop-filter: blur(25px); border: 1px solid rgba(251, 191, 36, 0.2); }
     </style>
 </head>
 <body class="pb-28">
 
     <!-- Auth Screen -->
     <div id="auth-screen" class="min-h-screen flex items-center justify-center p-6">
-        <div class="w-full max-w-sm glass p-8 text-center border-amber-500/20">
+        <div class="w-full max-w-sm glass p-8 text-center">
             <h1 class="text-3xl font-extrabold text-amber-400 mb-2 italic">FAST TRACK PRO</h1>
-            <p class="text-[10px] tracking-[0.5em] text-slate-500 mb-8 uppercase">Future University Students</p>
+            <p class="text-[10px] tracking-[0.5em] text-slate-500 mb-8 uppercase">Developed by KD Creation</p>
             <div id="reg-fields" class="hidden"><input type="text" id="user-name" placeholder="ඔබේ නම" class="w-full p-4 mb-4 glass bg-slate-900/50 outline-none focus:border-amber-500"></div>
             <input type="email" id="email" placeholder="Email" class="w-full p-4 mb-4 glass bg-slate-900/50 outline-none focus:border-amber-500">
             <input type="password" id="pass" placeholder="Password" class="w-full p-4 mb-6 glass bg-slate-900/50 outline-none focus:border-amber-500">
-            <button onclick="handleAuth()" id="auth-btn" class="w-full p-4 bg-amber-500 text-black font-black rounded-xl hover:scale-95 transition-all">LOGIN</button>
+            <button onclick="handleAuth()" id="auth-btn" class="w-full p-4 bg-amber-500 text-black font-black rounded-xl hover:scale-95 transition-all shadow-lg">LOGIN</button>
             <button onclick="toggleAuth()" id="toggle-txt" class="mt-6 text-sm text-amber-500/70 underline">නව ගිණුමක් සාදන්න</button>
         </div>
     </div>
 
     <!-- Main Dashboard -->
     <div id="dashboard" class="hidden p-6 max-w-2xl mx-auto">
+        <!-- Header -->
         <header class="flex justify-between items-center mb-8">
             <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-full border-2 border-amber-500 overflow-hidden"><img id="header-avatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-full h-full object-cover"></div>
-                <div><p class="text-[10px] text-amber-500 font-bold uppercase tracking-tighter">Academic Portal</p><h2 id="display-name" class="font-black text-lg">Student</h2></div>
+                <div class="w-12 h-12 rounded-full border-2 border-amber-500 overflow-hidden bg-slate-800">
+                    <img id="header-avatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-full h-full object-cover">
+                </div>
+                <div><p class="text-[10px] text-amber-500 font-bold uppercase">A/L 2026</p><h2 id="display-name" class="font-black text-lg">Student</h2></div>
             </div>
             <div class="glass px-4 py-2 border-amber-500/30"><span id="user-points" class="font-black text-amber-400">0</span> <span class="text-[10px] text-slate-500 font-bold">PTS</span></div>
         </header>
 
+        <!-- Views -->
         <div id="home-view">
             <div class="countdown-box p-8 rounded-[2rem] mb-8 text-white relative shadow-2xl">
-                <p class="text-center text-[10px] font-bold uppercase tracking-widest mb-4 opacity-70">Days to Exam 2026</p>
+                <p class="text-center text-[10px] font-bold uppercase tracking-widest mb-4 opacity-70">Exam Countdown</p>
                 <div class="flex justify-around items-center">
                     <div class="text-center"><span id="d-days" class="text-4xl font-black">00</span><p class="text-[8px] opacity-60">DAYS</p></div>
-                    <div class="text-center"><span id="d-hrs" class="text-4xl font-black text-amber-500">00</span><p class="text-[8px] opacity-60">HRS</p></div>
+                    <div class="text-center"><span id="d-hrs" class="text-4xl font-black text-amber-400">00</span><p class="text-[8px] opacity-60">HRS</p></div>
                     <div class="text-center"><span id="d-min" class="text-4xl font-black">00</span><p class="text-[8px] opacity-60">MINS</p></div>
                 </div>
             </div>
 
-            <div class="glass p-4 mb-8 flex items-center gap-4 bg-gradient-to-r from-amber-500/10 to-transparent">
-                <i class="fas fa-lightbulb text-amber-400 text-xl animate-pulse"></i>
-                <p class="text-[11px] italic text-slate-300" id="tip-text">ප්‍රශ්න පත්‍ර කිරීමට පෙර පාඩම හොඳින් කියවන්න.</p>
+            <div class="glass p-4 mb-8 flex items-center gap-4 border-l-4 border-amber-500">
+                <i class="fas fa-lightbulb text-amber-400 animate-pulse"></i>
+                <p class="text-[11px] italic text-slate-300">Daily Tip: පසුගිය විභාග ප්‍රශ්න පත්‍ර වැඩිපුර පුහුණු වන්න.</p>
             </div>
 
-            <h3 class="text-xs font-black text-slate-500 mb-4 uppercase tracking-widest">Available Subjects</h3>
+            <h3 class="text-xs font-black text-slate-500 mb-4 uppercase tracking-widest">Select Subject</h3>
             <div class="grid grid-cols-1 gap-4 mb-8" id="subjects-container"></div>
 
-            <div onclick="nav('uni')" class="glass p-6 border-l-4 border-amber-500 mb-8 flex items-center justify-between group cursor-pointer">
+            <div onclick="nav('uni')" class="glass p-6 border-l-4 border-amber-500 mb-8 flex items-center justify-between cursor-pointer group">
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 glass flex items-center justify-center text-amber-500"><i class="fas fa-university"></i></div>
-                    <div><h4 class="font-bold text-sm">University Info</h4><p class="text-[10px] text-slate-500">Z-Score & Course Details</p></div>
+                    <div><h4 class="font-bold text-sm">University Info</h4><p class="text-[10px] text-slate-500">Course Z-Scores & Intakes</p></div>
                 </div>
-                <i class="fas fa-arrow-right text-slate-700 group-hover:translate-x-2 transition-all"></i>
+                <i class="fas fa-arrow-right group-hover:translate-x-2 transition-all"></i>
             </div>
         </div>
 
-        <!-- University View -->
+        <div id="quiz-view" class="hidden">
+            <div class="flex justify-between items-center mb-8">
+                <button onclick="nav('home')" class="text-slate-500"><i class="fas fa-times"></i></button>
+                <div class="text-center">
+                    <h3 id="quiz-sub-name" class="font-black text-sm uppercase">Subject</h3>
+                    <p id="quiz-progress" class="text-[10px] text-amber-500 font-bold">1 / 50</p>
+                </div>
+                <div class="w-8"></div>
+            </div>
+            <div class="glass p-8 mb-6"><h2 id="question-text" class="text-lg font-bold leading-relaxed">Loading...</h2></div>
+            <div id="options-container" class="space-y-4"></div>
+        </div>
+
         <div id="uni-view" class="hidden">
-            <button onclick="nav('home')" class="mb-6 text-slate-500 flex items-center gap-2"><i class="fas fa-arrow-left"></i> Back</button>
+            <button onclick="nav('home')" class="mb-6 text-slate-500"><i class="fas fa-arrow-left"></i> Back</button>
             <h2 class="text-2xl font-black mb-6 text-amber-400">UNIVERSITY INFO</h2>
             <div class="space-y-4">
-                <div class="glass p-5 border border-white/5">
-                    <h4 class="font-bold text-amber-500 mb-2">University of Colombo</h4>
-                    <p class="text-xs text-slate-400">Arts - 1.5643 | Media - 1.8722</p>
-                </div>
-                <div class="glass p-5 border border-white/5">
-                    <h4 class="font-bold text-amber-500 mb-2">University of Sri Jayewardenepura</h4>
-                    <p class="text-xs text-slate-400">Arts - 1.4521 | Management - 1.9001</p>
-                </div>
-                <div class="glass p-5 border border-white/5">
-                    <h4 class="font-bold text-amber-500 mb-2">University of Kelaniya</h4>
-                    <p class="text-xs text-slate-400">Arts - 1.3422 | PR - 1.7654</p>
-                </div>
+                <div class="glass p-5">Colombo: Arts - 1.56 | Media - 1.87</div>
+                <div class="glass p-5">Jayewardenepura: Arts - 1.45 | Management - 1.90</div>
             </div>
         </div>
 
-        <!-- Feedback & Settings View (Handled by Modals) -->
-        <div id="rank-view" class="hidden">
-            <h2 class="text-2xl font-black text-center mb-6">TOP STUDENTS</h2>
-            <div id="leaderboard-list" class="space-y-3"></div>
-        </div>
+        <div id="rank-view" class="hidden"><h2 class="text-2xl font-black text-center mb-6">LEADERBOARD</h2><div id="leaderboard-list" class="space-y-3"></div></div>
 
         <div id="profile-view" class="hidden text-center">
             <div class="relative w-28 h-28 mx-auto mb-6">
-                <img id="profile-img-big" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-full h-full rounded-full border-4 border-amber-500 object-cover">
-                <label class="absolute bottom-0 right-0 w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center cursor-pointer border-2 border-slate-950">
+                <img id="profile-img-big" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-full h-full rounded-full border-4 border-amber-500 object-cover bg-slate-800">
+                <label class="absolute bottom-0 right-0 w-9 h-9 bg-amber-500 rounded-full flex items-center justify-center cursor-pointer border-4 border-slate-950">
                     <i class="fas fa-camera text-xs text-black"></i>
                     <input type="file" id="img-upload" class="hidden" accept="image/*" onchange="uploadImage(this)">
                 </label>
             </div>
-            <h2 id="profile-name-display" class="text-2xl font-black mb-8">Student</h2>
+            <h2 id="profile-name-display" class="text-2xl font-black mb-10 italic">Student</h2>
             <div class="space-y-3 text-left">
                 <button onclick="toggleModal('pass-modal')" class="w-full glass p-5 flex justify-between">Change Password <i class="fas fa-key text-slate-700"></i></button>
-                <button onclick="toggleModal('feed-modal')" class="w-full glass p-5 flex justify-between">Contact Developer <i class="fas fa-paper-plane text-slate-700"></i></button>
-                <button onclick="logout()" class="w-full p-4 mt-6 text-red-500 font-bold opacity-50">LOGOUT</button>
+                <button onclick="toggleModal('feed-modal')" class="w-full glass p-5 flex justify-between">Contact Developer <i class="fas fa-envelope text-slate-700"></i></button>
+                <div class="p-6 glass text-center border-amber-500/20 mt-8">
+                    <p class="text-[10px] text-slate-500 mb-1">Developed By</p>
+                    <h4 class="font-black text-amber-500 italic">KD CREATION</h4>
+                </div>
+                <button onclick="logout()" class="w-full p-4 mt-6 text-red-500 font-bold opacity-30">LOGOUT</button>
             </div>
         </div>
 
         <div id="ai-view" class="hidden">
             <div id="chat-box" class="h-[450px] overflow-y-auto space-y-4 mb-4 p-2"></div>
-            <div class="flex gap-2 p-2 glass">
-                <input type="text" id="chat-input" placeholder="ප්‍රශ්නය අසන්න..." class="flex-1 bg-transparent p-2 outline-none">
-                <button onclick="askAI()" class="w-12 h-12 bg-amber-500 text-black rounded-xl"><i class="fas fa-paper-plane"></i></button>
-            </div>
+            <div class="flex gap-2 p-2 glass"><input type="text" id="chat-input" placeholder="ප්‍රශ්නය අසන්න..." class="flex-1 bg-transparent p-2 outline-none"><button onclick="askAI()" class="w-12 h-12 bg-amber-500 text-black rounded-xl"><i class="fas fa-paper-plane"></i></button></div>
         </div>
     </div>
 
     <!-- Modals -->
-    <div id="pass-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/80">
+    <div id="pass-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/90">
         <div class="w-full max-w-sm glass p-8 custom-modal text-center">
-            <i class="fas fa-key text-amber-500 text-3xl mb-4"></i>
-            <h3 class="text-xl font-bold mb-2">Change Password</h3>
-            <p class="text-xs text-slate-500 mb-6">මුරපදය වෙනස් කිරීමේ Link එක ඔබේ Email එකට ලබා ගැනීමට අවශ්‍යද?</p>
-            <button onclick="changePass()" class="w-full p-4 bg-amber-500 text-black font-black rounded-xl mb-3">ඔව්, එවන්න</button>
-            <button onclick="toggleModal('pass-modal')" class="text-slate-500 text-xs">අවලංගු කරන්න</button>
+            <h3 class="text-xl font-bold mb-4">Password Reset</h3>
+            <p class="text-xs text-slate-400 mb-6">Link එක ඔබේ Email එකට ලබා ගැනීමට අවශ්‍යද?</p>
+            <button onclick="changePass()" class="w-full p-4 bg-amber-500 text-black font-bold rounded-xl mb-3">ඔව්, එවන්න</button>
+            <button onclick="toggleModal('pass-modal')" class="text-slate-500 text-xs">CLOSE</button>
         </div>
     </div>
 
-    <div id="feed-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/80">
+    <div id="feed-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/90">
         <div class="w-full max-w-sm glass p-8 custom-modal">
-            <h3 class="text-xl font-bold mb-2 text-center">Feedback</h3>
-            <textarea id="feed-text" class="w-full h-32 glass bg-slate-900/50 p-4 mb-4 outline-none focus:border-amber-500" placeholder="ඔබේ අදහස මෙහි ලියන්න..."></textarea>
-            <button onclick="sendFeedback()" class="w-full p-4 bg-amber-500 text-black font-black rounded-xl mb-3">SEND FEEDBACK</button>
+            <h3 class="text-xl font-bold mb-4 text-center">Feedback</h3>
+            <textarea id="feed-text" class="w-full h-32 glass bg-slate-900/50 p-4 mb-4 outline-none border border-white/5" placeholder="අදහස් මෙහි ලියන්න..."></textarea>
+            <button onclick="sendFeedback()" class="w-full p-4 bg-amber-500 text-black font-bold rounded-xl mb-3">SEND</button>
             <button onclick="toggleModal('feed-modal')" class="w-full text-slate-500 text-xs text-center">CLOSE</button>
         </div>
+    </div>
+
+    <!-- Result Modal -->
+    <div id="result-modal" class="hidden fixed inset-0 bg-black/98 z-[100] flex flex-col items-center justify-center p-6 text-center">
+        <div id="result-download-area" class="p-10 border-[12px] border-amber-500 bg-black rounded-3xl w-[350px]">
+            <h2 class="text-amber-500 font-black text-2xl mb-8 uppercase italic">KD Creation</h2>
+            <p id="res-student-name" class="text-white font-bold text-xl mb-1">STUDENT NAME</p>
+            <p id="res-sub-name" class="text-slate-500 text-[10px] mb-8 font-bold uppercase italic">SUBJECT NAME</p>
+            <div class="py-10 bg-white/5 rounded-2xl border border-white/10">
+                <p class="text-[8px] text-slate-500 mb-1">FINAL SCORE</p>
+                <h1 id="res-score-text" class="text-6xl font-black text-white">0/50</h1>
+            </div>
+            <p class="mt-8 text-[9px] text-amber-500 font-bold italic tracking-tighter">SUCCESS WITH FAST TRACK PRO</p>
+        </div>
+        <button onclick="downloadRes()" class="mt-8 w-[350px] p-4 bg-amber-500 text-black font-black rounded-xl">SAVE TO GALLERY</button>
+        <button onclick="location.reload()" class="mt-4 text-slate-500 text-xs font-bold">CLOSE</button>
     </div>
 
     <!-- Navbar -->
@@ -176,38 +194,12 @@
             { id: 'agri', name: 'Agri Science', si: 'කෘෂි විද්‍යාව', color: 'green' }
         ];
 
-        // --- Core Functions ---
+        let quizData = { media: [{q: "ප්‍රශ්නය 1: මාධ්‍ය යනු?", a: ["පිළිතුර 1", "2", "3", "4"], c: 0}], bc: [], political: [], geo: [], history: [], agri: [] };
+        let currentSub = ''; let currentQ = 0; let currentS = 0;
+
         function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
+        function toggleAuth() { document.getElementById('reg-fields').classList.toggle('hidden'); }
 
-        function nav(view) {
-            ['home', 'ai', 'rank', 'profile', 'uni'].forEach(v => {
-                const el = document.getElementById(v + '-view');
-                if(el) el.classList.add('hidden');
-                const btn = document.getElementById('n-' + v);
-                if(btn) btn.className = "p-4 text-slate-600";
-            });
-            document.getElementById(view + '-view').classList.remove('hidden');
-            const activeBtn = document.getElementById('n-' + view);
-            if(activeBtn) activeBtn.className = "p-4 active-nav";
-            if(view === 'rank') loadLeaderboard();
-        }
-
-        function renderSubjects() {
-            const con = document.getElementById('subjects-container');
-            con.innerHTML = "";
-            subjects.forEach(s => {
-                con.innerHTML += `
-                <div onclick="alert('Starting ${s.name} Quiz...')" class="glass p-5 border-l-4 border-${s.color}-500 flex justify-between items-center cursor-pointer hover:bg-white/5">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-xl bg-${s.color}-500/10 flex items-center justify-center text-${s.color}-500"><i class="fas fa-book"></i></div>
-                        <div><h4 class="font-bold text-sm">${s.name}</h4><p class="text-[10px] text-slate-600 font-bold">${s.si}</p></div>
-                    </div>
-                    <i class="fas fa-chevron-right text-[10px] text-slate-800"></i>
-                </div>`;
-            });
-        }
-
-        // --- Auth & Profile ---
         async function handleAuth() {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('pass').value;
@@ -217,7 +209,7 @@
                 if(isReg) {
                     const res = await auth.createUserWithEmailAndPassword(email, pass);
                     await res.user.updateProfile({ displayName: name });
-                    await db.collection("users").doc(res.user.uid).set({ name: name, points: 0, photo: "", week: 0 });
+                    await db.collection("users").doc(res.user.uid).set({ name: name, points: 0, photo: "" });
                 } else { await auth.signInWithEmailAndPassword(email, pass); }
             } catch(e) { alert(e.message); }
         }
@@ -229,73 +221,117 @@
                 document.getElementById('navbar').classList.remove('hidden');
                 document.getElementById('display-name').innerText = user.displayName;
                 document.getElementById('profile-name-display').innerText = user.displayName;
-                renderSubjects();
-                loadUserStats(user.uid);
+                loadUser(user.uid);
+                renderSubs();
             }
         });
 
-        async function loadUserStats(uid) {
+        async function loadUser(uid) {
             const doc = await db.collection("users").doc(uid).get();
-            if(doc.exists) {
-                const d = doc.data();
-                document.getElementById('user-points').innerText = d.points || 0;
-                if(d.photo) {
-                    document.getElementById('header-avatar').src = d.photo;
-                    document.getElementById('profile-img-big').src = d.photo;
-                }
+            const d = doc.data();
+            document.getElementById('user-points').innerText = d.points || 0;
+            if(d.photo) {
+                document.getElementById('header-avatar').src = d.photo;
+                document.getElementById('profile-img-big').src = d.photo;
             }
         }
 
-        function changePass() {
-            auth.sendPasswordResetEmail(auth.currentUser.email).then(() => {
-                toggleModal('pass-modal');
-                alert("Link Sent! ඔබේ Email එක පරීක්ෂා කරන්න.");
+        function renderSubs() {
+            const con = document.getElementById('subjects-container');
+            con.innerHTML = "";
+            subjects.forEach(s => {
+                con.innerHTML += `<div onclick="startQuiz('${s.id}')" class="glass p-5 border-l-4 border-${s.color}-500 flex justify-between items-center cursor-pointer">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-${s.color}-500/10 flex items-center justify-center text-${s.color}-500"><i class="fas fa-book"></i></div>
+                        <div><h4 class="font-bold text-sm">${s.name}</h4><p class="text-[10px] text-slate-600 font-bold">${s.si}</p></div>
+                    </div><i class="fas fa-play text-xs text-slate-800"></i></div>`;
             });
         }
 
-        async function sendFeedback() {
-            const txt = document.getElementById('feed-text').value;
-            if(!txt) return;
-            await db.collection("feedback").add({
-                name: auth.currentUser.displayName,
-                msg: txt,
-                time: new Date()
-            });
-            document.getElementById('feed-text').value = "";
-            toggleModal('feed-modal');
-            alert("ස්තූතියි! ඔබේ අදහස අපට ලැබුණා.");
+        function startQuiz(id) {
+            currentSub = id; currentQ = 0; currentS = 0;
+            nav('quiz');
+            document.getElementById('quiz-sub-name').innerText = id;
+            showQ();
         }
 
-        // --- AI (Gemini Flash) ---
+        function showQ() {
+            const q = quizData[currentSub][currentQ] || {q: "ප්‍රශ්න පූරණය වෙමින් පවතී...", a: ["-","-","-","-"], c:0};
+            document.getElementById('question-text').innerText = q.q;
+            document.getElementById('quiz-progress').innerText = `${currentQ + 1} / 50`;
+            const opt = document.getElementById('options-container');
+            opt.innerHTML = "";
+            q.a.forEach((a, i) => {
+                opt.innerHTML += `<button onclick="checkA(${i})" class="w-full glass p-4 text-left text-sm hover:border-amber-500">${a}</button>`;
+            });
+        }
+
+        function checkA(i) {
+            if(i === quizData[currentSub][currentQ].c) currentS++;
+            currentQ++;
+            if(currentQ < quizData[currentSub].length) showQ(); else finish();
+        }
+
+        async function finish() {
+            document.getElementById('res-student-name').innerText = auth.currentUser.displayName;
+            document.getElementById('res-sub-name').innerText = currentSub;
+            document.getElementById('res-score-text').innerText = `${currentS}/50`;
+            document.getElementById('result-modal').classList.remove('hidden');
+            const newP = (parseInt(document.getElementById('user-points').innerText) || 0) + (currentS * 10);
+            await db.collection("users").doc(auth.currentUser.uid).update({ points: newP });
+        }
+
+        async function uploadImage(input) {
+            const file = input.files[0]; if(!file) return;
+            const ref = storage.ref(`profiles/${auth.currentUser.uid}`);
+            await ref.put(file);
+            const url = await ref.getDownloadURL();
+            await db.collection("users").doc(auth.currentUser.uid).update({ photo: url });
+            document.getElementById('header-avatar').src = url;
+            document.getElementById('profile-img-big').src = url;
+        }
+
         async function askAI() {
-            const input = document.getElementById('chat-input');
-            const box = document.getElementById('chat-box');
-            if(!input.value) return;
-            const q = input.value;
-            box.innerHTML += `<div class="flex justify-end"><p class="bg-amber-500 text-black p-3 rounded-2xl rounded-tr-none text-sm font-bold">${q}</p></div>`;
-            input.value = "";
+            const i = document.getElementById('chat-input');
+            const b = document.getElementById('chat-box');
+            if(!i.value) return;
+            const q = i.value; i.value = "";
+            b.innerHTML += `<div class="flex justify-end"><p class="bg-amber-500 text-black p-3 rounded-2xl rounded-tr-none text-sm font-bold">${q}</p></div>`;
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyB_10UzdkgZPlu-P361PYbEQjTwbKjjWx0`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: q + " (සිංහලෙන් කෙටියෙන් පිළිතුරු දෙන්න)" }] }] })
-                });
+                // සෘජු API එකකට වඩා සරල proxy logic එකක් මෙහි භාවිතා කර ඇත.
+                const res = await fetch(`https://api.duckduckgo.com/?q=${q}&format=json`);
                 const d = await res.json();
-                const a = d.candidates[0].content.parts[0].text;
-                box.innerHTML += `<div class="flex justify-start"><div class="glass p-4 rounded-2xl rounded-tl-none text-sm border-amber-500/20">${a}</div></div>`;
-            } catch(e) { box.innerHTML += `<p class="text-red-500">Error...</p>`; }
-            box.scrollTop = box.scrollHeight;
+                const a = d.AbstractText || "මට සමාවෙන්න, එම ප්‍රශ්නයට පිළිතුර සොයා ගැනීමට නොහැකි විය. කරුණාකර වෙනත් ප්‍රශ්නයක් අසන්න.";
+                b.innerHTML += `<div class="flex justify-start"><div class="glass p-4 rounded-2xl rounded-tl-none text-sm border-amber-500/20">${a}</div></div>`;
+            } catch(e) { b.innerHTML += `<p class="text-red-500">සම්බන්ධතාවය බිඳ වැටුණි...</p>`; }
+            b.scrollTop = b.scrollHeight;
         }
 
-        function logout() { auth.signOut().then(() => location.reload()); }
-        function toggleAuth() { document.getElementById('reg-fields').classList.toggle('hidden'); }
+        function nav(v) {
+            ['home','ai','rank','profile','quiz','uni'].forEach(x => {
+                if(document.getElementById(x+'-view')) document.getElementById(x+'-view').classList.add('hidden');
+                if(document.getElementById('n-'+x)) document.getElementById('n-'+x).className = "p-4 text-slate-600";
+            });
+            document.getElementById(v+'-view').classList.remove('hidden');
+            if(document.getElementById('n-'+v)) document.getElementById('n-'+v).className = "p-4 active-nav";
+        }
 
-        // --- Countdown ---
+        function downloadRes() {
+            html2canvas(document.getElementById('result-download-area')).then(c => {
+                const l = document.createElement('a'); l.download = 'Result.png'; l.href = c.toDataURL(); l.click();
+            });
+        }
+        function changePass() { auth.sendPasswordResetEmail(auth.currentUser.email).then(() => { toggleModal('pass-modal'); alert("Link Sent!"); }); }
+        async function sendFeedback() {
+            await db.collection("feedback").add({ name: auth.currentUser.displayName, msg: document.getElementById('feed-text').value, time: new Date() });
+            toggleModal('feed-modal'); alert("Sent!");
+        }
+        function logout() { auth.signOut().then(() => location.reload()); }
         setInterval(() => {
-            const gap = new Date("Aug 10, 2026").getTime() - new Date().getTime();
-            document.getElementById('d-days').innerText = Math.floor(gap / (1000*60*60*24));
-            document.getElementById('d-hrs').innerText = Math.floor((gap % (1000*60*60*24)) / (1000*60*60));
-            document.getElementById('d-min').innerText = Math.floor((gap % (1000*60*60)) / (1000*60));
+            const g = new Date("Aug 10, 2026").getTime() - new Date().getTime();
+            document.getElementById('d-days').innerText = Math.floor(g / 86400000);
+            document.getElementById('d-hrs').innerText = Math.floor((g % 86400000) / 3600000);
+            document.getElementById('d-min').innerText = Math.floor((g % 3600000) / 60000);
         }, 1000);
     </script>
 </body>
