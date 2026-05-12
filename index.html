@@ -74,7 +74,30 @@ body {
     background: #eab308;
     border-radius: 10px;
 }
-    </style>
+   /* වම් පැත්තේ පාට පටිය (Accent Line) */
+.glass-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px; /* පටියේ මහත */
+    height: 100%;
+    /* කාඩ් එකට අදාළ පාට මෙතනින් ගනියි */
+    background: var(--subject-color, #eab308); 
+    box-shadow: 2px 0 15px var(--subject-color);
+    z-index: 2;
+}
+
+/* Hover කරද්දී පොඩි Glow එකක් දෙමු */
+.glass-card:hover::before {
+    width: 8px;
+    transition: width 0.3s ease;
+} </style>
 </head>
 <body class="pb-28">
 
