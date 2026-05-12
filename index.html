@@ -74,48 +74,124 @@ body {
     background: #eab308;
     border-radius: 10px;
 }
-        /* Premium Background */
+  /* --- 1. Premium Global Background --- */
 body {
     background: radial-gradient(circle at top right, #1e1b4b, #0f172a, #020617) !important;
     background-attachment: fixed !important;
     color: #f8fafc;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', -apple-system, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
 }
 
-/* Glassmorphism Subject Cards */
+/* --- 2. Countdown Container Style --- */
+.timer-container {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.4));
+    border-radius: 2.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* --- 3. Subject Card - Main Style --- */
 .subject-card {
     background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 1.5rem;
     padding: 1.25rem;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
+    z-index: 1;
+    /* Soft Shadow based on Subject Color */
+    box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.3);
 }
 
+/* --- 4. Hover Effects (The Magic) --- */
 .subject-card:hover {
-    transform: translateY(-5px) scale(1.02);
+    transform: translateY(-8px) scale(1.02);
     background: rgba(255, 255, 255, 0.07);
-    border-color: rgba(234, 179, 8, 0.4);
-    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+    border-color: var(--subject-color);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6), 
+                0 0 20px -5px var(--subject-color);
 }
 
-/* විෂය අනුව වර්ණ ගැන්වීම (Glow Effect) */
+/* Left Accent Line */
 .subject-card::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; width: 4px; height: 100%;
-    background: var(--subject-color, #eab308);
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background: var(--subject-color);
     box-shadow: 2px 0 15px var(--subject-color);
+    z-index: 2;
 }
 
-/* Countdown Section එක ලස්සන කරන්න */
-.countdown-container {
-    background: linear-gradient(135deg, rgba(234, 179, 8, 0.1), rgba(0, 0, 0, 0.4));
-    border-radius: 2rem;
-    border: 1px solid rgba(234, 179, 8, 0.2);
-    backdrop-filter: blur(20px);
+/* Neon Border Glow on Hover */
+.subject-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 1.5rem;
+    padding: 2px; /* Border thickness */
+    background: linear-gradient(135deg, var(--subject-color), transparent, var(--subject-color));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.subject-card:hover::after {
+    opacity: 0.6;
+}
+
+/* --- 5. Icon & Text Styles --- */
+.subject-card i.fas {
+    transition: all 0.4s ease;
+}
+
+.subject-card:hover i.fas {
+    transform: rotate(10deg) scale(1.2);
+    filter: drop-shadow(0 0 8px var(--subject-color));
+}
+
+.subject-card h4 {
+    transition: color 0.3s ease;
+}
+
+.subject-card:hover h4 {
+    color: #fff;
+}
+
+/* --- 6. Scrollbar Styling --- */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #020617;
+}
+::-webkit-scrollbar-thumb {
+    background: #eab308;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #ca8a04;
+}
+
+/* --- 7. Animation for Fade-in --- */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#subject-list-container > div {
+    animation: fadeInUp 0.5s ease forwards;
 }
     </style>
 </head>
