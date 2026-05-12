@@ -88,85 +88,87 @@ input:focus {
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
+} /* Cap එකේ ලස්සන Animation එක */
+@keyframes bounce-subtle {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-5px) rotate(2deg); }
+}
+
+.animate-bounce-subtle {
+    animation: bounce-subtle 3s ease-in-out infinite;
+}
+
+/* Input boxes වලට එන hover highlight */
+input:focus {
+    box-shadow: 0 0 20px rgba(234, 179, 8, 0.03);
+}
+
+/* Auth Mode මාරු වෙද්දී එන Fade effect */
+.animate-fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
     </style>
 </head>
 <body class="pb-28">
 
-    <!-- Auth Screen -->
-    <div class="w-full max-w-sm glass-card p-10 relative z-10 border border-white/5 shadow-2xl rounded-[2.5rem] backdrop-blur-xl">
-    
-    <div class="flex justify-center mb-6">
-        <div class="relative group">
-            <div class="absolute inset-0 bg-yellow-500 blur-2xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
-            
-            <div class="relative w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-[1.5rem] flex items-center justify-center shadow-[0_10px_30px_rgba(234,179,8,0.3)] transform -rotate-6 group-hover:rotate-0 transition-transform duration-500">
-                <i class="fas fa-graduation-cap text-4xl text-[#020617]"></i>
-            </div>
-        </div>
-    </div>
-
-    <div class="text-center mb-10">
-        <h1 class="text-4xl font-black text-white mb-1 tracking-tighter italic">FAST <span class="text-yellow-500">TRACK</span></h1>
-        <p class="text-[9px] text-slate-500 uppercase tracking-[0.5em] font-black">KD Creation Pro</p>
-    </div>
-
-    ```
-
-### 2. මේ CSS කෑල්ලත් එකතු කරගන්න (Animation එකට):
-
-```css
-/* Cap එක ලාවට උඩ පල්ලෙහා යන්න (Floating Animation) */
-.fa-graduation-cap {
-    animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-}
     <div id="auth-screen" class="min-h-screen flex items-center justify-center p-6 relative overflow-hidden bg-[#020617]">
     <div class="absolute top-0 right-0 w-64 h-64 bg-yellow-500/5 blur-[100px]"></div>
     <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/5 blur-[100px]"></div>
 
-    <div class="w-full max-w-sm glass-card p-10 relative z-10 border border-white/5 shadow-2xl rounded-[2.5rem] backdrop-blur-xl">
-        <div class="text-center mb-10">
+    <div class="w-full max-w-sm glass-card p-10 relative z-10 border border-white/5 shadow-2xl rounded-[2.5rem] backdrop-blur-xl text-center">
+        
+        <div class="flex justify-center mb-8">
+            <div class="relative group">
+                <div class="absolute inset-0 bg-yellow-500 blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-700"></div>
+                
+                <div class="relative w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-[1.5rem] flex items-center justify-center shadow-[0_15px_35px_rgba(234,179,8,0.3)] transform -rotate-6 group-hover:rotate-0 transition-transform duration-500">
+                    <i class="fas fa-graduation-cap text-4xl text-[#020617] animate-bounce-subtle"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-10">
             <h1 class="text-4xl font-black text-white mb-1 tracking-tighter italic">FAST <span class="text-yellow-500">TRACK</span></h1>
             <p class="text-[9px] text-slate-500 uppercase tracking-[0.5em] font-black">KD Creation Pro</p>
         </div>
 
         <div id="register-fields" class="hidden animate-fade-in">
-            <div class="relative mb-4">
-                <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 text-xs"></i>
-                <input type="text" id="reg-name" placeholder="ඔබේ නම" 
-                    class="w-full pl-11 pr-4 py-4 rounded-2xl bg-white/[0.03] border border-white/10 outline-none text-white text-sm focus:border-yellow-500/50 transition-all">
+            <div class="relative mb-4 text-left">
+                <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 text-xs transition-colors group-focus-within:text-yellow-500"></i>
+                <input type="text" id="reg-name" placeholder="Enter Your Name" 
+                    class="w-full pl-11 pr-4 py-4 rounded-2xl bg-white/[0.03] border border-white/10 outline-none text-white text-sm focus:border-yellow-500/50 focus:bg-white/5 transition-all">
             </div>
         </div>
 
-        <div class="relative mb-4">
+        <div class="relative mb-4 text-left">
             <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 text-xs"></i>
             <input type="email" id="auth-email" placeholder="Email Address" 
-                class="w-full pl-11 pr-4 py-4 rounded-2xl bg-white/[0.03] border border-white/10 outline-none text-white text-sm focus:border-yellow-500/50 transition-all">
+                class="w-full pl-11 pr-4 py-4 rounded-2xl bg-white/[0.03] border border-white/10 outline-none text-white text-sm focus:border-yellow-500/50 focus:bg-white/5 transition-all">
         </div>
 
-        <div class="relative mb-8">
+        <div class="relative mb-8 text-left">
             <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 text-xs"></i>
             <input type="password" id="auth-password" placeholder="Password" 
-                class="w-full pl-11 pr-4 py-4 rounded-2xl bg-white/[0.03] border border-white/10 outline-none text-white text-sm focus:border-yellow-500/50 transition-all">
+                class="w-full pl-11 pr-4 py-4 rounded-2xl bg-white/[0.03] border border-white/10 outline-none text-white text-sm focus:border-yellow-500/50 focus:bg-white/5 transition-all">
         </div>
 
         <button onclick="handleAuth()" id="auth-btn" 
-            class="w-full py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-black rounded-2xl shadow-[0_10px_20px_rgba(234,179,8,0.2)] active:scale-95 transition-all uppercase tracking-widest text-xs">
-            Login
+            class="w-full py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-black rounded-2xl shadow-[0_10px_25px_rgba(234,179,8,0.25)] active:scale-95 transition-all uppercase tracking-widest text-xs flex items-center justify-center gap-2 group">
+            <span id="auth-text">Login</span>
+            <i class="fas fa-arrow-right-long text-[10px] group-hover:translate-x-1 transition-transform"></i>
         </button>
 
-        <div class="flex justify-between mt-8">
-            <button onclick="toggleAuthMode()" id="toggle-btn" class="text-[10px] font-bold text-yellow-500 hover:underline tracking-wider uppercase">Create Account</button>
-            <button onclick="showPopup('reset-popup')" class="text-[10px] font-bold text-slate-500 hover:text-slate-300 tracking-wider uppercase italic underline">Forgot?</button>
+        <div class="flex justify-between mt-10">
+            <button onclick="toggleAuthMode()" id="toggle-btn" class="text-[10px] font-black text-yellow-500 hover:text-yellow-400 tracking-wider uppercase transition-colors">Register Now</button>
+            <button onclick="showPopup('reset-popup')" class="text-[10px] font-bold text-slate-600 hover:text-slate-400 tracking-wider uppercase italic underline transition-colors">Forgot Password?</button>
         </div>
     </div>
 </div>
-
     <!-- Dashboard -->
     <div id="dashboard" class="hidden p-6 max-w-2xl mx-auto">
         <header class="flex justify-between items-center mb-10">
