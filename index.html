@@ -3957,17 +3957,37 @@ function startQuiz(type, title) {
         const newCorrectIdx = q.options.indexOf(correctAnswerText);
 
         container.innerHTML += `
-            <div class="glass-card p-6 quiz-card mb-4" data-correct="${newCorrectIdx}">
-                <p class="text-[10px] font-black text-yellow-500 mb-3 uppercase tracking-widest">Question ${idx + 1}</p>
-                <p class="text-sm font-bold mb-5 leading-relaxed text-slate-100">${q.q || q.question}</p>
-                <div class="space-y-2">
-                    ${q.options.map((opt, i) => `
-                        <button onclick="selectAnswer(this, ${i})" class="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-left text-xs transition-all hover:bg-white/10">
-                            ${opt}
-                        </button>
-                    `).join('')}
-                </div>
-            </div>`;
+    <div class="glass-card p-8 quiz-card mb-8 rounded-[2rem] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-all duration-500 hover:border-yellow-500/40 group relative overflow-hidden" data-correct="${newCorrectIdx}">
+        
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-yellow-500/5 blur-[80px] group-hover:bg-yellow-500/10 transition-all"></div>
+
+        <div class="flex items-center gap-3 mb-6">
+            <span class="px-4 py-1 rounded-lg bg-yellow-500 text-black text-[10px] font-black uppercase tracking-tighter">
+                Q-${idx + 1}
+            </span>
+            <div class="h-[1px] flex-1 bg-white/10"></div>
+        </div>
+
+        <p class="text-base md:text-lg font-bold mb-8 leading-relaxed text-slate-100 group-hover:text-white transition-colors">
+            ${q.q || q.question}
+        </p>
+
+        <div class="grid grid-cols-1 gap-3">
+            ${q.options.map((opt, i) => `
+                <button onclick="selectAnswer(this, ${i})" 
+                    class="group/btn relative w-full p-5 rounded-2xl bg-white/[0.03] border border-white/10 text-left text-sm transition-all duration-300 
+                    hover:bg-yellow-500 hover:text-black hover:font-bold hover:scale-[1.02] active:scale-95 hover:shadow-[0_10px_20px_rgba(234,179,8,0.2)]">
+                    
+                    <div class="flex items-center gap-4">
+                        <span class="w-6 h-6 flex items-center justify-center rounded-full bg-white/10 group-hover/btn:bg-black/20 text-[10px] font-black">
+                            ${String.fromCharCode(65 + i)}
+                        </span>
+                        <span class="flex-1">${opt}</span>
+                    </div>
+                </button>
+            `).join('')}
+        </div>
+    </div>`;
     });
     window.scrollTo(0,0);
 }
