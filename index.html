@@ -74,6 +74,49 @@ body {
     background: #eab308;
     border-radius: 10px;
 }
+        /* Premium Background */
+body {
+    background: radial-gradient(circle at top right, #1e1b4b, #0f172a, #020617) !important;
+    background-attachment: fixed !important;
+    color: #f8fafc;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Glassmorphism Subject Cards */
+.subject-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.5rem;
+    padding: 1.25rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.subject-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(234, 179, 8, 0.4);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+}
+
+/* විෂය අනුව වර්ණ ගැන්වීම (Glow Effect) */
+.subject-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 4px; height: 100%;
+    background: var(--subject-color, #eab308);
+    box-shadow: 2px 0 15px var(--subject-color);
+}
+
+/* Countdown Section එක ලස්සන කරන්න */
+.countdown-container {
+    background: linear-gradient(135deg, rgba(234, 179, 8, 0.1), rgba(0, 0, 0, 0.4));
+    border-radius: 2rem;
+    border: 1px solid rgba(234, 179, 8, 0.2);
+    backdrop-filter: blur(20px);
+}
     </style>
 </head>
 <body class="pb-28">
