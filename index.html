@@ -238,7 +238,7 @@ input:focus {
                 </div>
                 <div onclick="openSubject('Logic')" class="glass-card p-6 flex items-center cursor-pointer border-l-4 border-cyan-500">
                     <div class="w-12 h-12 bg-cyan-500/20 rounded-2xl flex items-center justify-center text-cyan-400 mr-4"><i class="fas fa-brain"></i></div>
-                    <div><h4 class="font-extrabold">Logic</h4><p class="text-[10px] text-slate-500 uppercase font-bold">තර්ක ශාස්ත්‍රය</p></div>
+                    <div><h4 class="font-extrabold">HISTORY</h4><p class="text-[10px] text-slate-500 uppercase font-bold">ඉතිහාසය</p></div>
                 </div>
                 <div onclick="openSubject('Sinhala')" class="glass-card p-6 flex items-center cursor-pointer border-l-4 border-red-500">
                     <div class="w-12 h-12 bg-red-500/20 rounded-2xl flex items-center justify-center text-red-400 mr-4"><i class="fas fa-book-open"></i></div>
@@ -308,7 +308,7 @@ input:focus {
                     <div class="flex justify-around items-center">
                         <div><p class="font-bold text-xs">KD</p><p class="text-[8px] opacity-50">Lead Dev</p></div>
                         <div class="h-8 w-px bg-white/10"></div>
-                        <div><p class="font-bold text-xs">KD_X Team</p><p class="text-[8px] opacity-50">TEAM</p></div>
+                        <div><p class="font-bold text-xs">KD_X Team</p><p class="text-[8px] opacity-50">devolop Team</p></div>
                     </div>
                 </div>
                 <button onclick="handleLogout()" class="w-full p-5 bg-red-500/10 text-red-500 rounded-3xl font-black mt-6 border border-red-500/20 uppercase">Logout</button>
@@ -448,7 +448,7 @@ input:focus {
             <h3 id="res-card-score" style="font-size: 50px; font-weight: 900; color: #f59e0b;">0%</h3>
         </div>
         <p id="res-card-title" style="font-size: 12px; font-weight: bold; color: #94a3b8;"></p>
-        <p style="margin-top: 30px; font-size: 8px; opacity: 0.4;">© 2026 Fast Track - KD Creation</p>
+        <p style="margin-top: 30px; font-size: 8px; opacity: 0.4;">© 2026 Fast Track - KD_X TEAM</p>
     </div>
 </div>
     <!-- Navigation -->
@@ -1902,7 +1902,7 @@ const unitQuizData = { // මෙතන නම unitQuizData ලෙස තිබ�
     }
 ] 
             },
-    "Logic": { "Unit 01": [] },
+    "HISTORY": { "Unit 01": [] },
     "Sinhala": { "Unit 01": [] },
     "Geography": { "Unit 01": [] }
 };
@@ -4276,7 +4276,7 @@ function downloadResultImage() {
             const file = input.files[0];
             if(!file) return;
             const ref = storage.ref(`submissions/${auth.currentUser.uid}/${Date.now()}_${file.name}`);
-            alert("ගොනුව Upload වෙමින් පවතී...");
+            alert("මෙම පහසුකම තවම ලබා දී නොමැත coming soon...");
             await ref.put(file);
             const url = await ref.getDownloadURL();
             db.collection("submissions").add({
