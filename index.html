@@ -140,6 +140,14 @@ body {
                     <div class="text-center"><span id="cd-days" class="text-5xl font-black block">00</span><span class="text-[9px] font-bold opacity-70 uppercase">Days</span></div>
                     <div class="text-center"><span id="cd-hours" class="text-5xl font-black block">00</span><span class="text-[9px] font-bold opacity-70 uppercase">Hrs</span></div>
                     <div class="text-center"><span id="cd-mins" class="text-5xl font-black block">00</span><span class="text-[9px] font-bold opacity-70 uppercase">Mins</span></div>
+                    <div class="mt-6 pt-4 border-t border-white/5 relative z-10 text-center">
+    <p class="text-[9px] font-black text-yellow-500/50 uppercase tracking-[0.3em] mb-1">Daily Study Tip</p>
+    <div class="h-8 flex items-center justify-center">
+        <p id="study-tip" class="text-[11px] md:text-xs text-slate-300 font-medium italic transition-all duration-500 opacity-100">
+            සෑම පැයකටම වරක් විනාඩි 5ක විවේකයක් ගන්න.
+        </p>
+    </div>
+</div>
                 </div>
             </div>
 
@@ -4340,6 +4348,37 @@ async function handleAuth() {
     }
 });
         function handleLogout() { auth.signOut().then(() => location.reload()); }
+    const tips = [
+    "සෑම පැයකටම වරක් විනාඩි 5ක විවේකයක් ගන්න. 🧘‍♂️",
+    "අමාරු පාඩම් උදේ කාලයේදී පාඩම් කරන්න. ☀️",
+    "පාඩම් කරන අතරතුර ඇති තරම් ජලය පානය කරන්න. 💧",
+    "කෙටි සටහන් (Short Notes) පාවිච්චි කරමින් මතකය අලුත් කරන්න. 📝",
+    "එකම විෂය පැය ගණනාවක් නොකර විෂයන් මාරු කරමින් පාඩම් කරන්න. 🔄",
+    "Marking Scheme එක බලමින් පිළිතුරු ලිවීමට හුරු වන්න. ✅",
+    "සැමවිටම පසුගිය විභාග ප්‍රශ්න පත්‍ර (Past Papers) වලට පිළිතුරු ලියන්න. 📚",
+    "පාඩම් කරන තැන පිරිසිදුව සහ පිළිවෙළට තබා ගන්න. ✨"
+];
+
+let tipIndex = 0;
+function rotateTips() {
+    const tipElement = document.getElementById('study-tip');
+    
+    // Fade out
+    tipElement.style.opacity = 0;
+    tipElement.style.transform = "translateY(-5px)";
+    
+    setTimeout(() => {
+        tipIndex = (tipIndex + 1) % tips.length;
+        tipElement.innerText = tips[tipIndex];
+        
+        // Fade in
+        tipElement.style.opacity = 1;
+        tipElement.style.transform = "translateY(0)";
+    }, 500);
+}
+
+// තත්පර 15කට වරක් ටිප් එක මාරු කරන්න
+setInterval(rotateTips, 15000);
     </script>
 </body>
 </html>
