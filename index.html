@@ -74,161 +74,48 @@ body {
     background: #eab308;
     border-radius: 10px;
 }
-  /* --- 1. Premium Global Background --- */
+        /* Premium Background */
 body {
     background: radial-gradient(circle at top right, #1e1b4b, #0f172a, #020617) !important;
     background-attachment: fixed !important;
     color: #f8fafc;
-    font-family: 'Inter', -apple-system, sans-serif;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
+    font-family: 'Inter', sans-serif;
 }
 
-/* --- 2. Countdown Container Style --- */
-.timer-container {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.4));
-    border-radius: 2.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-}
-
-/* --- 3. Subject Card - Main Style --- */
+/* Glassmorphism Subject Cards */
 .subject-card {
     background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 1.5rem;
     padding: 1.25rem;
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
-    z-index: 1;
-    /* Soft Shadow based on Subject Color */
-    box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.3);
 }
 
-/* --- 4. Hover Effects (The Magic) --- */
 .subject-card:hover {
-    transform: translateY(-8px) scale(1.02);
+    transform: translateY(-5px) scale(1.02);
     background: rgba(255, 255, 255, 0.07);
-    border-color: var(--subject-color);
-    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6), 
-                0 0 20px -5px var(--subject-color);
+    border-color: rgba(234, 179, 8, 0.4);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
 }
 
-/* Left Accent Line */
+/* විෂය අනුව වර්ණ ගැන්වීම (Glow Effect) */
 .subject-card::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 5px;
-    height: 100%;
-    background: var(--subject-color);
+    top: 0; left: 0; width: 4px; height: 100%;
+    background: var(--subject-color, #eab308);
     box-shadow: 2px 0 15px var(--subject-color);
-    z-index: 2;
 }
 
-/* Neon Border Glow on Hover */
-.subject-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 1.5rem;
-    padding: 2px; /* Border thickness */
-    background: linear-gradient(135deg, var(--subject-color), transparent, var(--subject-color));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-}
-
-.subject-card:hover::after {
-    opacity: 0.6;
-}
-
-/* --- 5. Icon & Text Styles --- */
-.subject-card i.fas {
-    transition: all 0.4s ease;
-}
-
-.subject-card:hover i.fas {
-    transform: rotate(10deg) scale(1.2);
-    filter: drop-shadow(0 0 8px var(--subject-color));
-}
-
-.subject-card h4 {
-    transition: color 0.3s ease;
-}
-
-.subject-card:hover h4 {
-    color: #fff;
-}
-
-/* --- 6. Scrollbar Styling --- */
-::-webkit-scrollbar {
-    width: 8px;
-}
-::-webkit-scrollbar-track {
-    background: #020617;
-}
-::-webkit-scrollbar-thumb {
-    background: #eab308;
-    border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #ca8a04;
-}
-
-/* --- 7. Animation for Fade-in --- */
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-#subject-list-container > div {
-    animation: fadeInUp 0.5s ease forwards;
-}
-        /* Countdown Container එක ඇතුළේ තියෙන image එකට අදාළයි */
-.timer-container img {
-    filter: saturate(1.2) brightness(0.8);
-}
-
-/* අකුරු වලට පොඩි Glow එකක් දෙන්න */
-#cd-days, #cd-hours, #cd-mins {
-    background: linear-gradient(to bottom, #fff, #cbd5e1);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-        /* මුළු පේජ් එකම අඳුරු කරන්න */
-html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    min-height: 100vh; /* පේජ් එකේ උස 100% ක් අනිවාර්ය කරයි */
-    background-color: #020617 !important; /* සුදු පාට එන එක වළක්වන්න තද නිල්/කළු පාටක් */
-    overflow-x: hidden;
-}
-
-/* දැනට තියෙන Gradient එකට අමතරව මේකත් දාන්න */
-body {
-    background: radial-gradient(circle at top right, #1e1b4b, #0f172a, #020617) no-repeat center center fixed !important;
-    background-size: cover !important;
-}
-
-/* Bottom Navigation Bar එකට පල්ලෙහායින් හිස් ඉඩක් එනවා නම් මේක දාන්න */
-#bottom-nav {
-    bottom: 0;
-    left: 0;
-    right: 0;
-    position: fixed;
-    z-index: 50;
-    background: rgba(15, 23, 42, 0.8);
-    backdrop-filter: blur(15px);
+/* Countdown Section එක ලස්සන කරන්න */
+.countdown-container {
+    background: linear-gradient(135deg, rgba(234, 179, 8, 0.1), rgba(0, 0, 0, 0.4));
+    border-radius: 2rem;
+    border: 1px solid rgba(234, 179, 8, 0.2);
+    backdrop-filter: blur(20px);
 }
     </style>
 </head>
@@ -266,19 +153,26 @@ body {
         </header>
 
       <div id="home-view">
-   <div class="timer-container p-8 rounded-[2.5rem] mb-10 text-white relative border border-white/10 shadow-2xl overflow-hidden group">
-    
-    <div class="absolute inset-0 z-0">
-        <img src="https://ඔයාගේ-වෙබ්-ලින්ක් එක/ෆොටෝ-නම.jpg" 
-             class="w-full h-full object-cover opacity-40 group-hover:scale-110 transition-transform duration-700" 
-             style="mix-blend-mode: overlay;">
-        <div class="absolute inset-0 bg-[#020617]/60"></div>
+    <div class="timer-container p-8 rounded-[3rem] mb-10 text-white relative border border-white/10 shadow-2xl overflow-hidden group">
+        <div class="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent opacity-50"></div>
+        <p class="relative z-10 text-center text-[10px] font-black uppercase mb-6 tracking-[0.3em] text-yellow-500/80">2026 A/L Countdown</p>
+        <div class="relative z-10 flex justify-around items-center">
+            <div class="text-center">
+                <span id="cd-days" class="text-5xl font-black block drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">00</span>
+                <span class="text-[9px] font-bold opacity-60 uppercase tracking-widest">Days</span>
+            </div>
+            <div class="h-10 w-[1px] bg-white/10"></div>
+            <div class="text-center">
+                <span id="cd-hours" class="text-5xl font-black block drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">00</span>
+                <span class="text-[9px] font-bold opacity-60 uppercase tracking-widest">Hrs</span>
+            </div>
+            <div class="h-10 w-[1px] bg-white/10"></div>
+            <div class="text-center">
+                <span id="cd-mins" class="text-5xl font-black block drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">00</span>
+                <span class="text-[9px] font-bold opacity-60 uppercase tracking-widest">Mins</span>
+            </div>
+        </div>
     </div>
-
-    <div class="relative z-10">
-        ...
-    </div>
-</div>
 
     <div class="space-y-4 mb-8" id="subject-list-container">
         
