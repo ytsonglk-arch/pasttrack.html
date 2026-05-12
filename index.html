@@ -3686,7 +3686,7 @@ function startQuiz(type, title) {
         container.innerHTML += `
             <div class="glass-card p-6 quiz-card mb-4" data-correct="${newCorrectIdx}">
                 <p class="text-[10px] font-black text-yellow-500 mb-3 uppercase tracking-widest">Question ${idx + 1}</p>
-                <p class="text-sm font-bold mb-5 leading-relaxed text-slate-100">${q.q}</p>
+                <p class="text-sm font-bold mb-5 leading-relaxed text-slate-100">${q.q || q.question}</p>
                 <div class="space-y-2">
                     ${q.options.map((opt, i) => `
                         <button onclick="selectAnswer(this, ${i})" class="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-left text-xs transition-all hover:bg-white/10">
