@@ -204,6 +204,32 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
+        /* මුළු පේජ් එකම අඳුරු කරන්න */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh; /* පේජ් එකේ උස 100% ක් අනිවාර්ය කරයි */
+    background-color: #020617 !important; /* සුදු පාට එන එක වළක්වන්න තද නිල්/කළු පාටක් */
+    overflow-x: hidden;
+}
+
+/* දැනට තියෙන Gradient එකට අමතරව මේකත් දාන්න */
+body {
+    background: radial-gradient(circle at top right, #1e1b4b, #0f172a, #020617) no-repeat center center fixed !important;
+    background-size: cover !important;
+}
+
+/* Bottom Navigation Bar එකට පල්ලෙහායින් හිස් ඉඩක් එනවා නම් මේක දාන්න */
+#bottom-nav {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    position: fixed;
+    z-index: 50;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(15px);
+}
     </style>
 </head>
 <body class="pb-28">
@@ -243,28 +269,14 @@ body {
    <div class="timer-container p-8 rounded-[2.5rem] mb-10 text-white relative border border-white/10 shadow-2xl overflow-hidden group">
     
     <div class="absolute inset-0 z-0">
-        <img src="ඔයාගේ_පොටෝ_එකේ_link_එක" class="w-full h-full object-cover opacity-30 group-hover:scale-110 transition-transform duration-700" alt="Countdown Background">
-        <div class="absolute inset-0 bg-gradient-to-b from-[#020617]/80 via-transparent to-[#020617]/90"></div>
+        <img src="https://ඔයාගේ-වෙබ්-ලින්ක් එක/ෆොටෝ-නම.jpg" 
+             class="w-full h-full object-cover opacity-40 group-hover:scale-110 transition-transform duration-700" 
+             style="mix-blend-mode: overlay;">
+        <div class="absolute inset-0 bg-[#020617]/60"></div>
     </div>
 
     <div class="relative z-10">
-        <p class="text-center text-[10px] font-black uppercase mb-6 tracking-[0.3em] text-yellow-500/90">2026 A/L Countdown</p>
-        <div class="flex justify-around items-center">
-            <div class="text-center">
-                <span id="cd-days" class="text-5xl font-black block drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]">00</span>
-                <span class="text-[9px] font-bold opacity-70 uppercase tracking-widest">Days</span>
-            </div>
-            <div class="h-10 w-[1px] bg-white/20"></div>
-            <div class="text-center">
-                <span id="cd-hours" class="text-5xl font-black block drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]">00</span>
-                <span class="text-[9px] font-bold opacity-70 uppercase tracking-widest">Hrs</span>
-            </div>
-            <div class="h-10 w-[1px] bg-white/20"></div>
-            <div class="text-center">
-                <span id="cd-mins" class="text-5xl font-black block drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]">00</span>
-                <span class="text-[9px] font-bold opacity-70 uppercase tracking-widest">Mins</span>
-            </div>
-        </div>
+        ...
     </div>
 </div>
 
