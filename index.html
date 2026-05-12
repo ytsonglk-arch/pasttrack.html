@@ -117,6 +117,32 @@ body {
     border: 1px solid rgba(234, 179, 8, 0.2);
     backdrop-filter: blur(20px);
 }
+        /* මුළු පේජ් එකම අඳුරු කරන්න */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh; /* පේජ් එකේ උස 100% ක් අනිවාර්ය කරයි */
+    background-color: #020617 !important; /* සුදු පාට එන එක වළක්වන්න තද නිල්/කළු පාටක් */
+    overflow-x: hidden;
+}
+
+/* දැනට තියෙන Gradient එකට අමතරව මේකත් දාන්න */
+body {
+    background: radial-gradient(circle at top right, #1e1b4b, #0f172a, #020617) no-repeat center center fixed !important;
+    background-size: cover !important;
+}
+
+/* Bottom Navigation Bar එකට පල්ලෙහායින් හිස් ඉඩක් එනවා නම් මේක දාන්න */
+#bottom-nav {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    position: fixed;
+    z-index: 50;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(15px);
+}
     </style>
 </head>
 <body class="pb-28">
