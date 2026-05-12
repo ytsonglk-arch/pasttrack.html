@@ -4390,22 +4390,44 @@ async function handleAuth() {
         authBtn.innerText = isLoginMode ? "LOGIN" : "REGISTER";
     }
 }
-     auth.onAuthStateChanged(user => {
+     auth.onAuthStateChanged(async (user) => {
     if(user) {
         // Dashboard පෙන්වීම
         document.getElementById('auth-screen').classList.add('hidden');
         document.getElementById('dashboard').classList.remove('hidden');
         document.getElementById('bottom-nav').classList.remove('hidden');
         
+        // 1. නම තීරණය කිරීම (ප්‍රමුඛතාවය: Database නම > Auth නම > default Student)
+        let displayName = user.displayName || "Student";
+
+        // 🟢 මෙතනදී අපි Firestore එකට දත්ත Save කරනවා
+        // මෙයින් තමයි Leaderboard එකට දත්ත ලැබෙන්නේ
+        const userRef = db.collection("users").doc(user.uid);
+        
+        try {
+            // set({ ... }, { merge: true }) මගින් පරණ දත්ත නොමකා අලුත් දත්ත ඇතුළත් කරයි
+            await userRef.set({
+                name: displayName,
+                email: user.email,
+                photoURL: user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=d4af37&color=fff&bold=true`,
+                lastLogin: new Date()
+            }, { merge: true });
+
+            // එකපාරක් Database එකෙන් නම කියවමු (සමහරවිට අපි අතින් වෙනස් කරලා තිබුණොත් ගන්න)
+            const doc = await userRef.get();
+            if (doc.exists && doc.data().name) {
+                displayName = doc.data().name;
+            }
+        } catch (err) {
+            console.error("Error updating user data:", err);
+        }
+
         // නම් පෙන්වීම
-        const displayName = user.displayName || "Student";
         document.getElementById('user-display-name-header').innerText = displayName;
         document.getElementById('user-display-name-profile').innerText = displayName;
 
-        // 🟢 ඊමේල් ලොගින් නිසා අපි නමෙන් Avatar එකක් හදමු
-        // මෙහි background=d4af37 (රන්වන් පාට) සහ color=fff (සුදු පාට) දීලා තියෙනවා
+        // Avatar එක සැකසීම
         const userImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=d4af37&color=fff&bold=true&size=128`;
-
         const avatarHeader = document.getElementById('user-avatar');
         const avatarProfile = document.getElementById('profile-pic-large');
 
