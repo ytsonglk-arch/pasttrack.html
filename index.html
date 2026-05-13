@@ -4442,5 +4442,118 @@ async function handleAuth() {
 });
         function handleLogout() { auth.signOut().then(() => location.reload()); }
     </script>
+<!-- 1. EmailJS සේවාව සම්බන්ධ කිරීම -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+<script type="text/javascript">
+    // ---------------------------------------------------------
+    // පියවර 1: ඔබේ පුද්ගලික තොරතුරු මෙතැන ඇතුළත් කරන්න
+    // ---------------------------------------------------------
+    const EMAILJS_PUBLIC_KEY = "M-lXJxBaJExB_hgQ_"; 
+    const SERVICE_ID = "service_d74wi3p";
+    const TEMPLATE_ID = "template_5mqjlgr";
+    
+    // ඔබ ලබාදුන් ImgBB Key එක මම මෙතනට දැම්මා
+    const IMGBB_API_KEY = "eb0245c00ce158e232b0b4c6d8bbb714"; 
+
+    // EmailJS සක්‍රීය කිරීම
+    (function() {
+        emailjs.init(EMAILJS_PUBLIC_KEY);
+    })();
+
+    let uploadedFileUrl = "No File Attached";
+
+    // ---------------------------------------------------------
+    // පියවර 2: Chat එකේ පිළිතුරු පෙන්වන Function එක
+    // ---------------------------------------------------------
+    function showStatusInChat(message, type = 'success') {
+        const chatOutput = document.getElementById('ai-chat-output');
+        const msgDiv = document.createElement('div');
+        
+        msgDiv.className = `p-4 rounded-2xl text-xs leading-relaxed max-w-[80%] my-2 ${
+            type === 'success' 
+            ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' 
+            : 'bg-red-500/20 text-red-400 border border-red-500/30'
+        }`;
+        msgDiv.innerText = message;
+        
+        chatOutput.appendChild(msgDiv);
+        chatOutput.scrollTop = chatOutput.scrollHeight;
+    }
+
+    // ---------------------------------------------------------
+    // පියවර 3: පින්තූර හෝ PDF Upload කිරීම
+    // ---------------------------------------------------------
+    async function uploadFile(input, type) {
+        const file = input.files[0];
+        if (!file) return;
+
+        const label = input.parentElement;
+        const originalHTML = label.innerHTML;
+        
+        label.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Uploading...`;
+        label.style.pointerEvents = "none";
+
+        try {
+            const formData = new FormData();
+            let uploadUrl = (type === 'image') 
+                ? `https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}` 
+                : `https://file.io`;
+
+            formData.append(type === 'image' ? "image" : "file", file);
+
+            const response = await fetch(uploadUrl, { method: "POST", body: formData });
+            const data = await response.json();
+            
+            uploadedFileUrl = (type === 'image') ? data.data.url : data.link;
+            
+            label.innerHTML = `<i class="fas fa-check-circle text-green-500"></i> DONE!`;
+            showStatusInChat(`${type.toUpperCase()} එක සාර්ථකව සම්බන්ධ කළා. දැන් Send කරන්න.`, 'success');
+
+        } catch (error) {
+            showStatusInChat("Upload කිරීම අසාර්ථකයි!", 'error');
+            label.innerHTML = originalHTML;
+        } finally {
+            label.style.pointerEvents = "auto";
+        }
+    }
+
+    // ---------------------------------------------------------
+    // පියවර 4: සියල්ල Gmail එකට යැවීම
+    // ---------------------------------------------------------
+    async function handleSubmission() {
+        const textInput = document.getElementById('ai-input');
+        const sendBtn = document.querySelector('button[onclick="handleSubmission()"]');
+        const message = textInput.value.trim();
+        
+        if (!message && uploadedFileUrl === "No File Attached") {
+            showStatusInChat("කරුණාකර පණිවිඩයක් හෝ ගොනුවක් ඇතුළත් කරන්න.", "error");
+            return;
+        }
+
+        sendBtn.disabled = true;
+        showStatusInChat("පණිවිඩය Gmail වෙත යවමින් පවතී...", "success");
+
+        const templateParams = {
+            from_name: "A/L Fast Track User",
+            message: message || "No text message",
+            attachment_link: uploadedFileUrl
+        };
+
+        emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
+            .then(() => {
+                showStatusInChat("සාර්ථකයි! ඔබේ පණිවිඩය අපට ලැබුණා.", "success");
+                textInput.value = ""; 
+                uploadedFileUrl = "No File Attached";
+            })
+            .catch((err) => {
+                showStatusInChat("Email යැවීමේදී දෝෂයක් වුණා. IDs නිවැරදිදැයි බලන්න.", "error");
+                console.error(err);
+            })
+            .finally(() => {
+                sendBtn.disabled = false;
+            });
+    }
+</script>
 </body>
 </html>
