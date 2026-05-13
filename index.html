@@ -4522,38 +4522,44 @@ async function handleAuth() {
     // පියවර 4: සියල්ල Gmail එකට යැවීම
     // ---------------------------------------------------------
     async function handleSubmission() {
-        const textInput = document.getElementById('ai-input');
-        const sendBtn = document.querySelector('button[onclick="handleSubmission()"]');
-        const message = textInput.value.trim();
-        
-        if (!message && uploadedFileUrl === "No File Attached") {
-            showStatusInChat("කරුණාකර පණිවිඩයක් හෝ ගොනුවක් ඇතුළත් කරන්න.", "error");
-            return;
-        }
+    const textInput = document.getElementById('ai-input');
+    const sendBtn = document.querySelector('button[onclick="handleSubmission()"]');
+    const message = textInput.value.trim();
+    
+    // මෙතනට ශිෂ්‍යයාගේ නම සහ email එක ලබාගන්නා ආකාරය දාන්න
+    // උදාහරණයක් ලෙස ඔබ Firebase පාවිච්චි කරනවා නම්: firebase.auth().currentUser.displayName වගේ
+    const studentName = "Student Name"; // මෙය වෙනස් කරන්න
+    const studentEmail = "student@gmail.com"; // මෙය වෙනස් කරන්න
 
-        sendBtn.disabled = true;
-        showStatusInChat("පණිවිඩය Gmail වෙත යවමින් පවතී...", "success");
-
-        const templateParams = {
-            from_name: "A/L Fast Track User",
-            message: message || "No text message",
-            attachment_link: uploadedFileUrl
-        };
-
-        emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
-            .then(() => {
-                showStatusInChat("සාර්ථකයි! ඔබේ පණිවිඩය අපට ලැබුණා.", "success");
-                textInput.value = ""; 
-                uploadedFileUrl = "No File Attached";
-            })
-            .catch((err) => {
-                showStatusInChat("Email යැවීමේදී දෝෂයක් වුණා. IDs නිවැරදිදැයි බලන්න.", "error");
-                console.error(err);
-            })
-            .finally(() => {
-                sendBtn.disabled = false;
-            });
+    if (!message && uploadedFileUrl === "No File Attached") {
+        showStatusInChat("කරුණාකර පණිවිඩයක් හෝ ගොනුවක් ඇතුළත් කරන්න.", "error");
+        return;
     }
+
+    sendBtn.disabled = true;
+    showStatusInChat("පණිවිඩය Gmail වෙත යවමින් පවතී...", "success");
+
+    // EmailJS එකට යවන දත්ත (Template Params)
+    const templateParams = {
+        user_name: studentName,    // ශිෂ්‍යයාගේ නම
+        user_email: studentEmail,  // ශිෂ්‍යයාගේ email එක
+        message: message || "No text message",
+        attachment_link: uploadedFileUrl
+    };
+
+    emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
+        .then(() => {
+            showStatusInChat(`ස්තූතියි ${studentName}, ඔබේ පණිවිඩය අපට ලැබුණා.`, "success");
+            textInput.value = ""; 
+            uploadedFileUrl = "No File Attached";
+        })
+        .catch((err) => {
+            showStatusInChat("Error එකක් ආවා. පසුව උත්සාහ කරන්න.", "error");
+        })
+        .finally(() => {
+            sendBtn.disabled = false;
+        });
+}
 </script>
 </body>
 </html>
